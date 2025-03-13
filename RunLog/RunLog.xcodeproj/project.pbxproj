@@ -6,6 +6,13 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		16F688C22D82972000C2163F /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 16F688C12D82972000C2163F /* SnapKit */; };
+		16F688C52D82972900C2163F /* Then in Frameworks */ = {isa = PBXBuildFile; productRef = 16F688C42D82972900C2163F /* Then */; };
+		16F688C82D82974E00C2163F /* CombineMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 16F688C72D82974E00C2163F /* CombineMoya */; };
+		16F688CA2D82974E00C2163F /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = 16F688C92D82974E00C2163F /* Moya */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		16F686B72D827D6C00C2163F /* RunLog.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RunLog.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -36,6 +43,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				16F688C22D82972000C2163F /* SnapKit in Frameworks */,
+				16F688C52D82972900C2163F /* Then in Frameworks */,
+				16F688CA2D82974E00C2163F /* Moya in Frameworks */,
+				16F688C82D82974E00C2163F /* CombineMoya in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +89,10 @@
 			);
 			name = RunLog;
 			packageProductDependencies = (
+				16F688C12D82972000C2163F /* SnapKit */,
+				16F688C42D82972900C2163F /* Then */,
+				16F688C72D82974E00C2163F /* CombineMoya */,
+				16F688C92D82974E00C2163F /* Moya */,
 			);
 			productName = RunLog;
 			productReference = 16F686B72D827D6C00C2163F /* RunLog.app */;
@@ -107,6 +122,11 @@
 			);
 			mainGroup = 16F686AE2D827D6C00C2163F;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				16F688C02D82972000C2163F /* XCRemoteSwiftPackageReference "SnapKit" */,
+				16F688C32D82972900C2163F /* XCRemoteSwiftPackageReference "Then" */,
+				16F688C62D82974E00C2163F /* XCRemoteSwiftPackageReference "Moya" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 16F686B82D827D6C00C2163F /* Products */;
 			projectDirPath = "";
@@ -349,6 +369,56 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		16F688C02D82972000C2163F /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SnapKit/SnapKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.7.1;
+			};
+		};
+		16F688C32D82972900C2163F /* XCRemoteSwiftPackageReference "Then" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/devxoul/Then";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.0.0;
+			};
+		};
+		16F688C62D82974E00C2163F /* XCRemoteSwiftPackageReference "Moya" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Moya/Moya.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 15.0.3;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		16F688C12D82972000C2163F /* SnapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 16F688C02D82972000C2163F /* XCRemoteSwiftPackageReference "SnapKit" */;
+			productName = SnapKit;
+		};
+		16F688C42D82972900C2163F /* Then */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 16F688C32D82972900C2163F /* XCRemoteSwiftPackageReference "Then" */;
+			productName = Then;
+		};
+		16F688C72D82974E00C2163F /* CombineMoya */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 16F688C62D82974E00C2163F /* XCRemoteSwiftPackageReference "Moya" */;
+			productName = CombineMoya;
+		};
+		16F688C92D82974E00C2163F /* Moya */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 16F688C62D82974E00C2163F /* XCRemoteSwiftPackageReference "Moya" */;
+			productName = Moya;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 16F686AF2D827D6C00C2163F /* Project object */;
 }
