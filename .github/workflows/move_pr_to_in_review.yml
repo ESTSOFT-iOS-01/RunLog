@@ -8,6 +8,9 @@ jobs:
   move_pr_to_in_review:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository  # ✅ GitHub 레포지토리 가져오기
+        uses: actions/checkout@v4  
+
       - name: Move PR to In Review in GitHub Project
         run: |
           PR_ID=$(gh pr view ${{ github.event.pull_request.number }} --json id -q ".id")
