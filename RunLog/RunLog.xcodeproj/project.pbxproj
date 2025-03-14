@@ -35,7 +35,6 @@
 				Sources/Presentation/Run/View/.gitkeep,
 				Sources/Presentation/Run/ViewModel/.gitkeep,
 				Sources/Presentation/Setting/Coordinator/.gitkeep,
-				Sources/Presentation/Setting/View/.gitkeep,
 				Sources/Presentation/Setting/ViewModel/.gitkeep,
 				Sources/Util/Extension/.gitkeep,
 			);
