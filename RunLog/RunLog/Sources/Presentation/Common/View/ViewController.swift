@@ -25,6 +25,10 @@ class ViewController: UIViewController {
         $0.setImage(UIImage(systemName: DesignSystemIcon.closeButton.name), for: .normal)
         $0.backgroundColor = UIColor.orange
     }
+    
+    var lbl = UILabel().then {
+        $0.font = .LRHeading1
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .red
