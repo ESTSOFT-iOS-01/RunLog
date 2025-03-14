@@ -75,7 +75,7 @@ final class MypageProfileView: UIView {
     private func setupLayout() {
         nameLabel.snp.makeConstraints {
             $0.leading.equalToSuperview().offset(24)
-            $0.top.equalToSuperview().offset(40)
+            $0.top.equalToSuperview().offset(146)
         }
         
         despLabel.snp.makeConstraints {
