@@ -8,6 +8,10 @@
 import Foundation
 
 struct AppConfig {
-  var nickname: String
-  var unitDistance: Double
+    var nickname: String
+    var totalDistance: Double
+    var streakDays: Int
+    var totalDays: Int
+    
+    var unitDistance: Double
 }

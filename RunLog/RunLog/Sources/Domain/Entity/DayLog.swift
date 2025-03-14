@@ -8,16 +8,16 @@
 import Foundation
 
 struct DayLog {
-  let date: Date
-  let locationName: String
-  let weather: Int
-  let temperature: Int
-  
-  var trackImage: Data
-  var title: String
-  var level: Int
-  var totalTime: TimeInterval
-  var totalDistance: Double
-  var totalSteps: Int
-  var sections: [Section]
+    let date: Date
+    let locationName: String
+    let weather: Int
+    let temperature: Int
+    
+    var trackImage: Data
+    var title: String
+    var level: Int
+    var totalTime: TimeInterval
+    var totalDistance: Double
+    var totalSteps: Int
+    var sections: [Section]
 }

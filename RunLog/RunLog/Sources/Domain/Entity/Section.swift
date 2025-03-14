@@ -8,13 +8,13 @@
 import Foundation
 
 struct Section {
-  var distance: Double
-  var steps: Int
-  var route: [Point]
+    var distance: Double
+    var steps: Int
+    var route: [Point]
 }
 
 struct Point {
-  var latitude: Double
-  var longitude: Double
-  var timestamp: Date
+    var latitude: Double
+    var longitude: Double
+    var timestamp: Date
 }
