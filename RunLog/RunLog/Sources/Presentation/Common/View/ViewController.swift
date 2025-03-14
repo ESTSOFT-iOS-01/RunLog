@@ -11,23 +11,16 @@ import SnapKit
 
 class ViewController: UIViewController {
     var label = UILabel().then {
-        $0.attributedText = DesignSystemFont.Title.attributedString(
-            for: "Hello World!",
-            color: DesignSystemColor.Gray00.value
-        )
+        $0.attributedText = .RLAttributedString(text: "Hello World!", font: .Heading1, align: .center)
         $0.backgroundColor = .blue
     }
     var closeButton = UIButton().then {
-        $0.setAttributedTitle(DesignSystemFont.Heading1.attributedString(
-            for: "닫기",
-            color: DesignSystemColor.Gray00.value
-        ), for: .normal)
-        $0.setImage(UIImage(systemName: DesignSystemIcon.closeButton.name), for: .normal)
+        $0.setAttributedTitle(.RLAttributedString(text: "닫기", font: .Button, align: .center), for: .normal)
+        $0.setImage(UIImage(systemName: RLIcon.closeButton.name), for: .normal)
         $0.backgroundColor = UIColor.orange
     }
-    
     var lbl = UILabel().then {
-        $0.font = .LRHeading1
+        $0.font = .RLHeading1
     }
     override func viewDidLoad() {
         super.viewDidLoad()
