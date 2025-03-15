@@ -13,6 +13,7 @@ import Combine
 final class LogViewController: UIViewController {
     
     // MARK: - DI
+    private let logView = LogView()
     private let viewModel: LogViewModel
     private var cancellables = Set<AnyCancellable>()
     
@@ -50,11 +51,16 @@ final class LogViewController: UIViewController {
     // MARK: - Setup UI
     private func setupUI() {
         // UI 요소 추가
+        view.addSubview(logView)
+        logView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
     }
     
     // MARK: - Setup Navigation Bar
     private func setupNavigationBar() {
         // 네비게이션바 디테일 설정
+        title = "LOGO"
     }
 
     // MARK: - Setup Gesture

@@ -13,6 +13,7 @@ final class LogView: UIView {
     
     // MARK: - UI Components 선언
     
+    
     // MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: frame)
