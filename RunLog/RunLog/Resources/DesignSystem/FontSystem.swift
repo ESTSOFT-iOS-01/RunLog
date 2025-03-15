@@ -106,7 +106,10 @@ extension UIFont {
         return UIFont(name: RLFont.semiBold.rawValue, size: 18) ?? UIFont.systemFont(ofSize: 18, weight: .semibold)
     }
     public static var RLHeadline2: UIFont {
-        return UIFont(name: RLFont.regular.rawValue, size: 18) ?? UIFont.systemFont(ofSize: 18, weight: .semibold)
+        return UIFont(name: RLFont.regular.rawValue, size: 18) ?? UIFont.systemFont(ofSize: 18, weight: .regular)
+    }
+    public static var RLHeadline3: UIFont {
+        return UIFont(name: RLFont.semiBold.rawValue, size: 18) ?? UIFont.systemFont(ofSize: 18, weight: .semibold)
     }
     // MARK: - Title
     public static var RLTitle: UIFont {
@@ -120,21 +123,21 @@ extension UIFont {
     }
     // MARK: - etc
     public static var RLBody1: UIFont {
-        return UIFont(name: RLFont.regular.rawValue, size: 16) ?? UIFont.systemFont(ofSize: 16, weight: .semibold)
+        return UIFont(name: RLFont.regular.rawValue, size: 16) ?? UIFont.systemFont(ofSize: 16, weight: .regular)
     }
     public static var RLLabel1: UIFont {
-        return UIFont(name: RLFont.bold.rawValue, size: 14) ?? UIFont.systemFont(ofSize: 14, weight: .semibold)
+        return UIFont(name: RLFont.bold.rawValue, size: 14) ?? UIFont.systemFont(ofSize: 14, weight: .bold)
     }
     public static var RLLabel2: UIFont {
-        return UIFont(name: RLFont.regular.rawValue, size: 14) ?? UIFont.systemFont(ofSize: 14, weight: .semibold)
+        return UIFont(name: RLFont.regular.rawValue, size: 14) ?? UIFont.systemFont(ofSize: 14, weight: .regular)
     }
     public static var RLButton: UIFont {
-        return UIFont(name: RLFont.medium.rawValue, size: 24) ?? UIFont.systemFont(ofSize: 24, weight: .semibold)
+        return UIFont(name: RLFont.medium.rawValue, size: 24) ?? UIFont.systemFont(ofSize: 24, weight: .medium)
     }
     public static var RLSegment1: UIFont {
         return UIFont(name: RLFont.semiBold.rawValue, size: 16) ?? UIFont.systemFont(ofSize: 16, weight: .semibold)
     }
     public static var RLSegment2: UIFont {
-        return UIFont(name: RLFont.medium.rawValue, size: 16) ?? UIFont.systemFont(ofSize: 16, weight: .semibold)
+        return UIFont(name: RLFont.medium.rawValue, size: 16) ?? UIFont.systemFont(ofSize: 16, weight: .medium)
     }
 }

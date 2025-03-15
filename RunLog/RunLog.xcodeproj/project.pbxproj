@@ -35,9 +35,6 @@
 				Sources/Presentation/Run/View/.gitkeep,
 				Sources/Presentation/Run/ViewModel/.gitkeep,
 				Sources/Presentation/Setting/Coordinator/.gitkeep,
-				Sources/Presentation/Setting/View/.gitkeep,
-				Sources/Presentation/Setting/ViewModel/.gitkeep,
-				Sources/Util/Extension/.gitkeep,
 			);
 			target = 16F686B62D827D6C00C2163F /* RunLog */;
 		};
