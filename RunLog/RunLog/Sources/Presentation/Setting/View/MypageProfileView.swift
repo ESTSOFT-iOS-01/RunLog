@@ -49,6 +49,16 @@ final class MypageProfileView: UIView {
         return stackView
     }()
     
+    public lazy var tableView = UITableView(frame: .zero, style: .plain).then {
+        $0.backgroundColor = .clear
+        $0.separatorStyle = .none
+        $0.sectionHeaderTopPadding = 4
+        $0.rowHeight = 48
+        $0.contentInsetAdjustmentBehavior = .never
+        $0.isScrollEnabled = false
+        $0.bounces = false
+        $0.register(SettingMenuCell.self, forCellReuseIdentifier: SettingMenuCell.identifier)
+    }
     
     // MARK: - Init
     init(nickname: String = "사용자", totalDistance: Double = 0.0, logCount: Int = 0, streakCount: Int = 0) {
@@ -68,24 +78,29 @@ final class MypageProfileView: UIView {
     
     // MARK: - Setup UI
     private func setupUI() {
-        self.addSubviews(nameLabel, despLabel, cardStackView)
+        self.addSubviews(nameLabel, despLabel, cardStackView, tableView)
     }
     
     // MARK: - Setup Layout
     private func setupLayout() {
         nameLabel.snp.makeConstraints {
-            $0.leading.equalToSuperview().offset(24)
+            $0.leading.trailing.equalToSuperview()
             $0.top.equalToSuperview().offset(146)
         }
         
         despLabel.snp.makeConstraints {
-            $0.leading.equalTo(nameLabel.snp.leading)
+            $0.leading.trailing.equalToSuperview()
             $0.top.equalTo(nameLabel.snp.bottom).offset(4)
         }
         
         cardStackView.snp.makeConstraints {
-            $0.leading.trailing.equalToSuperview().inset(24)
+            $0.leading.trailing.equalToSuperview()
             $0.top.equalTo(despLabel.snp.bottom).offset(24)
+        }
+        
+        tableView.snp.makeConstraints {
+            $0.top.equalTo(cardStackView.snp.bottom).offset(40)
+            $0.leading.trailing.bottom.equalToSuperview()
         }
     }
     

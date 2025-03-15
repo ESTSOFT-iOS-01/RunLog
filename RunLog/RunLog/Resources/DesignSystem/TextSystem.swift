@@ -8,7 +8,7 @@
 import UIKit
 
 extension NSAttributedString {
-    public static func RLAttributedString(text: String, font: RLFont, color: UIColor = .black, align: NSTextAlignment = .left) -> NSAttributedString {
+    public static func RLAttributedString(text: String, font: RLFont, color: UIColor = .Gray000, align: NSTextAlignment = .left) -> NSAttributedString {
         
         let lineHeight = font.value.lineHeight * font.lineHeightMultiple
         

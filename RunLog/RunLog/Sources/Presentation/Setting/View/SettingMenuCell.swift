@@ -9,10 +9,13 @@ import UIKit
 import SnapKit
 import Then
 
-class SettingMenuCell: UITableViewCell {
+final class SettingMenuCell: UITableViewCell {
+    // MARK: - Identifier
+    static let identifier = "SettingMenuCell"
+    
     // MARK: - UI Components
     lazy var titleLabel = UILabel().then {
-        $0.attributedText = .RLAttributedString(text: "메뉴", font: .Body2)
+        $0.attributedText = .RLAttributedString(text: "메뉴", font: .Body2, color: .Gray000)
     }
     
     private lazy var arrowImageView = UIImageView().then {
@@ -33,8 +36,15 @@ class SettingMenuCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - Prepare For Reuse
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        titleLabel.attributedText = nil
+    }
+    
     // MARK: - Setup UI
     private func setupUI() {
+        contentView.backgroundColor = .clear
         selectionStyle = .none
         contentView.addSubviews(titleLabel, arrowImageView)
     }
@@ -42,12 +52,12 @@ class SettingMenuCell: UITableViewCell {
     // MARK: - Setup Layout
     private func setupLayout() {
         titleLabel.snp.makeConstraints {
-            $0.leading.equalToSuperview().offset(16)
+            $0.leading.equalToSuperview().offset(4)
             $0.centerY.equalToSuperview()
         }
         
         arrowImageView.snp.makeConstraints {
-            $0.trailing.equalToSuperview().inset(16)
+            $0.trailing.equalToSuperview().inset(4)
             $0.centerY.equalToSuperview()
             $0.height.equalTo(16)
         }
@@ -55,7 +65,7 @@ class SettingMenuCell: UITableViewCell {
     
     // MARK: - Configure
     func configure(title: String) {
-        titleLabel.text = title
+        titleLabel.attributedText = .RLAttributedString(text: title, font: .Body2, color: .Gray000)
     }
 
 }

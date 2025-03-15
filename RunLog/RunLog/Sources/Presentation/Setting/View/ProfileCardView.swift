@@ -88,15 +88,15 @@ final class ProfileCardView: UIView {
         let valueStr = value.formattedWithComma()
         switch property {
         case .logCount:
-            propertyTitle.attributedText = .RLAttributedString(text: "운동 기록", font: .Label1)
+            propertyTitle.attributedText = .RLAttributedString(text: "운동 기록", font: .Label1, color: .Gray900)
             iconImg.image = UIImage(systemName: RLIcon.document.name)?
                 .applyingSymbolConfiguration(UIImage.SymbolConfiguration(pointSize: 32, weight: .medium))
-            propertyValue.attributedText = .RLAttributedString(text: "\(valueStr)건", font: .Headline1)
+            propertyValue.attributedText = .RLAttributedString(text: "\(valueStr)건", font: .Headline1, color: .Gray900)
         case .streak:
-            propertyTitle.attributedText = .RLAttributedString(text: "연속 스트릭", font: .Label1)
+            propertyTitle.attributedText = .RLAttributedString(text: "연속 스트릭", font: .Label1, color: .Gray900)
             iconImg.image = UIImage(systemName: RLIcon.streak.name)?
                 .applyingSymbolConfiguration(UIImage.SymbolConfiguration(pointSize: 32, weight: .medium))
-            propertyValue.attributedText = .RLAttributedString(text: "\(valueStr)일", font: .Headline1)
+            propertyValue.attributedText = .RLAttributedString(text: "\(valueStr)일", font: .Headline1, color: .Gray900)
         }
     }
 }
