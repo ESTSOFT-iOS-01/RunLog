@@ -11,13 +11,13 @@ import SnapKit
 final class UnderlineSegmentedControl: UISegmentedControl {
     
     // MARK: - UI Components
+    private lazy var baseLineView = UIView().then {
+        $0.backgroundColor = .Gray500
+        self.addSubview($0)
+    }
+
     private lazy var underlineView = UIView().then {
-        let width = self.bounds.size.width / CGFloat(self.numberOfSegments)
-        let height = 2.0
-        let xPosition = CGFloat(self.selectedSegmentIndex) * width
-        let yPosition = self.bounds.size.height - 1.0
-        $0.frame = CGRect(x: xPosition, y: yPosition, width: width, height: height)
-        $0.backgroundColor = .green
+        $0.backgroundColor = .LightGreen
         self.addSubview($0)
     }
     
@@ -30,6 +30,7 @@ final class UnderlineSegmentedControl: UISegmentedControl {
     
     override init(items: [Any]?) {
         super.init(items: items)
+        self.setupUI()
         self.removeBackgroundAndDivider()
     }
     
@@ -41,15 +42,56 @@ final class UnderlineSegmentedControl: UISegmentedControl {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        let underlineFinalXPosition = (self.bounds.width / CGFloat(self.numberOfSegments)) * CGFloat(self.selectedSegmentIndex)
-        UIView.animate(
-            withDuration: 0.1,
-            animations: {
-                self.underlineView.frame.origin.x = underlineFinalXPosition
-            }
+        let segmentWidth = self.bounds.width / CGFloat(self.numberOfSegments)
+        let height: CGFloat = 2.0
+        let yPosition = self.bounds.height - height
+        
+        baseLineView.frame = CGRect(
+            x: 0,
+            y: yPosition,
+            width: self.bounds.width,
+            height: height
         )
+
+        let underlineFinalXPosition = CGFloat(self.selectedSegmentIndex) * segmentWidth
+          UIView.animate(
+            withDuration: 0.1,
+            delay: 0,
+            options: .curveEaseInOut,
+            animations: {
+              self.underlineView.frame = CGRect(
+                x: underlineFinalXPosition,
+                y: yPosition,
+                width: segmentWidth,
+                height: height
+              )
+          })
     }
     
+    private func setupUI() {
+        
+        let unselectedColor: UIColor = .Gray500
+        let selectedColor: UIColor = .LightGreen
+        
+        self.setTitleTextAttributes([
+                NSAttributedString.Key.foregroundColor: unselectedColor,
+                .font: UIFont.RLSegment2
+            ],
+            for: .normal
+        )
+        self.setTitleTextAttributes([
+                NSAttributedString.Key.foregroundColor: selectedColor,
+                .font: UIFont.RLSegment1
+            ],
+            for: .selected
+        )
+        self.setContentPositionAdjustment(
+            UIOffset(horizontal: 0, vertical: -5),
+            forSegmentType: .any,
+            barMetrics: .default
+        )
+        self.clipsToBounds = false
+    }
 }
 
 extension UnderlineSegmentedControl {

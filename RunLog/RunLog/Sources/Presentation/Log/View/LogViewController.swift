@@ -8,77 +8,109 @@
 import UIKit
 import SnapKit
 import Then
-import Combine
 
 final class LogViewController: UIViewController {
     
-    // MARK: - DI
+    // MARK: - Properties
     private let logView = LogView()
-    private let viewModel: LogViewModel
-    private var cancellables = Set<AnyCancellable>()
+    private let vc1 = UIViewController().then { $0.view.backgroundColor = .red }
+    private let vc2 = UIViewController().then { $0.view.backgroundColor = .blue }
     
-    // MARK: - Init
-    init(viewModel: LogViewModel) {
-        self.viewModel = viewModel
-        super.init(nibName: nil, bundle: nil)
-    }
+    private lazy var dataViewControllers: [UIViewController] = [vc1, vc2]
+    private var currentPage: Int = 0
 
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
         setupNavigationBar()
-        setupGesture()
-        setupData()
-        bindViewModel()
+        setupActions()
     }
-    
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        self.navigationController?.setNavigationBarHidden(false, animated: animated)
+        navigationController?.setNavigationBarHidden(false, animated: animated)
     }
-    
+
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        self.navigationController?.setNavigationBarHidden(true, animated: false)
+        navigationController?.setNavigationBarHidden(true, animated: false)
     }
-    
-    
+
     // MARK: - Setup UI
     private func setupUI() {
-        // UI 요소 추가
         view.addSubview(logView)
         logView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
+        
+        logView.pageViewController.setViewControllers(
+            [dataViewControllers[0]],
+            direction: .forward,
+            animated: true
+        )
+        logView.pageViewController.delegate = self
+        logView.pageViewController.dataSource = self
     }
-    
+
     // MARK: - Setup Navigation Bar
     private func setupNavigationBar() {
-        // 네비게이션바 디테일 설정
         title = "LOGO"
     }
 
-    // MARK: - Setup Gesture
-    private func setupGesture() {
-        // 제스처 추가
+    private func setupActions() {
+        logView.segmentedControl.addTarget(
+            self,
+            action: #selector(changeValue(control:)),
+            for: .valueChanged
+        )
+    }
+}
+
+extension LogViewController {
+    // MARK: - Private Fucntions
+    @objc private func changeValue(control: UISegmentedControl) {
+        let newIndex = control.selectedSegmentIndex
+        let direction: UIPageViewController.NavigationDirection = newIndex > currentPage ? .forward : .reverse
+        
+        logView.pageViewController.setViewControllers(
+            [dataViewControllers[newIndex]],
+            direction: direction,
+            animated: true,
+            completion: nil
+        )
+        currentPage = newIndex
+    }
+}
+
+// MARK: - PageViewController Delegate & DataSource
+extension LogViewController: UIPageViewControllerDelegate, UIPageViewControllerDataSource {
+    
+    func pageViewController(
+        _ pageViewController: UIPageViewController,
+        viewControllerBefore viewController: UIViewController
+    ) -> UIViewController? {
+        guard let index = dataViewControllers.firstIndex(of: viewController), index - 1 >= 0 else { return nil }
+        return dataViewControllers[index - 1]
     }
     
-    // MARK: - Setup Data
-    private func setupData() {
-        // 초기 데이터 로드
+    func pageViewController(
+        _ pageViewController: UIPageViewController,
+        viewControllerAfter viewController: UIViewController
+    ) -> UIViewController? {
+        guard let index = dataViewControllers.firstIndex(of: viewController), index + 1 < dataViewControllers.count else { return nil }
+        return dataViewControllers[index + 1]
     }
-
-    // MARK: - Bind ViewModel
-    private func bindViewModel() {
-//        viewModel.output.something
-//            .sink { [weak self] value in
-//                // View 업데이트 로직
-//            }
-//            .store(in: &cancellables)
+    
+    func pageViewController(
+        _ pageViewController: UIPageViewController,
+        didFinishAnimating finished: Bool,
+        previousViewControllers: [UIViewController],
+        transitionCompleted completed: Bool
+    ) {
+        guard let viewController = pageViewController.viewControllers?.first,
+              let index = dataViewControllers.firstIndex(of: viewController) else { return }
+        currentPage = index
+        logView.segmentedControl.selectedSegmentIndex = index
     }
 }
