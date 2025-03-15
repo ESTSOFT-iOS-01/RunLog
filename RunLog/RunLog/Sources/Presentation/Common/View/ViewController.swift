@@ -39,7 +39,6 @@ class ViewController: UIViewController {
         // Do any additional setup after loading the view.
         [label, closeButton, rlBtn].forEach{ view.addSubview($0) }
         
-        
         view.addSubview(label)
         label.snp.makeConstraints {
             $0.centerX.centerY.equalToSuperview()

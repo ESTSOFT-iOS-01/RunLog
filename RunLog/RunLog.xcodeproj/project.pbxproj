@@ -32,7 +32,6 @@
 				Sources/Presentation/Log/View/.gitkeep,
 				Sources/Presentation/Log/ViewModel/.gitkeep,
 				Sources/Presentation/Run/Coordinator/.gitkeep,
-				Sources/Presentation/Run/View/.gitkeep,
 				Sources/Presentation/Run/ViewModel/.gitkeep,
 				Sources/Presentation/Setting/Coordinator/.gitkeep,
 				Sources/Presentation/Setting/View/.gitkeep,
@@ -183,7 +182,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 83K577A944;
+				DEVELOPMENT_TEAM = C5K6DF875Z;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = RunLog/Info.plist;
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "운동 거리 기록 및 시각화 정보 제공을 위한 위치 권한을 항상 혹은 앱 활성 시에만 허용하시겠습니까?";
@@ -200,7 +199,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.IEEE.RunLog;
+				PRODUCT_BUNDLE_IDENTIFIER = com.Syr.IEEE.RunLog;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -219,7 +218,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 83K577A944;
+				DEVELOPMENT_TEAM = C5K6DF875Z;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = RunLog/Info.plist;
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "운동 거리 기록 및 시각화 정보 제공을 위한 위치 권한을 항상 혹은 앱 활성 시에만 허용하시겠습니까?";
@@ -236,7 +235,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.IEEE.RunLog;
+				PRODUCT_BUNDLE_IDENTIFIER = com.Syr.IEEE.RunLog;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;

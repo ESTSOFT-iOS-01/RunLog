@@ -10,6 +10,7 @@ import Foundation
 // MARK: - 아이콘
 enum RLIcon {
     case closeButton
+    case weather
 }
 
 extension RLIcon {
@@ -17,6 +18,8 @@ extension RLIcon {
         switch self {
         case .closeButton:
             return "xmark"
+        case .weather:
+            return "thermometer.medium"
         }
     }
 }
