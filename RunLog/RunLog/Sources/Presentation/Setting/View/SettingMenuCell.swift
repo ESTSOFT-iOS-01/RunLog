@@ -19,7 +19,7 @@ final class SettingMenuCell: UITableViewCell {
     }
     
     private lazy var arrowImageView = UIImageView().then {
-        $0.image = UIImage(systemName: "chevron.right")?
+        $0.image = UIImage(systemName: RLIcon.rightArrow.name)?
             .applyingSymbolConfiguration(UIImage.SymbolConfiguration(pointSize: 16, weight: .regular))
         $0.tintColor = .Gray300
         $0.contentMode = .scaleAspectFit

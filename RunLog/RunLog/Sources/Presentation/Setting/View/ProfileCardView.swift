@@ -85,7 +85,7 @@ final class ProfileCardView: UIView {
     
     // MARK: - Configure
     func configure(property: ProfileCardType, value: Int) {
-        let valueStr = value.formattedWithComma()
+        let valueStr = value.formattedString
         switch property {
         case .logCount:
             propertyTitle.attributedText = .RLAttributedString(text: "운동 기록", font: .Label1, color: .Gray900)

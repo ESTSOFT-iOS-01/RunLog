@@ -109,33 +109,3 @@ final class MypageProfileView: UIView {
         // 뷰 설정
     }
 }
-
-
-//#if canImport(SwiftUI) && DEBUG
-//import SwiftUI
-//
-//struct MypageProfileView_Preview: PreviewProvider {
-//    static var previews: some View {
-//        UIViewPreview {
-//            MypageProfileView(nickname: "행복한쿼카러너", totalDistance: 12.3, logCount: 50, streakCount: 10)
-//        }
-//        .previewLayout(.sizeThatFits) // 크기를 적절하게 조절하여 미리보기 가능
-//        .padding()
-//    }
-//}
-//
-//// UIKit 뷰를 SwiftUI에서 렌더링하는 Helper
-//struct UIViewPreview<T: UIView>: UIViewRepresentable {
-//    let viewBuilder: () -> T
-//    
-//    init(_ viewBuilder: @escaping () -> T) {
-//        self.viewBuilder = viewBuilder
-//    }
-//    
-//    func makeUIView(context: Context) -> T {
-//        return viewBuilder()
-//    }
-//    
-//    func updateUIView(_ uiView: T, context: Context) {}
-//}
-//#endif
