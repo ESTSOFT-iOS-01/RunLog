@@ -11,6 +11,7 @@ import Then
 import Combine
 import MapKit
 
+// RunningView랑 CardView에서만 사용하는 타입 - 어디로빼야할지 고민
 struct SectionRecord {
     var sectionTime: TimeInterval // 시간
     var distance: Double // 거리
@@ -22,6 +23,7 @@ final class RunningViewController: UIViewController {
     // MARK: - DI
 //    private let viewModel: ViewModelType
     private var cancellables = Set<AnyCancellable>()
+    // 더미데이터
     var record = SectionRecord(
         sectionTime: 12 * 60 + 23,
         distance: 0.93,
@@ -121,13 +123,13 @@ final class RunningViewController: UIViewController {
     private func setupGesture() {
         // 제스처 추가
         cardView.finishButton.addTarget(self, action: #selector(finishButtonTouch), for: .touchUpInside)
-        foldButton.addTarget(self, action: #selector(foldButtonTouch), for: .touchUpInside)
-        unfoldButton.addTarget(self, action: #selector(unfoldButtonTouch), for: .touchUpInside)
+        foldButton.addTarget(self, action: #selector(toggleCardView), for: .touchUpInside)
+        unfoldButton.addTarget(self, action: #selector(toggleCardView), for: .touchUpInside)
     }
     
     // MARK: - Setup Data
     private func setupData() {
-        // 초기 데이터 로드
+        // 초기 데이터 로드 - 현재 더미 데이터 상태
         cardView.timeLabel.record = record
         cardView.distanceLabel.record = record
         cardView.stepsLabel.record = record
@@ -145,19 +147,11 @@ final class RunningViewController: UIViewController {
 
 extension RunningViewController {
     @objc private func finishButtonTouch(sender: UIButton) {
-        print("종료 버튼 클릭")
         self.dismiss(animated: false)
     }
-    @objc private func foldButtonTouch(sender: UIButton) {
-        print("닫기 버튼 클릭")
-        self.cardView.isHidden = true
-        self.foldButton.isHidden = true
-        self.unfoldButton.isHidden = false
-    }
-    @objc private func unfoldButtonTouch(sender: UIButton) {
-        print("열기 버튼 클릭")
-        self.cardView.isHidden = false
-        self.foldButton.isHidden = false
-        self.unfoldButton.isHidden = true
+    @objc private func toggleCardView(sender: UIButton) {
+        self.cardView.isHidden.toggle()
+        self.foldButton.isHidden.toggle()
+        self.unfoldButton.isHidden.toggle()
     }
 }

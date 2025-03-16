@@ -11,6 +11,7 @@ import MapKit
 
 final class LocationManager {
     static var shared: LocationManager = LocationManager()
+    
     var curLocationStr: NSAttributedString {
         let str = currentLocation()
         return .RLAttributedString(text: str, font: .Label2, color: .Gray000, align: .center)

@@ -10,6 +10,7 @@ import SnapKit
 import Then
 
 final class CardElementView: UIView {
+    // record로 안받고 value로 값만 받을려면 Any로 선언해서 configue에서 캐스팅 해줘도 될듯?
     var record: SectionRecord? {
         didSet {
             configure()
