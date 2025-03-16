@@ -11,6 +11,7 @@ import Foundation
 enum RLIcon {
     case foldButton
     case weather
+    case unfoldButton
 }
 
 extension RLIcon {
@@ -18,6 +19,8 @@ extension RLIcon {
         switch self {
         case .foldButton:
             return "xmark"
+        case .unfoldButton:
+            return "heart.text.square"
         case .weather:
             return "thermometer.medium"
         }

@@ -46,6 +46,10 @@ final class RunningViewController: UIViewController {
     var unfoldButton = UIButton().then {
         $0.backgroundColor = .LightGreen
         $0.layer.cornerRadius = 40
+        $0.setImage(UIImage(systemName: RLIcon.unfoldButton.name), for: .normal)
+        $0.tintColor = .Gray900
+        let sfConfig = UIImage.SymbolConfiguration(pointSize: 32, weight: .medium)
+        $0.setPreferredSymbolConfiguration(sfConfig, forImageIn: .normal)
         $0.isHidden = true
     }
     
@@ -103,8 +107,8 @@ final class RunningViewController: UIViewController {
         }
         unfoldButton.snp.makeConstraints {
             $0.width.height.equalTo(80)
-            $0.trailing.equalToSuperview().inset(40)
-            $0.bottom.equalToSuperview().inset(64)
+            $0.trailing.equalToSuperview().inset(16)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(24)
         }
     }
     
