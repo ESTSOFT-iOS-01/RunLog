@@ -44,7 +44,8 @@ final class MapBlurView: UIView {
         [background1, background2, background3].forEach { self.addSubview($0) }
         // 블러 효과가 올라가는 뷰
         background2.snp.makeConstraints {
-            $0.leading.trailing.centerY.equalToSuperview()
+            $0.centerY.equalToSuperview().offset(30)
+            $0.leading.trailing.equalToSuperview()
             $0.height.equalTo(UIScreen.main.bounds.width)
         }
         // 블러 효과 위쪽 뷰
@@ -78,7 +79,7 @@ final class MapBlurView: UIView {
         
         gradientLayer.locations = [0.4, 0.6, 0.8, 1.0]
         gradientLayer.startPoint = CGPoint(x: 0.5, y: 0.5)
-        gradientLayer.endPoint = CGPoint(x: 0.95, y: 0.95)
+        gradientLayer.endPoint = CGPoint(x: 1.0, y: 1.0)
         
         background2.layer.addSublayer(gradientLayer)
     }

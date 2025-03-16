@@ -9,14 +9,14 @@ import Foundation
 
 // MARK: - 아이콘
 enum RLIcon {
-    case closeButton
+    case foldButton
     case weather
 }
 
 extension RLIcon {
     var name: String {
         switch self {
-        case .closeButton:
+        case .foldButton:
             return "xmark"
         case .weather:
             return "thermometer.medium"

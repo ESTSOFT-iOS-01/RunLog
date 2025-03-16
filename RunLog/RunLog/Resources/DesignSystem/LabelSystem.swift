@@ -77,6 +77,7 @@ final class RLLabel: UIView {
             }
         }
     }
+    /// 아이콘 이미지 설정
     public func setImage(image: UIImage?) {
         self.icon.image = image
         self.icon.tintColor = .Gray000

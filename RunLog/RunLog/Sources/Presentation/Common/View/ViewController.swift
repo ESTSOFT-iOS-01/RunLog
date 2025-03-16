@@ -18,7 +18,7 @@ class ViewController: UIViewController {
     
     var closeButton = UIButton().then {
         $0.setAttributedTitle(.RLAttributedString(text: "닫기", font: .Button, align: .center), for: .normal)
-        $0.setImage(UIImage(systemName: RLIcon.closeButton.name), for: .normal)
+        $0.setImage(UIImage(systemName: RLIcon.foldButton.name), for: .normal)
         $0.backgroundColor = UIColor.orange
     }
     

@@ -18,16 +18,18 @@ final class RunHomeViewController: UIViewController {
     private var cancellables = Set<AnyCancellable>()
     
     // MARK: - UI
+    var mapView = MKMapView()
     var totalLabel = UILabel().then {
         $0.numberOfLines = 3
     }
     var weatherLabel = RLLabel().then {
         $0.setImage(image: UIImage(systemName: RLIcon.weather.name))
     }
-    var mapView = MKMapView()
-    var blueView = MapBlurView()
+    var blurView = MapBlurView()
     var locationLabel = UILabel()
-    var startButton = ExerciseStartButton()
+    var startButton = RLButton(title: "운동 시작하기", titleColor: .Gray900).then {
+        $0.clipsToBounds = true
+    }
     // MARK: - Init
     init() {
 //        self.viewModel = viewModel
@@ -63,7 +65,7 @@ final class RunHomeViewController: UIViewController {
     private func setupUI() {
         // UI 요소 추가
         view.backgroundColor = .systemBackground
-        view.addSubviews(mapView, blueView, totalLabel, weatherLabel, locationLabel, startButton)
+        view.addSubviews(mapView, blurView, totalLabel, weatherLabel, locationLabel, startButton)
         // 상단 레이블
         totalLabel.snp.makeConstraints {
             $0.top.leading.equalTo(view.safeAreaLayoutGuide).offset(36)
@@ -76,14 +78,13 @@ final class RunHomeViewController: UIViewController {
         mapView.snp.makeConstraints {
             $0.top.bottom.leading.trailing.equalToSuperview()
         }
-        blueView.snp.makeConstraints {
+        blurView.snp.makeConstraints {
             $0.top.bottom.leading.trailing.equalTo(mapView)
         }
         // 운동 시작 버튼
         startButton.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(52)
             $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(40)
-            $0.height.equalTo(63)
         }
         // 위치 레이블
         locationLabel.snp.makeConstraints {
@@ -130,6 +131,7 @@ final class RunHomeViewController: UIViewController {
 // MARK: - private functions
 extension RunHomeViewController {
     private func totalLabelCreate() {
+        // 여기서 사용자의 데이터를 받아오면 될듯
         let nickname = "행복한 쿼카러너화이팅"
         let road = "올레길"
         let number = "2.5"
@@ -142,5 +144,8 @@ extension RunHomeViewController {
     }
     @objc private func startButtonTouch(sender: UIButton) {
         print("운동 시작하기 버튼 클릭")
+        let vc = RunningViewController()
+        vc.modalPresentationStyle = .fullScreen
+        self.present(vc, animated: false)
     }
 }
