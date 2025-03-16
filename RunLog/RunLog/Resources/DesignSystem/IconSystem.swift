@@ -13,6 +13,7 @@ enum RLIcon {
     case document
     case streak
     case rightArrow
+    case play
 }
 
 extension RLIcon {
@@ -26,6 +27,8 @@ extension RLIcon {
             return "leaf"
         case .rightArrow:
             return "chevron.right"
+        case .play:
+            return "play"
         }
     }
 }
