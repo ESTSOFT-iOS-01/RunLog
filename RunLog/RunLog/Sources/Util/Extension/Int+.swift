@@ -9,9 +9,9 @@ import Foundation
 
 extension Int {
     /// 3자리마다 콤마(,)를 추가하여 문자열로 변환
-    func formattedWithComma() -> String {
-        let numberFormatter = NumberFormatter()
-        numberFormatter.numberStyle = .decimal
-        return numberFormatter.string(from: NSNumber(value: self)) ?? "\(self)"
+    var formattedString: String {
+      let numberFormatter = NumberFormatter()
+      numberFormatter.numberStyle = .decimal
+      return numberFormatter.string(from: NSNumber(value: self)) ?? "\(self)"
     }
 }

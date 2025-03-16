@@ -17,6 +17,7 @@ public enum RLColor {
     case Gray900
 
     case LightGreen
+    case LightGreen80
     case LightBlue
     case LightOrange
     case LightPink
@@ -53,6 +54,10 @@ extension UIColor {
     
     public static var LightGreen: UIColor {
         return UIColor(hex: "#B1F7B1")
+    }
+    
+    public static var LightGreen80: UIColor {
+        return UIColor(hex: "#B1F7B1", alpha: 0.8)
     }
     
     public static var LightBlue: UIColor {
