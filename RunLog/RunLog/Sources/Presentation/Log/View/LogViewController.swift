@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Combine
 import SnapKit
 import Then
 
@@ -13,18 +14,17 @@ final class LogViewController: UIViewController {
     
     // MARK: - Properties
     private let logView = LogView()
-    private let vc1 = UIViewController().then { $0.view.backgroundColor = .red }
-    private let vc2 = UIViewController().then { $0.view.backgroundColor = .blue }
+    private let logViewModel = LogViewModel()
     
-    private lazy var dataViewControllers: [UIViewController] = [vc1, vc2]
+    private var dataViewControllers: [UIViewController] = []
     private var currentPage: Int = 0
+    private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
         setupNavigationBar()
-        setupActions()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -39,16 +39,31 @@ final class LogViewController: UIViewController {
 
     // MARK: - Setup UI
     private func setupUI() {
+        dataViewControllers.append(
+            CalendarViewController(viewModel: logViewModel)
+        )
+        
+        dataViewControllers.append(
+            TimelineViewController(viewModel: logViewModel)
+        )
+        
         view.addSubview(logView)
         logView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
+        
+        logView.segmentedControl.addTarget(
+            self,
+            action: #selector(changeValue(control:)),
+            for: .valueChanged
+        )
         
         logView.pageViewController.setViewControllers(
             [dataViewControllers[0]],
             direction: .forward,
             animated: true
         )
+        
         logView.pageViewController.delegate = self
         logView.pageViewController.dataSource = self
     }
@@ -56,14 +71,6 @@ final class LogViewController: UIViewController {
     // MARK: - Setup Navigation Bar
     private func setupNavigationBar() {
         title = "LOGO"
-    }
-
-    private func setupActions() {
-        logView.segmentedControl.addTarget(
-            self,
-            action: #selector(changeValue(control:)),
-            for: .valueChanged
-        )
     }
 }
 
@@ -83,14 +90,16 @@ extension LogViewController {
     }
 }
 
-// MARK: - PageViewController Delegate & DataSource
+// MARK: - PageViewController Delegate
 extension LogViewController: UIPageViewControllerDelegate, UIPageViewControllerDataSource {
     
     func pageViewController(
         _ pageViewController: UIPageViewController,
         viewControllerBefore viewController: UIViewController
     ) -> UIViewController? {
-        guard let index = dataViewControllers.firstIndex(of: viewController), index - 1 >= 0 else { return nil }
+        guard let index = dataViewControllers.firstIndex(of: viewController),
+                index - 1 >= 0
+        else { return nil }
         return dataViewControllers[index - 1]
     }
     
@@ -98,7 +107,9 @@ extension LogViewController: UIPageViewControllerDelegate, UIPageViewControllerD
         _ pageViewController: UIPageViewController,
         viewControllerAfter viewController: UIViewController
     ) -> UIViewController? {
-        guard let index = dataViewControllers.firstIndex(of: viewController), index + 1 < dataViewControllers.count else { return nil }
+        guard let index = dataViewControllers.firstIndex(of: viewController),
+                index + 1 < dataViewControllers.count
+        else { return nil }
         return dataViewControllers[index + 1]
     }
     
@@ -109,7 +120,8 @@ extension LogViewController: UIPageViewControllerDelegate, UIPageViewControllerD
         transitionCompleted completed: Bool
     ) {
         guard let viewController = pageViewController.viewControllers?.first,
-              let index = dataViewControllers.firstIndex(of: viewController) else { return }
+              let index = dataViewControllers.firstIndex(of: viewController)
+        else { return }
         currentPage = index
         logView.segmentedControl.selectedSegmentIndex = index
     }
