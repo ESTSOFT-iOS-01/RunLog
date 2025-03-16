@@ -10,7 +10,6 @@ import UIKit
 extension NSAttributedString {
     /// AttributedString 생성 - text, font, color, align
     public static func RLAttributedString(text: String, font: RLFont, color: UIColor = .black, align: NSTextAlignment = .left) -> NSAttributedString {
-        
         let lineHeight = font.value.lineHeight * font.lineHeightMultiple
         
         let paragraphStyle = NSMutableParagraphStyle()

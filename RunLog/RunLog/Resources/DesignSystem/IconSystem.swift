@@ -15,6 +15,7 @@ enum RLIcon {
     case foldButton
     case weather
     case unfoldButton
+    case closeButton
 }
 
 extension RLIcon {
