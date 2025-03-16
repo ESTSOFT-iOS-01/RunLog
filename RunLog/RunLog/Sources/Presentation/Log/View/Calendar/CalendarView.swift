@@ -70,6 +70,7 @@ final class CalendarView: UIView {
     ).then {
         $0.axis = .horizontal
         $0.spacing = 9
+        $0.alignment = .center
     }
     
     private lazy var weekdayLabels: [UILabel] = {
@@ -95,6 +96,21 @@ final class CalendarView: UIView {
         $0.distribution = .fillEqually
     }
 
+    lazy var collectionView = UICollectionView(
+        frame: .zero,
+        collectionViewLayout: UICollectionViewFlowLayout().then {
+            let itemWidth = (UIScreen.main.bounds.width - 48) / 7
+            $0.itemSize = CGSize(width: itemWidth, height: itemWidth * 1.5)
+            $0.minimumLineSpacing = 0
+            $0.minimumInteritemSpacing = 0
+        }
+    ).then {
+        $0.backgroundColor = .clear
+        $0.register(
+            CalendarViewCell.self,
+            forCellWithReuseIdentifier: CalendarViewCell.identifier
+        )
+    }
     
     
     // MARK: - Init
@@ -102,6 +118,7 @@ final class CalendarView: UIView {
         super.init(frame: frame)
         setupUI()
         setupLayout()
+
     }
 
     required init?(coder: NSCoder) {
@@ -112,8 +129,9 @@ final class CalendarView: UIView {
     private func setupUI() {
         backgroundColor = .Gray900
         topBanner.addSubviews(walkImage, nicknameLabel, bottomLabel)
-        addSubviews(topBanner, calendarTitleContainer, weekdaysContainer)
-        
+        addSubviews(
+            topBanner, calendarTitleContainer, weekdaysContainer, collectionView
+        )
     }
     
     // MARK: - Setup Layout
@@ -143,12 +161,10 @@ final class CalendarView: UIView {
         }
         
         leftArrowButton.snp.makeConstraints {
-            $0.height.equalTo(16)
             $0.width.equalTo(26)
         }
         
         rightArrowButton.snp.makeConstraints {
-            $0.height.equalTo(16)
             $0.width.equalTo(26)
         }
         
@@ -162,6 +178,12 @@ final class CalendarView: UIView {
             $0.height.equalTo(19)
             $0.top.equalTo(calendarTitleContainer.snp.bottom).offset(24)
             $0.horizontalEdges.equalToSuperview().inset(24)
+        }
+        
+        collectionView.snp.makeConstraints {
+            $0.top.equalTo(weekdaysContainer.snp.bottom).offset(8)
+            $0.horizontalEdges.equalToSuperview().inset(24)
+            $0.bottom.equalToSuperview()
         }
     }
     
