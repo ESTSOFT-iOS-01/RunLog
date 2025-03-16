@@ -22,8 +22,7 @@ class MainTabBarController: UITabBarController {
         logView.title = "Log"
         logView.tabBarItem = UITabBarItem(title: "Log", image: UIImage(systemName: "star"), selectedImage: UIImage(systemName: "star.fill"))
         
-        let settingView = UINavigationController(rootViewController: UIViewController())
-        settingView.view.backgroundColor = .red
+        let settingView = UINavigationController(rootViewController: MyPageViewController())
         settingView.title = "Setting"
         settingView.tabBarItem = UITabBarItem(title: "Setting", image: UIImage(systemName: "star"), selectedImage: UIImage(systemName: "star.fill"))
         

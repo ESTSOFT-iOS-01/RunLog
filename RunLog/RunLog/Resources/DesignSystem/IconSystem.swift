@@ -9,7 +9,6 @@ import Foundation
 
 // MARK: - 아이콘
 enum RLIcon {
-    case closeButton
     case document
     case streak
     case rightArrow

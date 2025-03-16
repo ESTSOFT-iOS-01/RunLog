@@ -72,7 +72,7 @@ final class CardElementView: UIView {
             value.attributedText = .RLAttributedString(text: "\(record.distance.toString())km", font: .Title, color: .LightPink)
         case .steps:
             title.attributedText = .RLAttributedString(text: "걸음수", font: .Headline1, color: .Gray000)
-            value.attributedText = .RLAttributedString(text: "\(record.steps.formattedWithComma())", font: .Title, color: .LightBlue)
+            value.attributedText = .RLAttributedString(text: "\(record.steps.formattedString)", font: .Title, color: .LightBlue)
         }
     }
 }
