@@ -22,20 +22,20 @@ final class RecordDetailViewCell: UITableViewCell {
     private let distanceLabel = UILabel().then {
         $0.font = .RLHeadline2
         $0.textColor = .LightPink
-        $0.textAlignment = .center
+        $0.textAlignment = .left
     }
     private let stepsLabel = UILabel().then {
         $0.font = .RLHeadline2
         $0.textColor = .LightBlue
-        $0.textAlignment = .right
+        $0.textAlignment = .left
     }
     
     // 수평 스택뷰로 3개 라벨 배치
     private lazy var horizontalStack = UIStackView(arrangedSubviews: [timeLabel, distanceLabel, stepsLabel]).then {
         $0.axis = .horizontal
-        $0.alignment = .center
+        $0.alignment = .leading
         $0.distribution = .fillEqually
-        $0.spacing = 8
+        $0.spacing = 16
     }
     
     // MARK: - Init
@@ -69,6 +69,7 @@ final class RecordDetailViewCell: UITableViewCell {
     
     // MARK: - Configure
     func configureAsHeader() {
+        print("헤더 셀 구성 호출됨")
         // 뷰 설정
         timeLabel.font = .RLBody1
         timeLabel.textColor = .Gray000
@@ -77,12 +78,12 @@ final class RecordDetailViewCell: UITableViewCell {
         
         distanceLabel.font = .RLBody1
         distanceLabel.textColor = .Gray000
-        distanceLabel.textAlignment = .center
+        distanceLabel.textAlignment = .left
         distanceLabel.text = "운동거리"
         
         stepsLabel.font = .RLBody1
         stepsLabel.textColor = .Gray000
-        stepsLabel.textAlignment = .right
+        stepsLabel.textAlignment = .left
         stepsLabel.text = "걸음수"
     }
     
@@ -94,12 +95,12 @@ final class RecordDetailViewCell: UITableViewCell {
         
         distanceLabel.font = .RLHeadline2
         distanceLabel.textColor = .LightPink
-        distanceLabel.textAlignment = .center
+        distanceLabel.textAlignment = .left
         distanceLabel.text = record.distance
         
         stepsLabel.font = .RLHeadline2
         stepsLabel.textColor = .LightBlue
-        stepsLabel.textAlignment = .right
+        stepsLabel.textAlignment = .left
         stepsLabel.text = record.steps
     }
 }

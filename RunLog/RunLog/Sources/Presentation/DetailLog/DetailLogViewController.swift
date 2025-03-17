@@ -21,6 +21,7 @@ final class DetailLogViewController: UIViewController {
     // MARK: - DI
     private let viewModel: DetailLogViewModel
     private var cancellables = Set<AnyCancellable>()
+    
     private var recordDetails: [RecordDetail] = []
     
     // MARK: - UI
@@ -44,6 +45,8 @@ final class DetailLogViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        detailLogView.recordDetailView.tableViewInstance.dataSource = self
+        detailLogView.recordDetailView.tableViewInstance.delegate = self
         setupUI()
         setupNavigationBar()
         setupGesture()
@@ -103,7 +106,8 @@ final class DetailLogViewController: UIViewController {
         ]
         print("DetailLogViewController - 더미데이터 개수: \(dummyRecords.count)")
         // detailLogView 내부에 있는 테이블뷰(RecordDetailView)에 주입
-        detailLogView.recordDetailView.setRecords(dummyRecords)
+        //detailLogView.recordDetailView.setRecords(dummyRecords)
+        self.recordDetails = dummyRecords
     }
     
     // MARK: - Bind ViewModel
@@ -118,5 +122,43 @@ final class DetailLogViewController: UIViewController {
     // MARK: - Actions
     @objc private func buttonTapped() {
         print("오른쪽 네비게이션 버튼 탭됨")
+    }
+}
+
+// MARK: - UITableViewDataSource, UITableViewDelegate
+extension DetailLogViewController: UITableViewDataSource, UITableViewDelegate {
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 1
+    }
+    
+    // 헤더 행 1개 + 실제 데이터 수
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return recordDetails.count + 1
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
+        if indexPath.row == 0 {
+            // 헤더 셀
+            guard let cell = tableView.dequeueReusableCell(
+                withIdentifier: RecordDetailViewCell.identifier,
+                for: indexPath
+            ) as? RecordDetailViewCell else {
+                return UITableViewCell()
+            }
+            cell.configureAsHeader()
+            return cell
+        } else {
+            let record = recordDetails[indexPath.row - 1]
+            guard let cell = tableView.dequeueReusableCell(
+                withIdentifier: RecordDetailViewCell.identifier,
+                for: indexPath
+            ) as? RecordDetailViewCell else {
+                return UITableViewCell()
+            }
+            cell.configure(with: record)
+            return cell
+        }
     }
 }

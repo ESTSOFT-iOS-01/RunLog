@@ -25,12 +25,12 @@ final class RecordDetailView: UIView {
         $0.register(RecordDetailViewCell.self, forCellReuseIdentifier: RecordDetailViewCell.identifier)
         
         // 테이블뷰 기본 설정
+        $0.isScrollEnabled = false
         $0.backgroundColor = .Gray900
         $0.separatorStyle = .singleLine
         $0.separatorColor = .Gray500
-        $0.rowHeight = 32
-        $0.dataSource = self
-        $0.delegate = self
+        $0.rowHeight = UITableView.automaticDimension
+        $0.estimatedRowHeight = 32
     }
     
     // MARK: - Init
@@ -56,6 +56,7 @@ final class RecordDetailView: UIView {
         // 레이아웃 설정
         tableView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
+            make.height.equalTo(300)
         }
     }
     
@@ -63,40 +64,20 @@ final class RecordDetailView: UIView {
     private func configure() {
         // 뷰 설정
     }
-}
-
-
-extension RecordDetailView: UITableViewDataSource, UITableViewDelegate {
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
+    
+    // 외부에서 데이터소스와 델리게이트를 설정.
+    func setTableViewDataSourceDelegate(_ dataSourceDelegate: UITableViewDataSource & UITableViewDelegate) {
+        tableView.dataSource = dataSourceDelegate
+        tableView.delegate = dataSourceDelegate
+        tableView.reloadData()
     }
     
-    // 헤더행(1) + 실제 데이터 수
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return records.count + 1
+    // VC에서 데이터를 설정할 때 사용할 메서드
+    func reloadData() {
+        tableView.reloadData()
     }
     
-    // 셀 생성 로직
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if indexPath.row == 0 {
-            guard let cell = tableView.dequeueReusableCell(
-                withIdentifier: RecordDetailViewCell.identifier,
-                for: indexPath
-            ) as? RecordDetailViewCell else {
-                return UITableViewCell()
-            }
-            cell.configureAsHeader()
-            return cell
-        } else {
-            let record = records[indexPath.row - 1]
-            guard let cell = tableView.dequeueReusableCell(
-                withIdentifier: RecordDetailViewCell.identifier,
-                for: indexPath
-            ) as? RecordDetailViewCell else {
-                return UITableViewCell()
-            }
-            cell.configure(with: record)
-            return cell
+    var tableViewInstance: UITableView {
+            return tableView
         }
-    }
 }
