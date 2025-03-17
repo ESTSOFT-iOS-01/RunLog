@@ -72,7 +72,7 @@ final class RLLabel: UIView {
                 $0.top.bottom.equalToSuperview().inset(4)
             }
             label.snp.makeConstraints {
-                $0.leading.equalTo(icon.snp.trailing)
+                $0.leading.equalTo(icon.snp.trailing).offset(8)
                 $0.top.bottom.trailing.equalToSuperview()
             }
         }
