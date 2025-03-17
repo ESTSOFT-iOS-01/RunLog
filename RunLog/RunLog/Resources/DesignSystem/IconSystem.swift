@@ -12,15 +12,15 @@ enum RLIcon {
     case document
     case streak
     case rightArrow
-    case foldButton
+    case fold
     case weather
-    case unfoldButton
+    case unfold
 }
 
 extension RLIcon {
     var name: String {
         switch self {
-        case .foldButton:
+        case .fold:
             return "xmark"
         case .document:
             return "text.document"
@@ -28,7 +28,7 @@ extension RLIcon {
             return "leaf"
         case .rightArrow:
             return "chevron.right"
-        case .unfoldButton:
+        case .unfold:
             return "heart.text.square"
         case .weather:
             return "thermometer.medium"

@@ -39,7 +39,7 @@ final class RunningViewController: UIViewController {
         $0.configureBackgroundColor(.Gray700)
         $0.tintColor = .Gray000
         var config = UIButton.Configuration.plain()
-        config.image = UIImage(systemName: RLIcon.foldButton.name)
+        config.image = UIImage(systemName: RLIcon.fold.name)
         config.imagePadding = 4
         config.imagePlacement = .trailing
         config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(pointSize: 12, weight: .medium)
@@ -48,7 +48,7 @@ final class RunningViewController: UIViewController {
     var unfoldButton = UIButton().then {
         $0.backgroundColor = .LightGreen
         $0.layer.cornerRadius = 40
-        $0.setImage(UIImage(systemName: RLIcon.unfoldButton.name), for: .normal)
+        $0.setImage(UIImage(systemName: RLIcon.unfold.name), for: .normal)
         $0.tintColor = .Gray900
         let sfConfig = UIImage.SymbolConfiguration(pointSize: 32, weight: .medium)
         $0.setPreferredSymbolConfiguration(sfConfig, forImageIn: .normal)
