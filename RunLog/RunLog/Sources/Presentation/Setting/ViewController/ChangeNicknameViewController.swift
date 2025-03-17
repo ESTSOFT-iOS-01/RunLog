@@ -58,7 +58,12 @@ final class ChangeNicknameViewController: UIViewController {
         // 네비게이션바 디테일 설정
         navigationItem.title = "닉네임 수정"
         self.navigationController?.setupAppearance()
-        self.navigationController?.addRightButton(title: "완료", target: self, action: #selector(saveButtonTapped))
+        navigationController?
+            .addRightButton(title: "완료")
+            .sink { [weak self] in
+                self?.validateAndSaveNickname() // ✅ 닉네임 검증 후 저장
+            }
+            .store(in: &cancellables)
     }
     
     private func setupTextField() {
@@ -92,7 +97,7 @@ final class ChangeNicknameViewController: UIViewController {
         viewModel.bindTextField(nicknameView.nameField.publisher)
     }
     
-    @objc private func saveButtonTapped() {
+    private func validateAndSaveNickname() {
         guard let text = nicknameView.nameField.text, !text.isEmpty else {
             showAlert(message: "닉네임을 입력해주세요.")
             return
