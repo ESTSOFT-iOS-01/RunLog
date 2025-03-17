@@ -136,6 +136,13 @@ extension ChangeCalUnitViewController: UITextFieldDelegate {
         if let value = Double(updatedText), value > 100 {
             return false
         }
+        
+        if let currentText = textField.text {
+            let newLength = currentText.count + string.count - range.length
+            if newLength > 8 {
+                return false
+            }
+        }
 
         return true
     }
