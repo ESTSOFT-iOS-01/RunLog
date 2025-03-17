@@ -98,7 +98,7 @@ class TimelineViewCell: UITableViewCell {
     
     // MARK: - Configure
     func configure(dayLog: DayLog) {
-        self.distanceLabel.text = "\(dayLog.totalDistance)km"
+        self.distanceLabel.text = "\(dayLog.totalDistance.toString(withDecimal: 1))km"
         self.titleLabel.text = "\(dayLog.title)"
         self.dateLabel.text = "\(dayLog.date.formattedString(.fullDate))"
     }
@@ -142,5 +142,10 @@ class TimelineHeaderView: UITableViewHeaderFooterView {
             $0.top.equalToSuperview().offset(24)
             $0.bottom.equalToSuperview().offset(-16)
         }
+    }
+    
+    // MARK: - Configure
+    func configure(date: Date) {
+        self.headerLabel.text = date.formattedString(.yearMonth)
     }
 }

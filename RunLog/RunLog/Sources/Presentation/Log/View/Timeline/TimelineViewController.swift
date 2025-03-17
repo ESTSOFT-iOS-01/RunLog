@@ -16,7 +16,6 @@ final class TimelineViewController: UIViewController {
     private let timelineView = TimelineView()
     private let viewModel: LogViewModel
     private var cancellables = Set<AnyCancellable>()
-    private var dayLogs: [DayLog] = []
     
     // MARK: - Init
     init(viewModel: LogViewModel) {
@@ -79,11 +78,17 @@ final class TimelineViewController: UIViewController {
 }
 
 extension TimelineViewController: UITableViewDelegate, UITableViewDataSource {
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return viewModel.output.sortedKeys.value.count
+    }
+    
     func tableView(
         _ tableView: UITableView,
         numberOfRowsInSection section: Int
     ) -> Int {
-        return viewModel.output.dayLogs.value.count
+        let key = viewModel.output.sortedKeys.value[section]
+        return viewModel.output.groupedDayLogs.value[key]?.count ?? 0
     }
     
     func tableView(
@@ -94,19 +99,18 @@ extension TimelineViewController: UITableViewDelegate, UITableViewDataSource {
           withIdentifier: TimelineViewCell.identifier,
           for: indexPath
         ) as! TimelineViewCell
-        cell.configure(dayLog: viewModel.output.dayLogs.value[indexPath.row])
-        return cell
+
+        let key = viewModel.output.sortedKeys.value[indexPath.section]
         
+        if let dayLogs = viewModel.output.groupedDayLogs.value[key] {
+            let dayLog = dayLogs[indexPath.row]
+            cell.selectionStyle = .none
+            cell.configure(dayLog: dayLog)
+        }
+
+        return cell
     }
     
-    func tableView(
-        _ tableView: UITableView,
-        willDisplay cell: UITableViewCell,
-        forRowAt indexPath: IndexPath
-    ) {
-        cell.backgroundColor = .clear
-    }
-
     func tableView(
         _ tableView: UITableView,
         viewForHeaderInSection section: Int
@@ -115,6 +119,18 @@ extension TimelineViewController: UITableViewDelegate, UITableViewDataSource {
             withIdentifier: TimelineHeaderView.identifier
         ) as! TimelineHeaderView
         
+        header.configure(
+            date: viewModel.output.sortedKeys.value[section]
+        )
+        
         return header
+    }
+    
+    func tableView(
+        _ tableView: UITableView,
+        willDisplay cell: UITableViewCell,
+        forRowAt indexPath: IndexPath
+    ) {
+        cell.backgroundColor = .clear
     }
 }

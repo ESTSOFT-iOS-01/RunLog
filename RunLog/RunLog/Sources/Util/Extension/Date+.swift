@@ -18,14 +18,17 @@ extension Date {
 
 enum DateFormatStyle {
     case fullDate      // "2025. 02. 13."
-    case shortDate     // "0월 0일 (수)"
+    case monthDay     // "0월 0일 (수)"
+    case yearMonth     // "2025년 3월"
     
     var format: String {
         switch self {
         case .fullDate:
             return "yyyy. MM. dd."
-        case .shortDate:
+        case .monthDay:
             return "M월 d일 (E)"
+        case .yearMonth:
+            return "yyyy년 M월"
         }
     }
 }

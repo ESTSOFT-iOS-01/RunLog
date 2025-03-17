@@ -18,7 +18,8 @@ final class LogViewModel {
     
     // MARK: - UI에 관여하는 Output
     struct Output {
-        let dayLogs = CurrentValueSubject<[DayLog], Never>([])
+        let groupedDayLogs = CurrentValueSubject<[Date: [DayLog]], Never>([:])
+        let sortedKeys = CurrentValueSubject<[Date], Never>([])
     }
     
     private(set) var output: Output = .init()
@@ -51,7 +52,17 @@ final class LogViewModel {
 extension LogViewModel {
     // MARK: - private Functions
     private func loadAllDayLogs() {
-        output.dayLogs.send(DummyData.dummyDayLogs)
+        
+        // TODO: 데이터 연결
+        let dayLogs = DummyData.dummyDayLogs
+        
+        let groupedDayLogs = Dictionary(grouping: dayLogs) { dayLog in
+            let calendar = Calendar.current
+            let components = calendar.dateComponents([.year, .month], from: dayLog.date)
+            return calendar.date(from: components) ?? dayLog.date
+        }
+        output.groupedDayLogs.send(groupedDayLogs)
+        output.sortedKeys.send(groupedDayLogs.keys.sorted(by: >))
     }
 }
 
