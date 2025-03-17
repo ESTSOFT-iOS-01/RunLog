@@ -34,6 +34,7 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
     private let weatherService = WeatherService()
     
     // MARK: - Combine
+    var runHomeViewModel: RunHomeViewModel?
     private let locationSubject = PassthroughSubject<CLPlacemark, Never>()
     private let weatherSubject = PassthroughSubject<WeatherData, Never>()
     var locationPublisher: AnyPublisher<CLPlacemark, Never> {
@@ -44,7 +45,7 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
     }
     
     // MARK: - Init
-    private override init() {
+    override init() {
         super.init()
         setupLocationManager()
     }
@@ -75,7 +76,8 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
                 print("Geocoding 실패: \(error!.localizedDescription)")
                 return
             }
-            self.locationSubject.send(placemark)
+            runHomeViewModel?.input.send(.locationUpdate(placemark))
+//            self.locationSubject.send(placemark)
         }
     }
     // MARK: - 날씨 데이터 가져오기
@@ -89,7 +91,8 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
                 condition: weather.condition,
                 airQuality: aqi.aqi
             )
-            weatherSubject.send(weatherData)
+            runHomeViewModel?.input.send(.weatherUpdate(weatherData))
+//            self.weatherSubject.send(weatherData)
         }
     }
     

@@ -12,6 +12,11 @@ import WeatherKit
 
 final class RunHomeViewModel {
     // MARK: - Input & Output
+    enum Input {
+        case locationUpdate(CLPlacemark)
+        case weatherUpdate(WeatherData)
+    }
+    let input = PassthroughSubject<Input, Never>()
     enum Output {
         case locationUpdate(String) // 가공된 위치 데이터
         case weatherUpdate(String)  // 가공된 날씨 데이터
@@ -23,30 +28,47 @@ final class RunHomeViewModel {
     // MARK: - Init
     init() {
         bind()
+        locationManager.runHomeViewModel = self
     }
     // MARK: - Bind (Input -> Output)
     private func bind() {
-        // 도시명 변경 구독
-        locationManager.locationPublisher
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] placemark in
-                let city = self?.placemarksToString(placemark) ?? "알 수 없음"
-                self?.output.send(.locationUpdate(city))
+        input.receive(on: DispatchQueue.main)
+            .sink { [weak self] input in
+                switch input {
+                case .locationUpdate(let placemark): // 도시명 변경
+                    let city = self?.placemarksToString(placemark) ?? "알 수 없음"
+                    self?.output.send(.locationUpdate(city))
+                case .weatherUpdate(let weather): // 날씨 변경
+                    let condition = self?.conditionToString(weather.condition) ?? weather.condition.rawValue
+                    let temperature = "\(weather.temperature)°C"
+                    let aqi = self?.aqiToString(weather.airQuality) ?? "정보 없음"
+                    
+                    let formattedString = "\(condition) | \(temperature), 미세먼지 \(aqi)"
+                    self?.output.send(.weatherUpdate(formattedString))
+                }
             }
             .store(in: &cancellables)
-        // 날씨 변경 구독
-        locationManager.weatherPublisher
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] weather in
-                print("날씨: \(weather)")
-                let condition = self?.conditionToString(weather.condition) ?? weather.condition.rawValue
-                let temperature = "\(weather.temperature)°C"
-                let aqi = self?.aqiToString(weather.airQuality) ?? "정보 없음"
-                
-                let formattedString = "\(condition) | \(temperature), 미세먼지 \(aqi)"
-                self?.output.send(.weatherUpdate(formattedString))
-            }
-            .store(in: &cancellables)
+//        // 도시명 변경 구독
+//        locationManager.locationPublisher
+//            .receive(on: DispatchQueue.main)
+//            .sink { [weak self] placemark in
+//                let city = self?.placemarksToString(placemark) ?? "알 수 없음"
+//                self?.output.send(.locationUpdate(city))
+//            }
+//            .store(in: &cancellables)
+//        // 날씨 변경 구독
+//        locationManager.weatherPublisher
+//            .receive(on: DispatchQueue.main)
+//            .sink { [weak self] weather in
+//                print("날씨: \(weather)")
+//                let condition = self?.conditionToString(weather.condition) ?? weather.condition.rawValue
+//                let temperature = "\(weather.temperature)°C"
+//                let aqi = self?.aqiToString(weather.airQuality) ?? "정보 없음"
+//                
+//                let formattedString = "\(condition) | \(temperature), 미세먼지 \(aqi)"
+//                self?.output.send(.weatherUpdate(formattedString))
+//            }
+//            .store(in: &cancellables)
     }
     // MARK: - 위치 정보 데이터 -> 한글
     private func placemarksToString(_ placemark: CLPlacemark) -> String {
