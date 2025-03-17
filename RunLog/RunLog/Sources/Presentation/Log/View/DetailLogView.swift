@@ -32,8 +32,9 @@ final class DetailLogView: UIView {
     
     /// 지도 위에 오버레이될 무빙트랙 버튼
     private let movingTrackButton = UIButton(type: .system).then {
-        // 이거 수정 필요한지 체크
-        let attributedTitle = NSAttributedString.RLAttributedString(text: "   무빙트랙", font: .Label2, color: .Gray000)
+        $0.configuration = nil
+        
+        let attributedTitle = NSAttributedString.RLAttributedString(text: "무빙트랙", font: .Label2, color: .Gray000)
         $0.setAttributedTitle(attributedTitle, for: .normal)
         $0.backgroundColor = .Gray300
         $0.layer.cornerRadius = 10
@@ -42,6 +43,8 @@ final class DetailLogView: UIView {
         let icon = UIImage(systemName: RLIcon.play.name)?.withConfiguration(config)
         $0.setImage(icon, for: .normal)
         $0.tintColor = .Gray000
+        
+        $0.titleEdgeInsets = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 0)
     }
     
     /// 타이틀 라벨
@@ -56,7 +59,7 @@ final class DetailLogView: UIView {
     
     /// 날씨/지역 라벨들
     private let locationLabel = RLLabel(
-        text: "  서울특별시",
+        text: "서울특별시",
         textColor: .Gray100,
         icon: UIImage(systemName: RLIcon.mappin.name),
         align: .left,
@@ -64,7 +67,7 @@ final class DetailLogView: UIView {
         tintColor: .Gray100
     )
     private let weatherLabel = RLLabel(
-        text: "  흐림 | 12°C",
+        text: "흐림 | 12°C",
         textColor: .Gray100,
         icon: UIImage(systemName: RLIcon.weather.name),
         align: .left,
@@ -72,7 +75,7 @@ final class DetailLogView: UIView {
         tintColor: .Gray100
     )
     private let conditionLabel = RLLabel(
-        text: "  어려움",
+        text: "어려움",
         textColor: .Gray100,
         icon: UIImage(systemName: RLIcon.dumbell.name),
         align: .left,
@@ -145,7 +148,7 @@ final class DetailLogView: UIView {
     
     private let stepsTitleLabel = RLLabel(
         text: "걸음수",
-        textColor: .Gray100,
+        textColor: .Gray000,
         icon: nil,
         align: .left,
         font: .RLBody1
