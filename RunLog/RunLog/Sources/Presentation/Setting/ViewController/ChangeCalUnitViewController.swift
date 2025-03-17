@@ -19,14 +19,6 @@ final class ChangeCalUnitViewController: UIViewController {
     private var cancellables = Set<AnyCancellable>()
     
     // MARK: - Init
-    //    init(viewModel: ViewModelType) {
-    //        self.viewModel = viewModel
-    //        super.init(nibName: nil, bundle: nil)
-    //    }
-
-    //    required init?(coder: NSCoder) {
-    //        fatalError("init(coder:) has not been implemented")
-    //    }
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -67,8 +59,14 @@ final class ChangeCalUnitViewController: UIViewController {
     private func setupNavigationBar() {
         // 네비게이션바 디테일 설정
         navigationItem.title = "기록 시각화 단위 설정"
-        self.navigationController?.addRightButton(title: "완료", target: self, action: #selector(saveButtonTapped))
         self.navigationController?.setupAppearance()
+        
+        navigationController?
+            .addRightButton(title: "완료")
+            .sink { [weak self] in
+                self?.validateAndSaveUnit()
+            }
+            .store(in: &cancellables)
     }
     
 
@@ -84,13 +82,17 @@ final class ChangeCalUnitViewController: UIViewController {
     
     // MARK: - Setup Data
     private func setupData() {
-        // 초기 데이터 로드
-        calUnitView.unitField.setTextWithUnderline(String(viewModel.unit))
+        if viewModel.unit != 0 {
+            calUnitView.unitField.setTextWithUnderline(String(viewModel.unit))
+        }
+        
         calUnitView.updateDescriptionText(with: viewModel.unit)
     }
 
     // MARK: - Bind ViewModel
     private func bindViewModel() {
+        viewModel.bindTextField(calUnitView.unitField.publisher)
+        
         viewModel.output
             .sink { [weak self] output in
                 switch output {
@@ -103,35 +105,20 @@ final class ChangeCalUnitViewController: UIViewController {
             .store(in: &cancellables)
     }
     
-    @objc private func saveButtonTapped() {
-        guard let text = calUnitView.unitField.text, !text.isEmpty else {
-            showAlert(message: "값을 입력해주세요.")
+    private func validateAndSaveUnit() {
+        guard let text = calUnitView.unitField.text, let value = Double(text), value > 0 else {
+            showAlert(message: "올바른 값을 입력해주세요.")
             return
         }
-        
         viewModel.input.send(.saveButtonTapped)
-    }
-    
-    private func setupTapGestureToDismissKeyboard() {
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
-        tapGesture.cancelsTouchesInView = false
-        view.addGestureRecognizer(tapGesture)
-    }
-    
-    @objc private func dismissKeyboard() {
-        view.endEditing(true)
-    }
-    
-    private func showAlert(message: String) {
-        let alert = UIAlertController(title: "알림", message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "확인", style: .default))
-        present(alert, animated: true)
     }
 
 }
 
 extension ChangeCalUnitViewController: UITextFieldDelegate {
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        if string.isEmpty { return true }
+        
         let allowedCharacters = CharacterSet(charactersIn: "0123456789.")
         let characterSet = CharacterSet(charactersIn: string)
         

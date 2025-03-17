@@ -31,7 +31,6 @@ final class CalUnitView: UIView {
     
     lazy var unitField = RLTextField(placeholder: placeHolderString).then {
         $0.keyboardType = .decimalPad
-        $0.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
     }
     
     private let exampleView = UIView().then {
@@ -88,12 +87,14 @@ final class CalUnitView: UIView {
     
     // MARK: - Data Bind
     private func bindViewModel() {
+        viewModel.bindTextField(unitField.publisher)
+
         viewModel.output
             .sink { [weak self] output in
                 switch output {
                 case .unitUpdated(let value):
                     self?.updateDescriptionText(with: value)
-                case .saveSuccess:
+                default:
                     break
                 }
             }
@@ -114,7 +115,4 @@ final class CalUnitView: UIView {
         )
     }
     
-    @objc private func textFieldDidChange() {
-        viewModel.input.send(.unitChanged(unitField.text ?? ""))
-    }
 }

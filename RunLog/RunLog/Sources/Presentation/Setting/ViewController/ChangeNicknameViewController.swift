@@ -40,7 +40,6 @@ final class ChangeNicknameViewController: UIViewController {
         self.navigationController?.setNavigationBarHidden(false, animated: animated)
     }
     
-    
     // MARK: - Setup UI
     private func setupUI() {
         view.backgroundColor = .Gray900
