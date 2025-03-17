@@ -19,7 +19,7 @@ final class SettingMenuCell: UITableViewCell {
     }
     
     private lazy var arrowImageView = UIImageView().then {
-        $0.image = UIImage(systemName: RLIcon.rightArrow.name)?
+        $0.image = UIImage(systemName: RLIcon.rightChevron.name)?
             .applyingSymbolConfiguration(UIImage.SymbolConfiguration(pointSize: 16, weight: .regular))
         $0.tintColor = .Gray300
         $0.contentMode = .scaleAspectFit
@@ -65,7 +65,7 @@ final class SettingMenuCell: UITableViewCell {
     
     // MARK: - Configure
     func configure(title: String) {
-        titleLabel.attributedText = .RLAttributedString(text: title, font: .Body2, color: .Gray000)
+        titleLabel.attributedText = .RLAttributedString(text: title, font: .Body2)
     }
 
 }
