@@ -9,23 +9,24 @@ import Foundation
 
 // MARK: - 아이콘
 enum RLIcon {
-    case closeButton
     case walk
     case rightArrow
     case leftArrow
     case document
     case streak
-    case rightArrow
+    case rightChevron
     case play
     case mappin
     case weather
     case dumbell
+    case fold
+    case unfold
 }
 
 extension RLIcon {
     var name: String {
         switch self {
-        case .closeButton:
+        case .fold:
             return "xmark"
         case .walk:
             return "walk"
@@ -37,14 +38,16 @@ extension RLIcon {
             return "text.document"
         case .streak:
             return "leaf"
-        case .rightArrow:
+        case .rightChevron:
             return "chevron.right"
+        case .unfold:
+            return "heart.text.square"
+        case .weather:
+            return "thermometer.medium"
         case .play:
             return "play"
         case .mappin:
             return "mappin.and.ellipse"
-        case .weather:
-            return "thermometer.medium"
         case .dumbell:
             return "dumbbell"
         }

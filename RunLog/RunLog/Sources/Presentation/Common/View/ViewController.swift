@@ -18,7 +18,7 @@ class ViewController: UIViewController {
     
     var closeButton = UIButton().then {
         $0.setAttributedTitle(.RLAttributedString(text: "닫기", font: .Button, align: .center), for: .normal)
-        $0.setImage(UIImage(systemName: RLIcon.closeButton.name), for: .normal)
+        $0.setImage(UIImage(systemName: RLIcon.fold.name), for: .normal)
         $0.backgroundColor = UIColor.orange
     }
     
@@ -39,8 +39,20 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .Gray900
         // Do any additional setup after loading the view.
-        [textField].forEach{ view.addSubview($0) }
+        [label, closeButton, rlBtn, textField].forEach{ view.addSubview($0) }
         
+        view.addSubview(label)
+        label.snp.makeConstraints {
+            $0.centerX.centerY.equalToSuperview()
+        }
+        closeButton.snp.makeConstraints {
+            $0.leading.trailing.equalTo(label)
+            $0.top.equalTo(label.snp.bottom)
+        }
+        rlBtn.snp.makeConstraints {
+            // 버튼 width는 leading, trailing으로 잡아주면 좋아요
+            $0.leading.trailing.equalToSuperview().inset(24)
+        }
         textField.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(24) // 좌우 여백 24
             $0.top.equalToSuperview().offset(100) // 상단 여백 50

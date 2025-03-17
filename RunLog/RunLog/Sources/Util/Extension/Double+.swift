@@ -12,4 +12,9 @@ extension Double {
     func toString(withDecimal decimal: Int = 2) -> String {
         return String(format: "%.\(decimal)f", self)
     }
+    var asTimeString: String {
+        let minutes = Int(self) / 60
+        let seconds = Int(self) % 60
+        return String(format: "%02d : %02d", minutes, seconds)
+    }
 }
