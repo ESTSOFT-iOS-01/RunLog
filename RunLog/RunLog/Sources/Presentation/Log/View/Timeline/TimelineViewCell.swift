@@ -17,7 +17,7 @@ class TimelineViewCell: UITableViewCell {
         $0.layer.cornerRadius = 8
     }
     
-    lazy var distanceLabel = UILabel().then {
+    private lazy var distanceLabel = UILabel().then {
         $0.attributedText = .RLAttributedString(
             text: "25km",
             font: .Heading4,
@@ -25,7 +25,7 @@ class TimelineViewCell: UITableViewCell {
         )
     }
     
-    lazy var titleLabel = UILabel().then {
+    private lazy var titleLabel = UILabel().then {
         $0.attributedText = .RLAttributedString(
             text: "하트런",
             font: .Heading1,
@@ -33,7 +33,7 @@ class TimelineViewCell: UITableViewCell {
         )
     }
     
-    lazy var dateLabel = UILabel().then {
+    private lazy var dateLabel = UILabel().then {
         $0.attributedText = .RLAttributedString(
             text: "2025. 02. 03.",
             font: .Label2,
@@ -41,10 +41,13 @@ class TimelineViewCell: UITableViewCell {
         )
     }
     
-    lazy var trackImageView = UIView().then {
+    private lazy var trackImageView = UIImageView().then {
         // TODO: ImageView로 바꾸기
-        $0.backgroundColor = .black
+        $0.image = UIImage()
+        $0.backgroundColor = .Gray900
+        $0.contentMode = .scaleToFill
         $0.layer.cornerRadius = 4
+        $0.clipsToBounds = true
     }
     
     // MARK: - Init
@@ -91,6 +94,13 @@ class TimelineViewCell: UITableViewCell {
             $0.centerY.equalToSuperview()
             $0.trailing.equalToSuperview().offset(-24)
         }
+    }
+    
+    // MARK: - Configure
+    func configure(dayLog: DayLog) {
+        self.distanceLabel.text = "\(dayLog.totalDistance)km"
+        self.titleLabel.text = "\(dayLog.title)"
+        self.dateLabel.text = "\(dayLog.date.formattedString(.fullDate))"
     }
 }
 
