@@ -43,6 +43,7 @@ extension UINavigationController {
         if let title = title {
             rightButton.setTitle(title, for: .normal)
             rightButton.setTitleColor(.label, for: .normal)
+            
             rightButton.titleLabel?.attributedText = .RLAttributedString(text: title, font: .Label1, color: .LightGreen, align: .center)
         } else if let icon = icon {
             rightButton.setImage(UIImage(systemName: icon), for: .normal)
