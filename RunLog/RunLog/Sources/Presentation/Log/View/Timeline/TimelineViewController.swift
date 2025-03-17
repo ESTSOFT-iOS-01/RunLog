@@ -32,7 +32,6 @@ final class TimelineViewController: UIViewController {
         super.viewDidLoad()
         setupUI()
         bindGesture()
-        setupData()
         bindViewModel()
     }
     
@@ -61,19 +60,14 @@ final class TimelineViewController: UIViewController {
     private func bindGesture() {
         // 제스처 추가
     }
-    
-    // MARK: - Setup Data
-    private func setupData() {
-        // 초기 데이터 로드
-    }
 
     // MARK: - Bind ViewModel
     private func bindViewModel() {
-//        viewModel.output.rightarrowButton
-//            .sink { [weak self] value in
-//                // 로직
-//            }
-//            .store(in: &cancellables)
+        viewModel.output.groupedDayLogs
+            .sink { [weak self] _ in
+                self?.timelineView.tableView.reloadData()
+            }
+            .store(in: &cancellables)
     }
     
 }

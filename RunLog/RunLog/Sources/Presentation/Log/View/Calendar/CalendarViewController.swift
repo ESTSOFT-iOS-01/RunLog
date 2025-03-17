@@ -16,9 +16,9 @@ final class CalendarViewController: UIViewController {
     private let calendarView = CalendarView()
     private let viewModel: LogViewModel
     
-    // 사용자가 보고 있는 달, 일
-    private var currentMonth = Date()
-    private var currentMonthDays: [Int] = []
+    // 화면에 표시되고 있는 달력을 관리하는 변수
+    private var currentKeyIndex = 0
+    private var currentMonthDays:[Int] = []
     
     private var cancellables = Set<AnyCancellable>()
     
@@ -38,7 +38,6 @@ final class CalendarViewController: UIViewController {
         super.viewDidLoad()
         setupUI()
         bindGesture()
-        setupData()
         bindViewModel()
     }
     
@@ -64,33 +63,85 @@ final class CalendarViewController: UIViewController {
         calendarView.collectionView.delegate = self
     }
     
+    
     // MARK: - Bind Gesture
     private func bindGesture() {
         calendarView.leftArrowButton.publisher
-            .sink {
-                print("leftArrowButtonTapped")
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                let keys = self.viewModel.output.sortedKeys.value
+                let newIndex = self.currentKeyIndex + 1
+                
+                guard newIndex >= 0 && newIndex < keys.count else { return }
+                
+                self.updateCalendar(newIndex: newIndex)
+                self.updateArrowButtons()
             }.store(in: &cancellables)
         
         calendarView.rightArrowButton.publisher
-            .sink {
-                print("rightArrowButtonTapped")
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                let keys = self.viewModel.output.sortedKeys.value
+                let newIndex = self.currentKeyIndex - 1
+                
+                guard newIndex >= 0 && newIndex < keys.count else { return }
+                
+                self.updateCalendar(newIndex: newIndex)
+                self.updateArrowButtons()
             }.store(in: &cancellables)
-    }
-    
-    // MARK: - Setup Data
-    private func setupData() {
-        // 초기 데이터 로드
-        self.currentMonthDays = generateDaysFor(date: Date())
     }
     
     // MARK: - Bind ViewModel
     private func bindViewModel() {
+        viewModel.output.sortedKeys
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] keys in
+                guard let self = self, !keys.isEmpty else { return }
+                
+                let month = viewModel.output.sortedKeys.value.first ?? Date()
+                self.currentMonthDays = generateDaysFor(date: month)
+                calendarView.calendarTitleLabel.text = month.formattedString(
+                    .yearMonthShort
+                )
+                self.updateArrowButtons()
+                
+            }
+            .store(in: &cancellables)
         
+        viewModel.output.groupedDayLogs
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.calendarView.collectionView.reloadData()
+            }
+            .store(in: &cancellables)
     }
 }
 
 extension CalendarViewController {
-    func generateDaysFor(date: Date) -> [Int] {
+    // 캘린더 업데이트 함수
+    private func updateCalendar(newIndex: Int) {
+        let keys = viewModel.output.sortedKeys.value
+        currentKeyIndex = newIndex
+        currentMonthDays = generateDaysFor(date: keys[newIndex])
+        calendarView.calendarTitleLabel.text = keys[newIndex].formattedString(.yearMonthShort)
+        calendarView.collectionView.reloadData()
+    }
+
+    // 버튼 상태 업데이트 함수
+    private func updateArrowButtons() {
+        let sortedKeysCount = viewModel.output.sortedKeys.value.count
+        let isLeftEnabled = currentKeyIndex + 1 < sortedKeysCount
+        let isRightEnabled = currentKeyIndex - 1 >= 0
+        
+        calendarView.leftArrowButton.isEnabled = isLeftEnabled
+        calendarView.leftArrowButton.tintColor = isLeftEnabled ? .Gray000 : .Gray200
+
+        calendarView.rightArrowButton.isEnabled = isRightEnabled
+        calendarView.rightArrowButton.tintColor = isRightEnabled ? .Gray000 : .Gray200
+    }
+    
+    // date를 기반으로 그 달의 days를 만들어내는 함수
+    private func generateDaysFor(date: Date) -> [Int] {
         let calendar = Calendar.current
         let components = calendar.dateComponents([.year, .month], from: date)
         

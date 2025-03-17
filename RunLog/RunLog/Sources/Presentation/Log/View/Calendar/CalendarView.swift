@@ -57,7 +57,7 @@ final class CalendarView: UIView {
         $0.tintColor = .Gray000
     }
     
-    private var calendarTitleLabel = UILabel().then {
+    var calendarTitleLabel = UILabel().then {
         $0.attributedText = .RLAttributedString(
             text: "25년 3월",
             font: .Heading2,
