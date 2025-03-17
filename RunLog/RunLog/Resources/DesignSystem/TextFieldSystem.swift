@@ -40,7 +40,7 @@ open class RLTextField: UITextField {
     private func setupUI() {
         borderStyle = .none
         backgroundColor = .clear
-        attributedText = .RLAttributedString(text: "", font: .Headline1, color: .Gray000)
+        attributedText = .RLAttributedString(text: "", font: .Headline1)
         isUserInteractionEnabled = true
         
         underline.backgroundColor = .Gray200
@@ -80,7 +80,7 @@ open class RLTextField: UITextField {
     }
     
     @objc private func textDidChange() {
-        attributedText = .RLAttributedString(text: text ?? "", font: .Headline1, color: .Gray000)
+        attributedText = .RLAttributedString(text: text ?? "", font: .Headline1)
         underline.backgroundColor = (text?.isEmpty ?? true) ? .Gray200 : .LightGreen
     }
 }
