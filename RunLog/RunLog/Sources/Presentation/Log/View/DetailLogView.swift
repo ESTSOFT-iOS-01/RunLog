@@ -21,7 +21,7 @@ final class DetailLogView: UIView {
     }
     
     /// 스크롤뷰 내부 컨텐츠를 담는 뷰
-    private let contentView = UIView().then { _ in }
+    let contentView = UIView().then { _ in }
     
     /// 지도 영역을 표시하는 MKMapView
     private let mapView = MKMapView().then {
@@ -46,6 +46,8 @@ final class DetailLogView: UIView {
         
         $0.titleEdgeInsets = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 0)
     }
+    
+    var onMovingTrackButtonTapped: (() -> Void)?
     
     /// 타이틀 라벨
     private let titleLabel = RLLabel(
@@ -131,7 +133,7 @@ final class DetailLogView: UIView {
     )
     
     private let distanceValueLabel = RLLabel(
-        text: "9999.99km",
+        text: "999.99km",
         textColor: .LightPink,
         icon: nil,
         align: .left,
@@ -175,9 +177,18 @@ final class DetailLogView: UIView {
         stack.axis = .horizontal
         stack.alignment = .center
         stack.spacing = 16
-        stack.distribution = .fillEqually
+        stack.distribution = .equalSpacing
         return stack
     }()
+    
+    let recordTitleLabel = UILabel().then {
+        $0.text = "기록 상세"
+        $0.font = .RLHeading1
+        $0.textColor = .Gray000
+    }
+    
+    // 테이블뷰를 담은 뷰
+    let recordDetailView = RecordDetailView()
     
     
     // MARK: - Init
@@ -196,6 +207,12 @@ final class DetailLogView: UIView {
     private func setupUI() {
         // UI 요소 추가
         backgroundColor = .Gray900
+        
+        // 버튼 타겟팅
+        movingTrackButton.addTarget(self,
+                                    action: #selector(movingTrackButtonDidTap),
+                                    for: .touchUpInside)
+        
         // 1) 스크롤뷰 & contentView
         addSubview(scrollView)
         scrollView.addSubview(contentView)
@@ -213,6 +230,12 @@ final class DetailLogView: UIView {
         
         // 5) 통계 스택
         contentView.addSubview(statsStack)
+        
+        // 6) 기록 상세 라벨
+        contentView.addSubview(recordTitleLabel)
+        
+        // 7) “기록 상세” 테이블뷰 (RecordDetailView)
+        contentView.addSubview(recordDetailView)
     }
     
     // MARK: - Setup Layout
@@ -234,7 +257,7 @@ final class DetailLogView: UIView {
         
         movingTrackButton.snp.makeConstraints { make in
             make.bottom.trailing.equalToSuperview().inset(8)
-            make.width.equalTo(100)
+            make.width.equalTo(90)
             make.height.equalTo(40)
         }
         
@@ -262,6 +285,19 @@ final class DetailLogView: UIView {
             make.top.equalTo(separatorView.snp.bottom).offset(8)
             make.leading.trailing.equalToSuperview().inset(24)
         }
+        
+        // 기록상세
+        recordTitleLabel.snp.makeConstraints { make in
+            make.top.equalTo(statsStack.snp.bottom).offset(24)
+            make.leading.equalToSuperview().inset(24)
+        }
+        
+        // “기록 상세” 테이블뷰
+        recordDetailView.snp.makeConstraints { make in
+            make.top.equalTo(recordTitleLabel.snp.bottom).offset(16)
+            make.leading.trailing.equalToSuperview().inset(24)
+            make.bottom.equalToSuperview().offset(-20)
+        }
     }
     
     // MARK: - Configure
@@ -270,8 +306,8 @@ final class DetailLogView: UIView {
     }
     
     // MARK: - Actions
-    @objc private func movingTrackButtonTapped() {
-        print("무빙트랙 버튼 탭됨")
+    @objc private func movingTrackButtonDidTap() {
+        onMovingTrackButtonTapped?()
     }
 }
 
