@@ -69,7 +69,7 @@ final class CardElementView: UIView {
             value.attributedText = .RLAttributedString(text: "\(record.sectionTime.asTimeString)", font: .Heading4, color: .LightOrange)
         case .distance:
             title.attributedText = .RLAttributedString(text: "거리", font: .Headline1, color: .Gray000)
-            value.attributedText = .RLAttributedString(text: "\(record.distance.toString())km", font: .Title, color: .LightPink)
+            value.attributedText = .RLAttributedString(text: "\(record.distance.asTimeString)km", font: .Title, color: .LightPink)
         case .steps:
             title.attributedText = .RLAttributedString(text: "걸음수", font: .Headline1, color: .Gray000)
             value.attributedText = .RLAttributedString(text: "\(record.steps.formattedString)", font: .Title, color: .LightBlue)
