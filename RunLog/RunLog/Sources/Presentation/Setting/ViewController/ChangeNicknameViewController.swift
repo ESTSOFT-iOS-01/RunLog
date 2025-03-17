@@ -61,7 +61,7 @@ final class ChangeNicknameViewController: UIViewController {
         navigationController?
             .addRightButton(title: "완료")
             .sink { [weak self] in
-                self?.validateAndSaveNickname() // ✅ 닉네임 검증 후 저장
+                self?.validateAndSaveNickname()
             }
             .store(in: &cancellables)
     }
@@ -104,23 +104,7 @@ final class ChangeNicknameViewController: UIViewController {
         }
         viewModel.input.send(.saveButtonTapped)
     }
-    
-    // MARK: - Show Alert
-    private func showAlert(message: String) {
-        let alert = UIAlertController(title: "알림", message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "확인", style: .default))
-        present(alert, animated: true)
-    }
-    
-    private func setupTapGestureToDismissKeyboard() {
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
-        tapGesture.cancelsTouchesInView = false
-        view.addGestureRecognizer(tapGesture)
-    }
-    
-    @objc private func dismissKeyboard() {
-        view.endEditing(true)
-    }
+
 }
 
 extension ChangeNicknameViewController: UITextFieldDelegate {
