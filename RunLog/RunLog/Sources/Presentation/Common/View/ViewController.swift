@@ -33,25 +33,31 @@ class ViewController: UIViewController {
         $0.setHeight(100)
     }
     
+    private let textField = RLTextField(placeholder: "닉네임을 입력하세요")
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .red
+        view.backgroundColor = .Gray900
         // Do any additional setup after loading the view.
-        [label, closeButton, rlBtn].forEach{ view.addSubview($0) }
+        [textField].forEach{ view.addSubview($0) }
         
+        textField.snp.makeConstraints {
+            $0.leading.trailing.equalToSuperview().inset(24) // 좌우 여백 24
+            $0.top.equalToSuperview().offset(100) // 상단 여백 50
+            $0.height.equalTo(64)
+        }
         
-        view.addSubview(label)
-        label.snp.makeConstraints {
-            $0.centerX.centerY.equalToSuperview()
-        }
-        closeButton.snp.makeConstraints {
-            $0.leading.trailing.equalTo(label)
-            $0.top.equalTo(label.snp.bottom)
-        }
-        rlBtn.snp.makeConstraints {
-            // 버튼 width는 leading, trailing으로 잡아주면 좋아요
-            $0.leading.trailing.equalToSuperview().inset(24)
-        }
+//        label.snp.makeConstraints {
+//            $0.centerX.centerY.equalToSuperview()
+//        }
+//        closeButton.snp.makeConstraints {
+//            $0.leading.trailing.equalTo(label)
+//            $0.top.equalTo(label.snp.bottom)
+//        }
+//        rlBtn.snp.makeConstraints {
+//            // 버튼 width는 leading, trailing으로 잡아주면 좋아요
+//            $0.leading.trailing.equalToSuperview().inset(24)
+//        }
     }
 }
 
