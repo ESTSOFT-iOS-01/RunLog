@@ -56,6 +56,7 @@ final class MyPageViewController: UIViewController {
     // MARK: - Setup UI
     private func setupUI() {
         // UI 요소 추가
+        view.backgroundColor = .Gray900
         view.addSubview(mypageView)
         mypageView.snp.makeConstraints {
             $0.horizontalEdges.equalToSuperview().inset(24)
