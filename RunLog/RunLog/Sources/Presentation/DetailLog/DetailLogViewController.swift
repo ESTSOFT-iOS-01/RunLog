@@ -45,8 +45,9 @@ final class DetailLogViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        detailLogView.recordDetailView.tableViewInstance.dataSource = self
-        detailLogView.recordDetailView.tableViewInstance.delegate = self
+        let tableView = detailLogView.recordDetailView.tableView
+        tableView.dataSource = self
+        tableView.delegate = self
         setupUI()
         setupNavigationBar()
         setupGesture()
@@ -105,9 +106,9 @@ final class DetailLogViewController: UIViewController {
             RecordDetail(timeRange: "12:13 - 12:30", distance: "100.81km", steps: "2,237,345")
         ]
         print("DetailLogViewController - 더미데이터 개수: \(dummyRecords.count)")
-        // detailLogView 내부에 있는 테이블뷰(RecordDetailView)에 주입
-        //detailLogView.recordDetailView.setRecords(dummyRecords)
         self.recordDetails = dummyRecords
+        
+        detailLogView.recordDetailView.tableView.reloadData()
     }
     
     // MARK: - Bind ViewModel

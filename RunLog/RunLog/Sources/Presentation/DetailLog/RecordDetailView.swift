@@ -11,16 +11,8 @@ import Then
 
 final class RecordDetailView: UIView {
     
-    var records: [RecordDetail] = []
-    
-    func setRecords(_ newRecords: [RecordDetail]) {
-        print("RecordDetailView - 새로운 레코드 개수: \(newRecords.count)")
-        self.records = newRecords
-        tableView.reloadData()
-    }
-    
     // MARK: - UI Components 선언
-    private lazy var tableView = UITableView(frame: .zero, style: .plain).then {
+    lazy var tableView = UITableView(frame: .zero, style: .plain).then {
         // 셀 등록
         $0.register(RecordDetailViewCell.self, forCellReuseIdentifier: RecordDetailViewCell.identifier)
         
@@ -65,19 +57,5 @@ final class RecordDetailView: UIView {
         // 뷰 설정
     }
     
-    // 외부에서 데이터소스와 델리게이트를 설정.
-    func setTableViewDataSourceDelegate(_ dataSourceDelegate: UITableViewDataSource & UITableViewDelegate) {
-        tableView.dataSource = dataSourceDelegate
-        tableView.delegate = dataSourceDelegate
-        tableView.reloadData()
-    }
-    
-    // VC에서 데이터를 설정할 때 사용할 메서드
-    func reloadData() {
-        tableView.reloadData()
-    }
-    
-    var tableViewInstance: UITableView {
-            return tableView
-        }
+   
 }

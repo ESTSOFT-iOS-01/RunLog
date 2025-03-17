@@ -182,9 +182,7 @@ final class DetailLogView: UIView {
     }()
     
     let recordTitleLabel = UILabel().then {
-        $0.text = "기록 상세"
-        $0.font = .RLHeading1
-        $0.textColor = .Gray000
+        $0.attributedText = .RLAttributedString(text: "기록 상세", font: .Heading1)
     }
     
     // 테이블뷰를 담은 뷰
