@@ -13,6 +13,9 @@ enum RLIcon {
     case walk
     case rightArrow
     case leftArrow
+    case document
+    case streak
+    case rightArrow
 }
 
 extension RLIcon {
@@ -26,6 +29,12 @@ extension RLIcon {
             return "arrowtriangle.right.fill"
         case .leftArrow:
             return "arrowtriangle.left.fill"
+        case .document:
+            return "text.document"
+        case .streak:
+            return "leaf"
+        case .rightArrow:
+            return "chevron.right"
         }
     }
 }
