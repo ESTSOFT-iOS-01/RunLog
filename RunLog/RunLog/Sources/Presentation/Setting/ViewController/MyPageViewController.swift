@@ -68,6 +68,7 @@ final class MyPageViewController: UIViewController {
     private func setupNavigationBar() {
         // 네비게이션바 디테일 설정
         navigationItem.title = "LOGO"
+        self.navigationController?.setupAppearance()
     }
 
     // MARK: - Setup Gesture
@@ -127,9 +128,11 @@ extension MyPageViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        // 이후 페이지 완성되면 연결
         // coordinator 패턴쓰면 그걸로도 처리할 수 있을 듯?
-        print("\(menuItems[indexPath.row].viewControllerType) 선택됨")
+
+        let selectedItem = menuItems[indexPath.row]
+        let vc = selectedItem.viewControllerType.init()
+        navigationController?.pushViewController(vc, animated: true)
     }
     
 }

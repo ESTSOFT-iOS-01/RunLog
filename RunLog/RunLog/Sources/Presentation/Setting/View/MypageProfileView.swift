@@ -78,7 +78,8 @@ final class MypageProfileView: UIView {
     
     // MARK: - Setup UI
     private func setupUI() {
-        self.addSubviews(nameLabel, despLabel, cardStackView, tableView)
+        backgroundColor = .Gray900
+        addSubviews(nameLabel, despLabel, cardStackView, tableView)
     }
     
     // MARK: - Setup Layout

@@ -15,6 +15,8 @@ final class ChangeNicknameViewController: UIViewController {
     // MARK: - DI
 //    private let viewModel: ViewModelType
     private var cancellables = Set<AnyCancellable>()
+    private let placeHolderString = "최대 10자까지 입력 가능합니다"
+    private lazy var nameField = RLTextField(placeholder: placeHolderString)
     
     // MARK: - Init
     //    init(viewModel: ViewModelType) {
@@ -43,18 +45,29 @@ final class ChangeNicknameViewController: UIViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        self.navigationController?.setNavigationBarHidden(true, animated: false)
+        self.navigationController?.setNavigationBarHidden(false, animated: animated)
     }
     
     
     // MARK: - Setup UI
     private func setupUI() {
         // UI 요소 추가
+        view.backgroundColor = .Gray900
+        view.addSubview(nameField)
+        
+        nameField.snp.makeConstraints {
+            $0.leading.trailing.equalToSuperview().inset(24)
+            $0.top.equalToSuperview().offset(130)
+            $0.height.equalTo(64)
+        }
     }
     
     // MARK: - Setup Navigation Bar
     private func setupNavigationBar() {
         // 네비게이션바 디테일 설정
+        navigationItem.title = "닉네임 수정"
+        self.navigationController?.setupAppearance()
+        self.navigationController?.addRightButton(title: "완료", target: self, action: #selector(saveButtonTapped))
     }
 
     // MARK: - Setup Gesture
@@ -74,5 +87,16 @@ final class ChangeNicknameViewController: UIViewController {
 //                // View 업데이트 로직
 //            }
 //            .store(in: &cancellables)
+    }
+    
+    @objc private func saveButtonTapped() {
+        // 완료 버튼 선택
+        guard let newName = nameField.text else {
+            print("새로운 닉네임이 공백입니다.")
+            return
+        }
+        
+        print("닉네임이 저장됨 : \(newName)")
+        self.navigationController?.popViewController(animated: true)
     }
 }
