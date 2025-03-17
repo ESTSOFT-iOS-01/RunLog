@@ -1,5 +1,5 @@
 //
-//  LogView.swift
+//  DetailLogView.swift
 //  RunLog
 //
 //  Created by 도민준 on 3/17/25.
@@ -10,7 +10,7 @@ import MapKit
 import SnapKit
 import Then
 
-final class LogView: UIView {
+final class DetailLogView: UIView {
     
     // MARK: - UI Components 선언
     
@@ -276,10 +276,10 @@ final class LogView: UIView {
 #if canImport(SwiftUI) && DEBUG
 import SwiftUI
 
-struct LogView_Preview: PreviewProvider {
+struct DetailLogView_Preview: PreviewProvider {
     static var previews: some View {
         UIViewPreview {
-            LogView()
+            DetailLogView()
         }
         .previewLayout(.sizeThatFits) // 크기를 적절하게 조절하여 미리보기 가능
         .padding()
