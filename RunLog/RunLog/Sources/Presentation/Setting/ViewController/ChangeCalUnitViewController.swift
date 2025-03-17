@@ -13,9 +13,10 @@ import Combine
 final class ChangeCalUnitViewController: UIViewController {
     
     // MARK: - DI
-//    private let viewModel: ViewModelType
+    private let viewModel = CalUnitViewModel()
+    private lazy var calUnitView = CalUnitView(viewModel: viewModel)
+    
     private var cancellables = Set<AnyCancellable>()
-    private lazy var calUnitView = CalUnitView()
     
     // MARK: - Init
     //    init(viewModel: ViewModelType) {
@@ -32,6 +33,7 @@ final class ChangeCalUnitViewController: UIViewController {
         super.viewDidLoad()
         setupUI()
         setupNavigationBar()
+        setupTextField()
         setupGesture()
         setupData()
         bindViewModel()
@@ -68,34 +70,91 @@ final class ChangeCalUnitViewController: UIViewController {
         self.navigationController?.addRightButton(title: "완료", target: self, action: #selector(saveButtonTapped))
         self.navigationController?.setupAppearance()
     }
+    
 
     // MARK: - Setup Gesture
     private func setupGesture() {
         // 제스처 추가
+        setupTapGestureToDismissKeyboard()
+    }
+    
+    private func setupTextField() {
+        calUnitView.unitField.delegate = self
     }
     
     // MARK: - Setup Data
     private func setupData() {
         // 초기 데이터 로드
+        calUnitView.unitField.setTextWithUnderline(String(viewModel.unit))
+        calUnitView.updateDescriptionText(with: viewModel.unit)
     }
 
     // MARK: - Bind ViewModel
     private func bindViewModel() {
-//        viewModel.output.something
-//            .sink { [weak self] value in
-//                // View 업데이트 로직
-//            }
-//            .store(in: &cancellables)
+        viewModel.output
+            .sink { [weak self] output in
+                switch output {
+                case .saveSuccess:
+                    self?.navigationController?.popViewController(animated: true)
+                default:
+                    break
+                }
+            }
+            .store(in: &cancellables)
     }
     
     @objc private func saveButtonTapped() {
-        // 완료 버튼 선택
-        guard let newUnit = calUnitView.unitField.text else {
-            print("새로운 단위가 공백입니다.")
+        guard let text = calUnitView.unitField.text, !text.isEmpty else {
+            showAlert(message: "값을 입력해주세요.")
             return
         }
         
-        print("새로운 단위 저장됨 : \(newUnit)")
-        self.navigationController?.popViewController(animated: true)
+        viewModel.input.send(.saveButtonTapped)
+    }
+    
+    private func setupTapGestureToDismissKeyboard() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        tapGesture.cancelsTouchesInView = false
+        view.addGestureRecognizer(tapGesture)
+    }
+    
+    @objc private func dismissKeyboard() {
+        view.endEditing(true)
+    }
+    
+    private func showAlert(message: String) {
+        let alert = UIAlertController(title: "알림", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "확인", style: .default))
+        present(alert, animated: true)
+    }
+
+}
+
+extension ChangeCalUnitViewController: UITextFieldDelegate {
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        let allowedCharacters = CharacterSet(charactersIn: "0123456789.")
+        let characterSet = CharacterSet(charactersIn: string)
+        
+        if !allowedCharacters.isSuperset(of: characterSet) {
+            return false
+        }
+
+        let currentText = textField.text ?? ""
+        let updatedText = (currentText as NSString).replacingCharacters(in: range, with: string)
+
+        if updatedText.filter({ $0 == "." }).count > 1 {
+            return false
+        }
+        
+        if let value = Double(updatedText), value > 100 {
+            return false
+        }
+
+        return true
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
     }
 }

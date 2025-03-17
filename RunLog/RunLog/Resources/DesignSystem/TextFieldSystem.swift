@@ -45,6 +45,7 @@ open class RLTextField: UITextField {
         
         underline.backgroundColor = .Gray200
         addSubview(underline)
+        textDidChange()
     }
     
     // MARK: - Setup Layout
@@ -72,6 +73,12 @@ open class RLTextField: UITextField {
     // MARK: - Set Placeholder Color
     public func setPlaceholder(_ text: String, color: UIColor = .Gray300) {
         attributedPlaceholder = .RLAttributedString(text: text, font: .Headline2, color: color)
+    }
+    
+    public func setTextWithUnderline(_ value: String) {
+        text = value
+        attributedText = .RLAttributedString(text: value, font: .Headline1)
+        underline.backgroundColor = value.isEmpty ? .Gray200 : .LightGreen
     }
     
     // MARK: - Observers

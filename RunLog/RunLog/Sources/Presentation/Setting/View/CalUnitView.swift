@@ -6,48 +6,47 @@
 //
 
 import UIKit
+import Combine
 import SnapKit
 import Then
 
 final class CalUnitView: UIView {
-    var unit : Double = 10.0
+    
+    // MARK: - Properties
+    private let viewModel: CalUnitViewModel
+    private var cancellables = Set<AnyCancellable>()
+    
     private let placeHolderString = "최대 100km까지 입력 가능합니다"
     
     // MARK: - UI Components 선언
-    private lazy var exampleImageView = UIImageView().then {
+    private let exampleImageView = UIImageView().then {
         $0.backgroundColor = .clear
         $0.contentMode = .scaleAspectFit
     }
     
-    lazy var despLabel = UILabel().then {
+    private let despLabel = UILabel().then {
         $0.numberOfLines = 0
         $0.textAlignment = .center
-        
-        let unitString = (unit*0.3).toString()
-        let fullText = "하루에 \(unitString)km 이동하면 이렇게 표시돼요"
-        
-        $0.attributedText = fullText.styledText(
-            highlightText: unitString,
-            baseFont: .RLBody1,
-            baseColor: .Gray000,
-            highlightFont: .RLBody1,
-            highlightColor: .LightGreen
-        )
     }
     
-    lazy var unitField = RLTextField(placeholder: placeHolderString)
+    lazy var unitField = RLTextField(placeholder: placeHolderString).then {
+        $0.keyboardType = .decimalPad
+        $0.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
+    }
     
-    var exampleView = UIView().then {
+    private let exampleView = UIView().then {
         $0.backgroundColor = .Gray700
         $0.layer.cornerRadius = 12
         $0.clipsToBounds = true
     }
     
     // MARK: - Init
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    init(viewModel: CalUnitViewModel) {
+        self.viewModel = viewModel
+        super.init(frame: .zero)
         setupUI()
         setupLayout()
+        bindViewModel()
     }
 
     required init?(coder: NSCoder) {
@@ -58,7 +57,7 @@ final class CalUnitView: UIView {
     private func setupUI() {
         // UI 요소 추가
         backgroundColor = .Gray900
-        unitField.keyboardType = .decimalPad
+        
         exampleView.addSubviews(exampleImageView, despLabel)
         addSubviews(exampleView, unitField)
     }
@@ -87,8 +86,35 @@ final class CalUnitView: UIView {
         }
     }
     
+    // MARK: - Data Bind
+    private func bindViewModel() {
+        viewModel.output
+            .sink { [weak self] output in
+                switch output {
+                case .unitUpdated(let value):
+                    self?.updateDescriptionText(with: value)
+                case .saveSuccess:
+                    break
+                }
+            }
+            .store(in: &cancellables)
+    }
+    
     // MARK: - Configure
-    func configure(originText : String) {
-        unitField.text = originText
+    func updateDescriptionText(with value: Double) {
+        let unitString = (value * 0.3).toString()
+        let fullText = "하루에 \(unitString)km 이동하면 이렇게 표시돼요"
+        
+        despLabel.attributedText = fullText.styledText(
+            highlightText: unitString,
+            baseFont: .RLBody1,
+            baseColor: .Gray000,
+            highlightFont: .RLBody1,
+            highlightColor: .LightGreen
+        )
+    }
+    
+    @objc private func textFieldDidChange() {
+        viewModel.input.send(.unitChanged(unitField.text ?? ""))
     }
 }
