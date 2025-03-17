@@ -66,7 +66,7 @@ final class DetailLogView: UIView {
     private let weatherLabel = RLLabel(
         text: "  흐림 | 12°C",
         textColor: .Gray100,
-        icon: UIImage(systemName: RLIcon.thermometer.name),
+        icon: UIImage(systemName: RLIcon.weather.name),
         align: .left,
         font: .RLLabel2,
         tintColor: .Gray100
