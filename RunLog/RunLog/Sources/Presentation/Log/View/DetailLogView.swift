@@ -230,8 +230,7 @@ final class DetailLogView: UIView {
         }
         
         movingTrackButton.snp.makeConstraints { make in
-            make.trailing.equalToSuperview().inset(8)
-            make.bottom.equalToSuperview().inset(8)
+            make.bottom.trailing.equalToSuperview().inset(8)
             make.width.equalTo(100)
             make.height.equalTo(40)
         }
