@@ -10,12 +10,38 @@ import UIKit
 import MapKit
 import WeatherKit
 import CoreLocation
+import Combine
 
+// MARK: - WeatherData (날씨 + 대기질 정보)
+struct WeatherData {
+    let temperature: Int
+    let condition: WeatherCondition
+    let airQuality: Int
+}
+struct DummyWeather {
+    let temperature: Int
+    let condition: WeatherCondition
+    //    let aqi: Int
+}
+// MARK: - 더미 데이터 (Air Quality)
+struct DummyAirQuality {
+    let aqi: Int
+}
 final class LocationManager: NSObject, CLLocationManagerDelegate {
     static let shared = LocationManager()
     
     private var locationManager = CLLocationManager()
-    let weatherService = WeatherService()
+    private let weatherService = WeatherService()
+    
+    // MARK: - Combine
+    private let locationSubject = PassthroughSubject<CLPlacemark, Never>()
+    private let weatherSubject = PassthroughSubject<WeatherData, Never>()
+    var locationPublisher: AnyPublisher<CLPlacemark, Never> {
+        locationSubject.eraseToAnyPublisher()
+    }
+    var weatherPublisher: AnyPublisher<WeatherData, Never> {
+        weatherSubject.eraseToAnyPublisher()
+    }
     
     // MARK: - Init
     private override init() {
@@ -27,119 +53,52 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         // 배터리를 아낄려면 kCLLocationAccuracyHundredMeters를 이용 - 정확도를 조절
-//        locationManager.distanceFilter = 100 // 100미터를 이동하면 다시 업데이트
+        locationManager.distanceFilter = 100 // 100미터를 이동하면 다시 업데이트
         locationManager.requestWhenInUseAuthorization() // 위치 권한 요청
         locationManager.startUpdatingLocation() //위치를 받아오기 시작
     }
-    // MARK: - 이동하면 현재 위치를 받아오는 함수
+    // MARK: - 이동하면 위치를 받아 ViewModel에 input넣음
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last else { return }
-        print(location) // 마지막 위치 출력
-        fetchData(location: location)
-    }
-    // MARK: - 위치 기반 데이터 가져오기
-    private func fetchData(location: CLLocation) {
-        fetchCityName(location: location) { city in
-            print("📍 도시명: \(city)")
-        }
-        fetchWeather(location: location) { weather in
-            print("🌤 날씨: \(weather.temperature)°C, \(weather.condition)")
-        }
+        print("현재 위치: \(location.coordinate.latitude), \(location.coordinate.longitude)")
+        
+        fetchCityName(location: location)
+        fetchWeatherData(location: location)
     }
     // MARK: - 도시명 가져오기
-    func fetchCityName(location: CLLocation, completion: @escaping (String) -> Void) {
+    private func fetchCityName(location: CLLocation) {
         let geocoder = CLGeocoder()
-        geocoder.reverseGeocodeLocation(location) { placemarks, _ in
-            let city = placemarks?.first?.locality ?? "알 수 없음"
-            completion(city)
-        }
-    }
-    // MARK: - 날씨 가져오기 (WeatherKit or 더미 데이터)
-    func fetchWeather(location: CLLocation, completion: @escaping (DummyWeather) -> Void) {
-        Task {
-            do {
-                // 실제 WeatherKit API 사용 (주석 해제 시)
-                // let weather = try await weatherService.weather(for: location)
-                // let weatherData = DummyWeather(
-                //     temperature: Int(weather.currentWeather.temperature.value),
-                //     condition: weather.currentWeather.condition
-                // )
-                let weatherData = dummyWeatherSet() // 더미 데이터 사용
-                completion(weatherData)
-            } catch {
-                print("❌ WeatherKit 날씨 데이터 가져오기 실패: \(error.localizedDescription)")
-                completion(dummyWeatherSet()) // 실패 시 더미 데이터 반환
+        geocoder.reverseGeocodeLocation(location) {
+            [weak self] placemarks, error in
+            guard let self = self else { return }
+            guard let placemark = placemarks?.first else {
+                print("Geocoding 실패: \(error!.localizedDescription)")
+                return
             }
+            self.locationSubject.send(placemark)
         }
     }
+    // MARK: - 날씨 데이터 가져오기
+    private func fetchWeatherData(location: CLLocation) {
+        Task {
+            async let weather = fetchWeatherKitData(location: location)
+            async let aqi = fetchOpenWeatherData(location: location)
+            
+            let weatherData = await WeatherData(
+                temperature: weather.temperature,
+                condition: weather.condition,
+                airQuality: aqi.aqi
+            )
+            weatherSubject.send(weatherData)
+        }
+    }
+    
+    // MARK: - weatherKit으로 날씨를 받아옴
+    private func fetchWeatherKitData(location: CLLocation) async -> DummyWeather {
+        return DummyWeather(temperature: Int.random(in: -10...35), condition: .clear)
+    }
+    // MARK: - openWeatherMap으로 대기질을 받아옴
+    private func fetchOpenWeatherData(location: CLLocation) async -> DummyAirQuality {
+        return DummyAirQuality(aqi: Int.random(in: 1...5))
+    }
 }
-// MARK: - dummyWeather
-// 날씨 정보 - 온도, 상태, 대기질
-struct DummyWeather {
-    let temperature: Int
-    let condition: WeatherCondition
-    let aqi: Int
-}
-func dummyWeatherSet() -> DummyWeather {
-    let temperature: Int = Int.random(in: -20...40)
-    let condition: WeatherCondition = .clear
-    let aqi: Int = Int.random(in: 1...5)
-    return DummyWeather(temperature: temperature, condition: condition, aqi: aqi)
-}
-
-
-//
-//// MARK: - 대기질 관련 - 아직 사용X
-//extension LocationManager {
-//    // 대기질 상태 - 한글
-//    private func aqiDescription(_ aqi: Int) -> String {
-//        switch aqi {
-//        case 1: return "좋음"
-//        case 2: return "보통"
-//        case 3: return "나쁨"
-//        case 4: return "매우 나쁨"
-//        case 5: return "위험"
-//        default: return "정보 없음"
-//        }
-//    }
-//    // 날씨 상태 - 한글
-//    enum WeatherCondition: String {
-//        case clear = "맑음"
-//        case cloudy = "흐림"
-//        case rainy = "비"
-//        case snowy = "눈"
-//        case stormy = "폭풍"
-//    }
-//    
-//}
-
-
-
-
-
-//
-//// MARK: - private Functions
-//extension LocationManager {
-//    // 위치의 attributedString 반환
-//    var curLocationStr: NSAttributedString {
-//        let str = currentLocation()
-//        return .RLAttributedString(text: str, font: .Label2, align: .center)
-//    }
-//    // 날씨의 attributedString 반환
-//    var curWeatherStr: NSAttributedString {
-//        let str = currentWeather()
-//        return .RLAttributedString(text: str, font: .Label2, align: .center)
-//    }
-//    
-//    
-//    /// 현재 위치의 도시명을 받아와서 String으로 반환
-//    private func currentLocation() -> String {
-//        return currentCity
-//    }
-//    /// 현재 위치(currentLocation의 위치)의 날씨, 온도, 미세먼지 농도를 받아와서 String으로 반환
-//    private func currentWeather() -> String {
-//        let weather = dummyWeatherSet()
-//        return "\(weather.condition.rawValue) | \(weather.temperature)°C, 미세먼지 \(aqiDescription(weather.aqi))"
-//    }
-//    
-//}

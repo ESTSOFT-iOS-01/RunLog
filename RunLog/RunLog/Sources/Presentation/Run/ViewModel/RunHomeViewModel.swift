@@ -8,52 +8,77 @@
 import UIKit
 import Combine
 import MapKit
+import WeatherKit
 
 final class RunHomeViewModel {
-    
     // MARK: - Input & Output
-    enum Input {
-        case locationUpdate(CLLocation) // 사용자의 위치가 바뀜
-    }
-    
     enum Output {
-        case locationUpdate(String) // 사용자의 위치
-        case weatherUpdate(DummyWeather) // 현재 날씨
+        case locationUpdate(String) // 가공된 위치 데이터
+        case weatherUpdate(String)  // 가공된 날씨 데이터
     }
-    let locationManager = LocationManager.shared
-    
-    let input = PassthroughSubject<Input, Never>()
     let output = PassthroughSubject<Output, Never>()
     private var cancellables = Set<AnyCancellable>()
+    private let locationManager = LocationManager.shared
     
     // MARK: - Init
     init() {
         bind()
     }
-    
     // MARK: - Bind (Input -> Output)
     private func bind() {
-        input
+        // 도시명 변경 구독
+        locationManager.locationPublisher
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] event in
-                switch event {
-                case .locationUpdate(let location):
-                    self?.fetchLocationData(for: location)
-                }
+            .sink { [weak self] placemark in
+                let city = self?.placemarksToString(placemark) ?? "알 수 없음"
+                self?.output.send(.locationUpdate(city))
+            }
+            .store(in: &cancellables)
+        // 날씨 변경 구독
+        locationManager.weatherPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] weather in
+                print("날씨: \(weather)")
+                let condition = self?.conditionToString(weather.condition) ?? weather.condition.rawValue
+                let temperature = "\(weather.temperature)°C"
+                let aqi = self?.aqiToString(weather.airQuality) ?? "정보 없음"
+                
+                let formattedString = "\(condition) | \(temperature), 미세먼지 \(aqi)"
+                self?.output.send(.weatherUpdate(formattedString))
             }
             .store(in: &cancellables)
     }
-    
-    // MARK: - 위치 & 날씨 데이터 가져오기
-    private func fetchLocationData(for location: CLLocation) {
-        locationManager.fetchCityName(location: location) { [weak self] city in
-            print("📍 도시명 업데이트: \(city)")
-            self?.output.send(.locationUpdate(city))
-        }
+    // MARK: - 위치 정보 데이터 -> 한글
+    private func placemarksToString(_ placemark: CLPlacemark) -> String {
+        let state = placemark.administrativeArea ?? ""  // 도, 광역시
+        let city = placemark.locality ?? ""             // 시, 군, 구
+        let district = placemark.subLocality ?? ""      // 동, 읍, 면
         
-        locationManager.fetchWeather(location: location) { [weak self] weather in
-            print("🌤 날씨 업데이트: \(weather.temperature)°C, \(weather.condition)")
-            self?.output.send(.weatherUpdate(weather))
+        if district.isEmpty {
+            return "\(state) \(city)에서"
+        } else {
+            return "\(state) \(city) \(district)에서"
+        }
+    }
+    // MARK: - 날씨 정보 데이터 -> 한글
+    private func conditionToString(_ condition: WeatherCondition) -> String {
+        switch condition {
+        case .clear: return "맑음"
+        case .cloudy: return "흐림"
+        case .rain: return "비"
+        case .snow: return "눈"
+        case .strongStorms: return "폭풍"
+        default: return condition.rawValue
+        }
+    }
+    private func aqiToString(_ aqi: Int) -> String {
+        switch aqi {
+        case 1: return "좋음"
+        case 2: return "보통"
+        case 3: return "나쁨"
+        case 4: return "매우 나쁨"
+        case 5: return "위험"
+        default: return "정보 없음"
         }
     }
 }

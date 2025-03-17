@@ -106,14 +106,19 @@ final class RunHomeViewController: UIViewController {
     // MARK: - Setup Gesture
     private func setupGesture() {
         // 제스처 추가
-        startButton.addTarget(self, action: #selector(startButtonTouch), for: .touchUpInside)
+        startButton.publisher
+            .sink {
+                print("운동 시작하기 버튼 클릭")
+                let vc = RunningViewController()
+                vc.modalPresentationStyle = .fullScreen
+                self.present(vc, animated: false)
+            }
+            .store(in: &cancellables)
     }
     
     // MARK: - Setup Data
     private func setupData() {
         // 초기 데이터 로드
-//        locationLabel.attributedText = LocationManager.shared.curLocationStr
-//        weatherLabel.attributedText = LocationManager.shared.curWeatherStr
         totalLabelCreate()
     }
 
@@ -123,13 +128,13 @@ final class RunHomeViewController: UIViewController {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] output in
                 switch output {
-                case .locationUpdate(let city):
-                    self?.locationLabel.text = city
-                case .weatherUpdate(let weather):
-                    self?.weatherLabel.attributedText = .RLAttributedString(text: "🌤 \(weather.condition) | \(weather.temperature)°C", font: .Label2)
+                case .locationUpdate(let text):
+                    self?.locationLabel.attributedText = .RLAttributedString(text: text, font: .Label2, align: .center)
+                case .weatherUpdate(let text):
+                    self?.weatherLabel.attributedText = .RLAttributedString(text: text, font: .Label2)
                 }
-                
-            }.store(in: &cancellables)
+            }
+            .store(in: &cancellables)
     }
 }
 
@@ -146,11 +151,5 @@ extension RunHomeViewController {
             baseFont: .RLMainTitle,
             highlightFont: .RLMainTitle
         )
-    }
-    @objc private func startButtonTouch(sender: UIButton) {
-        print("운동 시작하기 버튼 클릭")
-        let vc = RunningViewController()
-        vc.modalPresentationStyle = .fullScreen
-        self.present(vc, animated: false)
     }
 }
