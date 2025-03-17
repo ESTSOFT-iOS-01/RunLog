@@ -13,20 +13,11 @@ import Combine
 final class ChangeNicknameViewController: UIViewController {
     
     // MARK: - DI
-//    private let viewModel: ViewModelType
+    private let viewModel = ChangeNicknameViewModel()
+    private lazy var nicknameView = ChangeNicknameView(viewModel: viewModel)
     private var cancellables = Set<AnyCancellable>()
-    private let placeHolderString = "최대 10자까지 입력 가능합니다"
-    private lazy var nameField = RLTextField(placeholder: placeHolderString)
     
     // MARK: - Init
-    //    init(viewModel: ViewModelType) {
-    //        self.viewModel = viewModel
-    //        super.init(nibName: nil, bundle: nil)
-    //    }
-
-    //    required init?(coder: NSCoder) {
-    //        fatalError("init(coder:) has not been implemented")
-    //    }
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -34,8 +25,9 @@ final class ChangeNicknameViewController: UIViewController {
         setupUI()
         setupNavigationBar()
         setupGesture()
-        setupData()
+        setupTextField()
         bindViewModel()
+        setupData()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -51,14 +43,13 @@ final class ChangeNicknameViewController: UIViewController {
     
     // MARK: - Setup UI
     private func setupUI() {
-        // UI 요소 추가
         view.backgroundColor = .Gray900
-        view.addSubview(nameField)
+        view.addSubview(nicknameView)
         
-        nameField.snp.makeConstraints {
-            $0.leading.trailing.equalToSuperview().inset(24)
+        nicknameView.snp.makeConstraints {
+            $0.horizontalEdges.equalToSuperview().inset(24)
             $0.top.equalToSuperview().offset(130)
-            $0.height.equalTo(64)
+            $0.bottom.equalToSuperview()
         }
     }
     
@@ -69,34 +60,72 @@ final class ChangeNicknameViewController: UIViewController {
         self.navigationController?.setupAppearance()
         self.navigationController?.addRightButton(title: "완료", target: self, action: #selector(saveButtonTapped))
     }
+    
+    private func setupTextField() {
+        nicknameView.nameField.delegate = self
+    }
 
     // MARK: - Setup Gesture
     private func setupGesture() {
-        // 제스처 추가
+        setupTapGestureToDismissKeyboard()
     }
     
     // MARK: - Setup Data
     private func setupData() {
         // 초기 데이터 로드
+        nicknameView.nameField.setTextWithUnderline(viewModel.nickname)
     }
 
     // MARK: - Bind ViewModel
     private func bindViewModel() {
-//        viewModel.output.something
-//            .sink { [weak self] value in
-//                // View 업데이트 로직
-//            }
-//            .store(in: &cancellables)
+        viewModel.output
+            .sink { [weak self] output in
+                switch output {
+                case .saveSuccess:
+                    self?.navigationController?.popViewController(animated: true)
+                default:
+                    break
+                }
+            }
+            .store(in: &cancellables)
     }
     
     @objc private func saveButtonTapped() {
-        // 완료 버튼 선택
-        guard let newName = nameField.text else {
-            print("새로운 닉네임이 공백입니다.")
+        guard let text = nicknameView.nameField.text, !text.isEmpty else {
+            showAlert(message: "닉네임을 입력해주세요.")
             return
         }
+        viewModel.input.send(.saveButtonTapped)
+    }
+    
+    // MARK: - Show Alert
+    private func showAlert(message: String) {
+        let alert = UIAlertController(title: "알림", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "확인", style: .default))
+        present(alert, animated: true)
+    }
+    
+    private func setupTapGestureToDismissKeyboard() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        tapGesture.cancelsTouchesInView = false
+        view.addGestureRecognizer(tapGesture)
+    }
+    
+    @objc private func dismissKeyboard() {
+        view.endEditing(true)
+    }
+}
+
+extension ChangeNicknameViewController: UITextFieldDelegate {
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        let currentText = textField.text ?? ""
+        let newText = (currentText as NSString).replacingCharacters(in: range, with: string)
         
-        print("닉네임이 저장됨 : \(newName)")
-        self.navigationController?.popViewController(animated: true)
+        return newText.count <= 10
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
     }
 }
