@@ -211,29 +211,12 @@ final class DetailLogView: UIView {
                                     action: #selector(movingTrackButtonDidTap),
                                     for: .touchUpInside)
         
-        // 1) 스크롤뷰 & contentView
         addSubview(scrollView)
         scrollView.addSubview(contentView)
         
-        // 2) 지도 + 무빙트랙 버튼
-        contentView.addSubview(mapView)
+        contentView.addSubviews(mapView, titleLabel, weatherStack, separatorView, statsStack, recordTitleLabel, recordDetailView)
         mapView.addSubview(movingTrackButton)
         
-        // 3) 타이틀, 날씨 스택
-        contentView.addSubview(titleLabel)
-        contentView.addSubview(weatherStack)
-        
-        // 4) 구분선
-        contentView.addSubview(separatorView)
-        
-        // 5) 통계 스택
-        contentView.addSubview(statsStack)
-        
-        // 6) 기록 상세 라벨
-        contentView.addSubview(recordTitleLabel)
-        
-        // 7) “기록 상세” 테이블뷰 (RecordDetailView)
-        contentView.addSubview(recordDetailView)
     }
     
     // MARK: - Setup Layout
