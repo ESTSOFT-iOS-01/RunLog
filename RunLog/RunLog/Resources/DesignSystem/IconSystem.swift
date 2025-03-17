@@ -15,7 +15,7 @@ enum RLIcon {
     case rightArrow
     case play
     case mappin
-    case thermometer
+    case weather
     case dumbell
 }
 
@@ -34,7 +34,7 @@ extension RLIcon {
             return "play"
         case .mappin:
             return "mappin.and.ellipse"
-        case .thermometer:
+        case .weather:
             return "thermometer.medium"
         case .dumbell:
             return "dumbbell"
