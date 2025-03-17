@@ -81,13 +81,15 @@ final class ChangeNicknameViewController: UIViewController {
         viewModel.output
             .sink { [weak self] output in
                 switch output {
+                case .nicknameUpdated(let text):
+                    self?.nicknameView.nameField.setTextWithUnderline(text)
                 case .saveSuccess:
                     self?.navigationController?.popViewController(animated: true)
-                default:
-                    break
                 }
             }
             .store(in: &cancellables)
+        
+        viewModel.bindTextField(nicknameView.nameField.publisher)
     }
     
     @objc private func saveButtonTapped() {

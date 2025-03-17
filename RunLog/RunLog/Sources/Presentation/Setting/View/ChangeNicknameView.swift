@@ -20,7 +20,6 @@ final class ChangeNicknameView: UIView {
     
     lazy var nameField = RLTextField(placeholder: placeHolderString).then {
         $0.keyboardType = .default
-        $0.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
     }
     
     // MARK: - Init
@@ -52,6 +51,8 @@ final class ChangeNicknameView: UIView {
     
     // MARK: - Bind ViewModel
     private func bindViewModel() {
+        viewModel.bindTextField(nameField.publisher)
+        
         viewModel.output
             .sink { [weak self] output in
                 switch output {
@@ -62,11 +63,6 @@ final class ChangeNicknameView: UIView {
                 }
             }
             .store(in: &cancellables)
-    }
-    
-    // MARK: - Handle TextField Input
-    @objc private func textFieldDidChange() {
-        viewModel.input.send(.nicknameChanged(nameField.text ?? ""))
     }
     
 }

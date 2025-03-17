@@ -12,7 +12,6 @@ final class ChangeNicknameViewModel {
     
     // MARK: - Input & Output
     enum Input {
-        case nicknameChanged(String) // 사용자가 입력값 변경
         case saveButtonTapped // 저장 버튼 클릭
     }
     
@@ -39,15 +38,19 @@ final class ChangeNicknameViewModel {
         inputSubject
             .receive(on: DispatchQueue.main)
             .sink { [weak self] event in
-                guard let self = self else { return }
                 switch event {
-                case .nicknameChanged(let text):
-                    self.nickname = text
-                    self.outputSubject.send(.nicknameUpdated(text))
-                    
                 case .saveButtonTapped:
-                    self.saveNickname()
+                    self?.saveNickname()
                 }
+            }
+            .store(in: &cancellables)
+    }
+    
+    func bindTextField(_ textPublisher: AnyPublisher<String, Never>) {
+        textPublisher
+            .sink { [weak self] text in
+                self?.nickname = text
+                self?.outputSubject.send(.nicknameUpdated(text))
             }
             .store(in: &cancellables)
     }
