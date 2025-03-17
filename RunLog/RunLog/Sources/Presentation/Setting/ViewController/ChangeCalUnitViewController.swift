@@ -15,6 +15,7 @@ final class ChangeCalUnitViewController: UIViewController {
     // MARK: - DI
 //    private let viewModel: ViewModelType
     private var cancellables = Set<AnyCancellable>()
+    private lazy var calUnitView = CalUnitView()
     
     // MARK: - Init
     //    init(viewModel: ViewModelType) {
@@ -50,11 +51,22 @@ final class ChangeCalUnitViewController: UIViewController {
     private func setupUI() {
         // UI 요소 추가
         view.backgroundColor = .Gray900
+        view.addSubview(calUnitView)
+        
+        calUnitView.snp.makeConstraints {
+            $0.horizontalEdges.equalToSuperview().inset(24)
+            $0.top.equalToSuperview().offset(130)
+            $0.bottom.equalToSuperview()
+        }
+        
     }
     
     // MARK: - Setup Navigation Bar
     private func setupNavigationBar() {
         // 네비게이션바 디테일 설정
+        navigationItem.title = "기록 시각화 단위 설정"
+        self.navigationController?.addRightButton(title: "완료", target: self, action: #selector(saveButtonTapped))
+        self.navigationController?.setupAppearance()
     }
 
     // MARK: - Setup Gesture
@@ -74,5 +86,16 @@ final class ChangeCalUnitViewController: UIViewController {
 //                // View 업데이트 로직
 //            }
 //            .store(in: &cancellables)
+    }
+    
+    @objc private func saveButtonTapped() {
+        // 완료 버튼 선택
+        guard let newUnit = calUnitView.unitField.text else {
+            print("새로운 단위가 공백입니다.")
+            return
+        }
+        
+        print("새로운 단위 저장됨 : \(newUnit)")
+        self.navigationController?.popViewController(animated: true)
     }
 }
