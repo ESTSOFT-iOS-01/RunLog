@@ -14,8 +14,8 @@ import MapKit
 final class RunHomeViewController: UIViewController {
     
     // MARK: - DI
-//    private let viewModel: ViewModelType
     private var cancellables = Set<AnyCancellable>()
+    private let viewModel = RunHomeViewModel()
     
     // MARK: - UI
     var mapView = MKMapView()
@@ -32,7 +32,6 @@ final class RunHomeViewController: UIViewController {
     }
     // MARK: - Init
     init() {
-//        self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -120,11 +119,17 @@ final class RunHomeViewController: UIViewController {
 
     // MARK: - Bind ViewModel
     private func bindViewModel() {
-//        viewModel.output.something
-//            .sink { [weak self] value in
-//                // View 업데이트 로직
-//            }
-//            .store(in: &cancellables)
+        viewModel.output
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] output in
+                switch output {
+                case .locationUpdate(let city):
+                    self?.locationLabel.text = city
+                case .weatherUpdate(let weather):
+                    self?.weatherLabel.attributedText = .RLAttributedString(text: "🌤 \(weather.condition) | \(weather.temperature)°C", font: .Label2)
+                }
+                
+            }.store(in: &cancellables)
     }
 }
 
