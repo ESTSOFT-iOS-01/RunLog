@@ -11,13 +11,6 @@ import Then
 import Combine
 import MapKit
 
-// RunningView랑 CardView에서만 사용하는 타입 - 어디로빼야할지 고민
-struct SectionRecord {
-    var sectionTime: TimeInterval // 시간
-    var distance: Double // 거리
-    var steps: Int // 걸음 수
-}
-
 final class RunningViewController: UIViewController {
     
     // MARK: - DI

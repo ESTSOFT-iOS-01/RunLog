@@ -65,14 +65,26 @@ final class CardElementView: UIView {
         // 뷰 설정
         switch type {
         case .time:
-            title.attributedText = .RLAttributedString(text: "시간", font: .Heading1, color: .Gray000)
-            value.attributedText = .RLAttributedString(text: "\(record.sectionTime.asTimeString)", font: .Heading4, color: .LightOrange)
+            title.attributedText = .RLAttributedString(text: "시간", font: .Heading1)
+            value.attributedText = .RLAttributedString(
+                text: "\(record.sectionTime.asTimeString)",
+                font: .Heading4,
+                color: .LightOrange
+            )
         case .distance:
-            title.attributedText = .RLAttributedString(text: "거리", font: .Headline1, color: .Gray000)
-            value.attributedText = .RLAttributedString(text: "\(record.distance.asTimeString)km", font: .Title, color: .LightPink)
+            title.attributedText = .RLAttributedString(text: "거리", font: .Headline1)
+            value.attributedText = .RLAttributedString(
+                text: "\(record.distance.asTimeString)km",
+                font: .Title,
+                color: .LightPink
+            )
         case .steps:
-            title.attributedText = .RLAttributedString(text: "걸음수", font: .Headline1, color: .Gray000)
-            value.attributedText = .RLAttributedString(text: "\(record.steps.formattedString)", font: .Title, color: .LightBlue)
+            title.attributedText = .RLAttributedString(text: "걸음수", font: .Headline1)
+            value.attributedText = .RLAttributedString(
+                text: "\(record.steps.formattedString)",
+                font: .Title,
+                color: .LightBlue
+            )
         }
     }
 }

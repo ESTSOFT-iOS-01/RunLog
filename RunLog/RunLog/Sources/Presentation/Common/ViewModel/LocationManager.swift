@@ -8,17 +8,18 @@
 import Foundation
 import UIKit
 import MapKit
+import WeatherKit
 
 final class LocationManager {
     static var shared: LocationManager = LocationManager()
     
     var curLocationStr: NSAttributedString {
         let str = currentLocation()
-        return .RLAttributedString(text: str, font: .Label2, color: .Gray000, align: .center)
+        return .RLAttributedString(text: str, font: .Label2, align: .center)
     }
     var curWeatherStr: NSAttributedString {
         let str = currentWeather()
-        return .RLAttributedString(text: str, font: .Label2, color: .Gray000, align: .center)
+        return .RLAttributedString(text: str, font: .Label2, align: .center)
     }
     
     /// 현재 위치의 도시명을 받아와서 String으로 반환
@@ -29,6 +30,10 @@ final class LocationManager {
     private func currentWeather() -> String {
         return "흐림 | 12°C, 미세먼지 나쁨"
     }
+}
+// MARK: -  API 호출 함수
+extension LocationManager {
+    // 위치를 가지고 날씨를 받아옴
     
 }
 
