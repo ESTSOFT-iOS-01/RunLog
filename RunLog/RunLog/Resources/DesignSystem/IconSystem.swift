@@ -16,6 +16,10 @@ enum RLIcon {
     case document
     case streak
     case rightArrow
+    case play
+    case mappin
+    case weather
+    case dumbell
 }
 
 extension RLIcon {
@@ -35,6 +39,14 @@ extension RLIcon {
             return "leaf"
         case .rightArrow:
             return "chevron.right"
+        case .play:
+            return "play"
+        case .mappin:
+            return "mappin.and.ellipse"
+        case .weather:
+            return "thermometer.medium"
+        case .dumbell:
+            return "dumbbell"
         }
     }
 }
