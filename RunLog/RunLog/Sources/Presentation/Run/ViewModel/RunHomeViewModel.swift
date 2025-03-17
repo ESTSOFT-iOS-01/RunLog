@@ -14,7 +14,7 @@ struct SectionRecord {
     var steps: Int // 걸음 수
 }
 
-final class RunViewModel {
+final class RunHomeViewModel {
     
     // MARK: - Input & Output
     enum Input {
@@ -38,7 +38,6 @@ final class RunViewModel {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] event in
                 switch event {
-                    
                 }
             }
             .store(in: &cancellables)

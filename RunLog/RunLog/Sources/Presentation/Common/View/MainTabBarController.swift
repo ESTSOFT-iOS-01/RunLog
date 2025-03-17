@@ -17,8 +17,7 @@ class MainTabBarController: UITabBarController {
         runView.title = "Run"
         runView.tabBarItem = UITabBarItem(title: "Run", image: UIImage(systemName: "star"), selectedImage: UIImage(systemName: "star.fill"))
         
-        let logView = UINavigationController(rootViewController: UIViewController())
-        logView.view.backgroundColor = .blue
+        let logView = UINavigationController(rootViewController: LogViewController())
         logView.title = "Log"
         logView.tabBarItem = UITabBarItem(title: "Log", image: UIImage(systemName: "star"), selectedImage: UIImage(systemName: "star.fill"))
         

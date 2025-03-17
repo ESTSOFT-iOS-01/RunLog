@@ -113,8 +113,8 @@ final class RunHomeViewController: UIViewController {
     // MARK: - Setup Data
     private func setupData() {
         // 초기 데이터 로드
-        locationLabel.attributedText = LocationManager.shared.curLocationStr
-        weatherLabel.attributedText = LocationManager.shared.curWeatherStr
+//        locationLabel.attributedText = LocationManager.shared.curLocationStr
+//        weatherLabel.attributedText = LocationManager.shared.curWeatherStr
         totalLabelCreate()
     }
 
