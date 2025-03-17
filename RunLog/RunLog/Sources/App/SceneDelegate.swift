@@ -15,10 +15,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         window = UIWindow(frame: windowScene.coordinateSpace.bounds)
         window?.windowScene = windowScene
-        let detailViewModel = DetailLogViewModel()
-        let detailLogVC = DetailLogViewController(viewModel: detailViewModel)
-        
-        window?.rootViewController = UINavigationController(rootViewController: detailLogVC)
+        window?.rootViewController = MainTabBarController()
         window?.makeKeyAndVisible()
     }
 
