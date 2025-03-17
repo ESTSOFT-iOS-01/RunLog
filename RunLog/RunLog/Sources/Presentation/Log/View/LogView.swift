@@ -45,7 +45,7 @@ final class LogView: UIView {
         segmentedControl.snp.makeConstraints {
             $0.height.equalTo(31)
             $0.leading.trailing.equalToSuperview()
-            $0.top.equalTo(self.safeAreaLayoutGuide.snp.top).offset(8)
+            $0.top.equalTo(self.safeAreaLayoutGuide).offset(8)
         }
         
         pageViewController.view.snp.makeConstraints {

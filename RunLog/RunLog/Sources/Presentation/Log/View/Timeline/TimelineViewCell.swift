@@ -74,8 +74,7 @@ class TimelineViewCell: UITableViewCell {
         
         distanceLabel.snp.makeConstraints {
             $0.height.equalTo(49)
-            $0.leading.equalToSuperview().offset(24)
-            $0.top.equalToSuperview().offset(24)
+            $0.top.leading.equalToSuperview().offset(24)
         }
         titleLabel.snp.makeConstraints {
             $0.height.equalTo(26)

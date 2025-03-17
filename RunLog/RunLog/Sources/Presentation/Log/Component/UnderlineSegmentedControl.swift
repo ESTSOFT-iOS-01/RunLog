@@ -74,13 +74,13 @@ final class UnderlineSegmentedControl: UISegmentedControl {
         let selectedColor: UIColor = .LightGreen
         
         self.setTitleTextAttributes([
-                NSAttributedString.Key.foregroundColor: unselectedColor,
+                .foregroundColor: unselectedColor,
                 .font: UIFont.RLSegment2
             ],
             for: .normal
         )
         self.setTitleTextAttributes([
-                NSAttributedString.Key.foregroundColor: selectedColor,
+                .foregroundColor: selectedColor,
                 .font: UIFont.RLSegment1
             ],
             for: .selected
