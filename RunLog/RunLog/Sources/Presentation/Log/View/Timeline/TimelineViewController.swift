@@ -31,7 +31,7 @@ final class TimelineViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        setupGesture()
+        bindGesture()
         setupData()
         bindViewModel()
     }
@@ -57,8 +57,8 @@ final class TimelineViewController: UIViewController {
         timelineView.tableView.dataSource = self
     }
 
-    // MARK: - Setup Gesture
-    private func setupGesture() {
+    // MARK: - bindGesture
+    private func bindGesture() {
         // 제스처 추가
     }
     
@@ -69,12 +69,13 @@ final class TimelineViewController: UIViewController {
 
     // MARK: - Bind ViewModel
     private func bindViewModel() {
-//        viewModel.output.dayLogs
+//        viewModel.output.rightarrowButton
 //            .sink { [weak self] value in
-//                // View 업데이트 로직
+//                // 로직
 //            }
 //            .store(in: &cancellables)
     }
+    
 }
 
 extension TimelineViewController: UITableViewDelegate, UITableViewDataSource {

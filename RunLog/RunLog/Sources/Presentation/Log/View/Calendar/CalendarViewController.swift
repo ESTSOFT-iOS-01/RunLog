@@ -15,8 +15,13 @@ final class CalendarViewController: UIViewController {
     // MARK: - DI
     private let calendarView = CalendarView()
     private let viewModel: LogViewModel
+    
+    // 사용자가 보고 있는 달, 일
+    private var currentMonth = Date()
+    private var currentMonthDays: [Int] = []
+    
     private var cancellables = Set<AnyCancellable>()
-    private var days: [String] = []
+    
     
     // MARK: - Init
     init(viewModel: LogViewModel) {
@@ -32,7 +37,7 @@ final class CalendarViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        setupGesture()
+        bindGesture()
         setupData()
         bindViewModel()
     }
@@ -59,31 +64,35 @@ final class CalendarViewController: UIViewController {
         calendarView.collectionView.delegate = self
     }
     
-    // MARK: - Setup Gesture
-    private func setupGesture() {
-        // 제스처 추가
+    // MARK: - Bind Gesture
+    private func bindGesture() {
+        calendarView.leftArrowButton.publisher
+            .sink {
+                print("leftArrowButtonTapped")
+            }.store(in: &cancellables)
+        
+        calendarView.rightArrowButton.publisher
+            .sink {
+                print("rightArrowButtonTapped")
+            }.store(in: &cancellables)
     }
     
     // MARK: - Setup Data
     private func setupData() {
         // 초기 데이터 로드
-        self.days = generateDaysForMonth(year: 2025, month: 3)
+        self.currentMonthDays = generateDaysFor(date: Date())
     }
     
     // MARK: - Bind ViewModel
     private func bindViewModel() {
-        //        viewModel.output.something
-        //            .sink { [weak self] value in
-        //                // View 업데이트 로직
-        //            }
-        //            .store(in: &cancellables)
+        
     }
 }
 
 extension CalendarViewController {
-    func generateDaysForMonth(year: Int, month: Int) -> [String] {
+    func generateDaysFor(date: Date) -> [Int] {
         let calendar = Calendar.current
-        let components = DateComponents(year: year, month: month)
+        let components = calendar.dateComponents([.year, .month], from: date)
         
         guard let firstDayOfMonth = calendar.date(
             from: components
@@ -97,11 +106,11 @@ extension CalendarViewController {
         
         let firstWeekday = calendar.component(.weekday, from: firstDayOfMonth)
         
-        var daysArray: [String] = []
+        var daysArray: [Int] = []
         let emptyDays = firstWeekday - 1
-        daysArray.append(contentsOf: Array(repeating: "", count: emptyDays))
+        daysArray.append(contentsOf: Array(repeating: .zero, count: emptyDays))
         
-        daysArray.append(contentsOf: (1...totalDays).map { "\($0)" })
+        daysArray.append(contentsOf: (1...totalDays))
         
         return daysArray
     }
@@ -112,7 +121,7 @@ extension CalendarViewController: UICollectionViewDelegate, UICollectionViewData
         _ collectionView: UICollectionView,
         numberOfItemsInSection section: Int
     ) -> Int {
-        return days.count
+        return currentMonthDays.count
     }
     
     func collectionView(
@@ -123,7 +132,7 @@ extension CalendarViewController: UICollectionViewDelegate, UICollectionViewData
             withReuseIdentifier: CalendarViewCell.identifier,
             for: indexPath
         ) as! CalendarViewCell
-        cell.dayLabel.text = days[indexPath.row]
+        cell.configure(day: currentMonthDays[indexPath.row])
         return cell
     }
 }

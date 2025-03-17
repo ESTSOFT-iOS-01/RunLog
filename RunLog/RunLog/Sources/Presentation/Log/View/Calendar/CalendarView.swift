@@ -39,7 +39,7 @@ final class CalendarView: UIView {
         $0.layer.cornerRadius = 12
     }
     
-    private let leftArrowButton = UIButton().then {
+    let leftArrowButton = UIButton().then {
         $0.setImage(UIImage(systemName: RLIcon.leftArrow.name), for: .normal)
         $0.setPreferredSymbolConfiguration(
             .init(pointSize: 15, weight: .semibold), forImageIn: .normal
@@ -48,7 +48,7 @@ final class CalendarView: UIView {
         $0.tintColor = .Gray000
     }
     
-    private let rightArrowButton = UIButton().then {
+    let rightArrowButton = UIButton().then {
         $0.setImage(UIImage(systemName: RLIcon.rightArrow.name), for: .normal)
         $0.setPreferredSymbolConfiguration(
             .init(pointSize: 15, weight: .semibold), forImageIn: .normal

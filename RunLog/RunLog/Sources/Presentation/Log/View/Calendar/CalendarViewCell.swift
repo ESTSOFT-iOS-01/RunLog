@@ -13,7 +13,7 @@ class CalendarViewCell: UICollectionViewCell {
     
     static let identifier = "DayCell"
     
-    var dayLabel = UILabel().then {
+    private var dayLabel = UILabel().then {
         $0.attributedText = .RLAttributedString(
             text: "1",
             font: .Label2,
@@ -45,5 +45,10 @@ class CalendarViewCell: UICollectionViewCell {
             $0.top.equalToSuperview()
             $0.centerX.equalToSuperview()
         }
+    }
+    
+    // MARK: - Configure
+    func configure(day: Int) {
+        self.dayLabel.text = day == .zero ? "" : "\(day)"
     }
 }
