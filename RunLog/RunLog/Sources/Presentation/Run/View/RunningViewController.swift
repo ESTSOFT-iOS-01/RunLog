@@ -24,9 +24,8 @@ final class RunningViewController: UIViewController {
         $0.setCameraZoomRange(zoomRange, animated: false)
         $0.showsUserLocation = true
         $0.showsUserTrackingButton = true
-        $0.userTrackingMode = .none
         $0.pitchButtonVisibility = .visible
-        
+        $0.overrideUserInterfaceStyle = .light // 밝은 지도 - 궁금해서 넣어봄
     }
     var cardView = CardView()
     var foldButton = RLButton().then {
@@ -141,9 +140,11 @@ final class RunningViewController: UIViewController {
     private func setupData() {
         // 맵뷰 초기 데이터 설정
         let currentLocation = LocationManager.shared.currentLocation
+        mapView.setUserTrackingMode(.follow, animated: true)
         mapView.centerToLocation(currentLocation)
         // 뷰가 로드되면 운동이 시작된 상태
         viewModel.input.send(.runningStart)
+        
     }
 
     // MARK: - Bind ViewModel
@@ -172,7 +173,7 @@ extension RunningViewController: MKMapViewDelegate {
         self.foldButton.isHidden.toggle()
         self.unfoldButton.isHidden.toggle()
     }
-    
+    // 트래킹모드 .none이 되면 시야조정
     func mapView(_ mapView: MKMapView, didChange mode: MKUserTrackingMode, animated: Bool) {
         guard let userLocation = mapView.userLocation.location else { return }
         if mode == .none {

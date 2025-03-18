@@ -57,7 +57,11 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
     // MARK: - Init
     override init() {
         super.init()
+        locationManager.delegate = self
         setupLocationManager()
+    }
+    deinit {
+        locationManager.stopUpdatingLocation()
     }
     // MARK: - CLLocationManager 설정
     private func setupLocationManager() {
@@ -67,9 +71,7 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
         locationManager.distanceFilter = 10  //100미터를 이동하면 다시 업데이트
         locationManager.allowsBackgroundLocationUpdates = true
 //        locationManager.pausesLocationUpdatesAutomatically = false // 이동이 없으면 업데이트를 멈출지
-        locationManager.requestAlwaysAuthorization() // 항상 위치 권한 요청
-        locationManager.requestWhenInUseAuthorization() // 앱을 사용하는 동안 위치 권한 요청
-        locationManager.startUpdatingLocation() //위치를 받아오기 시작
+        getLocationUsagePermission()
     }
     // MARK: - 이동하면 위치를 받아 ViewModel에 input넣음
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
@@ -114,5 +116,33 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
     // MARK: - openWeatherMap으로 대기질을 받아옴
     private func fetchOpenWeatherData(location: CLLocation) async -> DummyAirQuality {
         return DummyAirQuality(aqi: Int.random(in: 1...5))
+    }
+}
+
+extension LocationManager {
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        getLocationUsagePermission()
+    }
+    private func getLocationUsagePermission() {
+        let status = locationManager.authorizationStatus
+        switch status {
+        case .notDetermined: // 허용 안한 상태
+            locationManager.requestWhenInUseAuthorization()
+        case .authorizedWhenInUse: // 앱을 사용동안 허용
+            locationManager.requestAlwaysAuthorization()
+        case .restricted, .denied: // 거부 상태
+            print("위치 권한이 거부됨 - 설정에서 변경 필요")
+            openAppSettings()
+        case .authorizedAlways: // 항상 허용
+            locationManager.startUpdatingLocation()
+        @unknown default:
+            return
+        }
+    }
+    private func openAppSettings() {
+        guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+        if UIApplication.shared.canOpenURL(url) {
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+        }
     }
 }
