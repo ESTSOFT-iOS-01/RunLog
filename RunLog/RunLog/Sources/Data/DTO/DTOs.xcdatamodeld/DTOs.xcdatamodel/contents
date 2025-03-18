@@ -18,14 +18,18 @@
         <attribute name="totalTime" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="trackImage" optional="YES" attributeType="Binary"/>
         <attribute name="weather" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="sections" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Section" inverseName="dayLog" inverseEntity="Section"/>
     </entity>
     <entity name="Point" representedClassName="Point" syncable="YES" codeGenerationType="class">
         <attribute name="latitude" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="longitude" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="timestamp" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="section" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Section" inverseName="route" inverseEntity="Section"/>
     </entity>
     <entity name="Section" representedClassName="Section" syncable="YES" codeGenerationType="class">
         <attribute name="distance" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="steps" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="dayLog" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="DayLog" inverseName="sections" inverseEntity="DayLog"/>
+        <relationship name="route" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Point" inverseName="section" inverseEntity="Point"/>
     </entity>
 </model>
