@@ -25,6 +25,8 @@ final class RunningViewController: UIViewController {
         $0.showsUserLocation = true
         $0.showsUserTrackingButton = true
         $0.userTrackingMode = .none
+        $0.pitchButtonVisibility = .visible
+        
     }
     var cardView = CardView()
     var foldButton = RLButton().then {
@@ -177,10 +179,5 @@ extension RunningViewController: MKMapViewDelegate {
         if mode == .none {
             mapView.centerToLocation(userLocation)
         }
-        
-    }
-    func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
-        let cameraHeight = mapView.camera.centerCoordinateDistance
-        print("📷 현재 카메라 높이 업데이트: \(cameraHeight)m")
     }
 }
