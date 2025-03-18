@@ -64,7 +64,7 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         // 배터리를 아낄려면 kCLLocationAccuracyHundredMeters를 이용 - 정확도를 조절
-        locationManager.distanceFilter = 100  //100미터를 이동하면 다시 업데이트
+        locationManager.distanceFilter = 10  //100미터를 이동하면 다시 업데이트
         locationManager.requestWhenInUseAuthorization() // 위치 권한 요청
         locationManager.startUpdatingLocation() //위치를 받아오기 시작
     }

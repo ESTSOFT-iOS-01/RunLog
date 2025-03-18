@@ -55,6 +55,7 @@ final class RunHomeViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationController?.setNavigationBarHidden(false, animated: animated)
+        self.mapView.centerToLocation(LocationManager.shared.currentLocation)
     }
     
     override func viewWillDisappear(_ animated: Bool) {

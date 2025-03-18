@@ -142,7 +142,6 @@ final class RunningViewController: UIViewController {
         // 맵뷰 초기 데이터 설정
         let currentLocation = LocationManager.shared.currentLocation
         mapView.centerToLocation(currentLocation)
-        
         // 뷰가 로드되면 운동이 시작된 상태
         viewModel.input.send(.runningStart)
     }
