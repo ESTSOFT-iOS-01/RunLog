@@ -65,7 +65,10 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         // 배터리를 아낄려면 kCLLocationAccuracyHundredMeters를 이용 - 정확도를 조절
         locationManager.distanceFilter = 10  //100미터를 이동하면 다시 업데이트
-        locationManager.requestWhenInUseAuthorization() // 위치 권한 요청
+        locationManager.allowsBackgroundLocationUpdates = true
+//        locationManager.pausesLocationUpdatesAutomatically = false // 이동이 없으면 업데이트를 멈출지
+        locationManager.requestAlwaysAuthorization() // 항상 위치 권한 요청
+        locationManager.requestWhenInUseAuthorization() // 앱을 사용하는 동안 위치 권한 요청
         locationManager.startUpdatingLocation() //위치를 받아오기 시작
     }
     // MARK: - 이동하면 위치를 받아 ViewModel에 input넣음
