@@ -20,7 +20,7 @@ final class LogViewModel {
     struct Output {
         let groupedDayLogs = CurrentValueSubject<[Date: [DayLog]], Never>([:])
         let sortedKeys = CurrentValueSubject<[Date], Never>([])
-        let distanceUnit = PassthroughSubject<Double, Never>()
+        let distanceUnit = CurrentValueSubject<Double, Never>(0.0)
     }
     
     private(set) var output: Output = .init()

@@ -27,16 +27,7 @@ class CalendarViewCell: UICollectionViewCell {
     }
     
     private var heartBeatImageView = UIImageView().then {
-        $0.image = UIImage(named: RLIcon.heartBeat.name)
-    }
-    
-    private lazy var horizontalStackView = UIStackView(
-        arrangedSubviews: []
-    ).then {
-        $0.backgroundColor = .clear
-        $0.spacing = -4
-        $0.axis = .horizontal
-        $0.distribution = .fill
+        $0.image = UIImage()
     }
     
     // MARK: - init
@@ -52,7 +43,7 @@ class CalendarViewCell: UICollectionViewCell {
     
     // MARK: - Setup UI
     private func setupUI() {
-        addSubviews(dayLabel, lineView, horizontalStackView)
+        addSubviews(dayLabel, heartBeatImageView)
     }
     
     // MARK: - Setup Layout
@@ -63,14 +54,8 @@ class CalendarViewCell: UICollectionViewCell {
             $0.centerX.equalToSuperview()
         }
         
-        lineView.snp.makeConstraints {
-            $0.height.equalTo(2)
+        heartBeatImageView.snp.makeConstraints {
             $0.horizontalEdges.equalToSuperview()
-            $0.centerY.equalToSuperview()
-        }
-        
-        horizontalStackView.snp.makeConstraints {
-            $0.centerX.equalToSuperview()
             $0.centerY.equalToSuperview()
         }
     }
@@ -79,11 +64,21 @@ class CalendarViewCell: UICollectionViewCell {
     func configure(day: Int, heartBeatCount: Int) {
         if day != .zero {
             self.dayLabel.text = "\(day)"
-            self.lineView.backgroundColor = .LightPink
-            
+            var imageName = ""
+            switch heartBeatCount {
+            case 1:
+                imageName = RLIcon.oneBeat.name
+            case 2:
+                imageName = RLIcon.twoBeats.name
+            case 3:
+                imageName = RLIcon.threeBeats.name
+            default:
+                imageName = RLIcon.noneBeat.name
+            }
+            heartBeatImageView.image = UIImage(named: imageName)
         } else {
             self.dayLabel.text = ""
-            self.lineView.backgroundColor = .clear
+            heartBeatImageView.image = nil
         }
     }
 }
