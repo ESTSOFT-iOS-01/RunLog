@@ -161,6 +161,9 @@ final class RunningViewController: UIViewController {
                     print("거리 변경")
                 case .stepsUpdate:
                     print("걸음 수 변경")
+                case .lineDraw(let lineDraw):
+                    print("라인 그리는 중")
+                    self?.mapView.addOverlay(lineDraw)
                 }
             }
             .store(in: &cancellables)
@@ -179,5 +182,18 @@ extension RunningViewController: MKMapViewDelegate {
         if mode == .none {
             mapView.centerToLocation(userLocation)
         }
+    }
+    func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+        guard let polyLine = overlay as? MKPolyline
+        else {
+            print("can't draw polyline")
+            return MKOverlayRenderer()
+        }
+        let renderer = MKPolylineRenderer(polyline: polyLine)
+        renderer.strokeColor = .orange
+        renderer.lineWidth = 5.0
+        renderer.alpha = 1.0
+        
+        return renderer
     }
 }

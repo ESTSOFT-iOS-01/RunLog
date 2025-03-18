@@ -21,6 +21,7 @@ final class RunningViewModel {
         distance: 0,
         steps: 0
     )
+    var previousCoordinate: CLLocationCoordinate2D?
     var timer: Timer?
     // MARK: - Input & Output
     enum Input {
@@ -34,6 +35,7 @@ final class RunningViewModel {
         case timerUpdate(String) // 운동 시간 업데이트
         case distanceUpdate // 운동 거리 업데이트
         case stepsUpdate // 운동 걸음 수 업데이트
+        case lineDraw(MKPolyline) // 지도에 라인을 그림
     }
     let input = PassthroughSubject<Input, Never>()
     let output = PassthroughSubject<Output, Never>()
@@ -55,8 +57,24 @@ final class RunningViewModel {
         // 사용자 위치 변경 구독
         locationManager.locationPublisher
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] locaiton in
-                self?.output.send(.locationUpdate(locaiton))
+            .sink { [weak self] location in
+                
+                if let previousCoordinate = self?.previousCoordinate {
+
+                    let point1 = CLLocationCoordinate2DMake(
+                        previousCoordinate.latitude,
+                        previousCoordinate.longitude
+                    )
+                    let point2 = CLLocationCoordinate2DMake(
+                        location.coordinate.latitude,
+                        location.coordinate.longitude
+                    )
+                    let points: [CLLocationCoordinate2D] = [point1, point2]
+                    let lineDraw = MKPolyline(coordinates: points, count: points.count)
+                    self?.output.send(.lineDraw(lineDraw))
+                }
+                self?.previousCoordinate = location.coordinate
+                self?.output.send(.locationUpdate(location))
             }
             .store(in: &cancellables)
         // input에 따라 처리
