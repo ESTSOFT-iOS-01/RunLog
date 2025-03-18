@@ -10,17 +10,25 @@ import Combine
 import MapKit
 
 final class RunningViewModel {
-    // MARK: - Property
+    
+    // MARK: - save Datas - 종료 버튼 누르면 저장 될 데이터들
     struct SectionRecord {
         var sectionTime: TimeInterval // 시간
         var distance: Double // 거리
         var steps: Int // 걸음 수
     }
+    // 섹션
+    var section: Section = Section(
+        distance: 0,
+        steps: 0,
+        route: []
+    )
     var record: SectionRecord = SectionRecord(
         sectionTime: 0,
         distance: 0,
         steps: 0
     )
+    // MARK: - Property
     var previousCoordinate: CLLocationCoordinate2D?
     var timer: Timer?
     // MARK: - Input & Output
@@ -49,15 +57,25 @@ final class RunningViewModel {
     deinit {
         timer?.invalidate()
         timer = nil
-        print("⏹ 운동 종료. 최종 시간: \(record.sectionTime)초")
+        saveLog()
     }
-    
+    private func saveLog() {
+        print("⏹ 운동 종료 ⏹")
+        print("최종 시간: \(record.sectionTime)초")
+        print("최종 경로 핀 수: \(section.route.count)")
+        print("최종 경로")
+        for location in section.route {
+            print("경도: \(location.latitude), 위도: \(location.longitude)")
+            print("시간: \(location.timestamp.formattedString)")
+        }
+    }
     // MARK: - Bind (Input -> Output)
     private func bind() {
         // 사용자 위치 변경 구독
         locationManager.locationPublisher
             .receive(on: DispatchQueue.main)
             .sink { [weak self] location in
+                // 경로 그리기
                 if let previousCoordinate = self?.previousCoordinate {
                     let point1 = CLLocationCoordinate2DMake(
                         previousCoordinate.latitude,
@@ -72,6 +90,12 @@ final class RunningViewModel {
                     self?.output.send(.lineDraw(lineDraw))
                 }
                 self?.previousCoordinate = location.coordinate
+                // 위치 변경
+                let point: Point = Point(
+                    latitude: location.coordinate.latitude,
+                    longitude: location.coordinate.longitude,
+                    timestamp: Date())
+                self?.section.route.append(point)
                 self?.output.send(.locationUpdate(location))
             }
             .store(in: &cancellables)

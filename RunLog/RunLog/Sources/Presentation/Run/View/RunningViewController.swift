@@ -123,6 +123,7 @@ final class RunningViewController: UIViewController {
         // 제스처 추가
         cardView.finishButton.publisher
             .sink { [weak self] in
+                
                 self?.dismiss(animated: false)
             }
             .store(in: &cancellables)
