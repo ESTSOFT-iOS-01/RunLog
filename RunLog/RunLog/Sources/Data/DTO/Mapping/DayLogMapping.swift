@@ -8,19 +8,25 @@
 import Foundation
 
 extension DayLogDTO {
-//    func toEntity() -> DayLog {
-//        return DayLog(
-//            date: self.date!,
-//            locationName: self.locationName,
-//            weather: self.weather,
-//            temperature: self.temperature,
-//            trackImage: self.trackImage,
-//            title: self.title,
-//            level: self.level,
-//            totalTime: self.totalTime,
-//            totalDistance: self.totalDistance,
-//            totalSteps: self.totalSteps,
-//            sections: <#T##[Section]#>
-//        )
-//    }
+    func toEntity() -> DayLog? {
+        guard let date = self.date,
+              let locationName = self.locationName,
+              let trackImage = self.trackImage,
+              let title = self.title
+        else { return nil }
+              
+        return DayLog(
+            date: date,
+            locationName: locationName,
+            weather: Int(weather),
+            temperature: Int(temperature),
+            trackImage: trackImage,
+            title: title,
+            level: Int(level),
+            totalTime: totalTime,
+            totalDistance: totalDistance,
+            totalSteps: Int(totalSteps),
+            sections: []
+        )
+    }
 }
