@@ -15,11 +15,28 @@ class CalendarViewCell: UICollectionViewCell {
     
     private var dayLabel = UILabel().then {
         $0.attributedText = .RLAttributedString(
-            text: "1",
+            text: "",
             font: .Label2,
             color: .Gray000
         )
         $0.textAlignment = .center
+    }
+    
+    private var lineView = UIView().then {
+        $0.backgroundColor = .clear
+    }
+    
+    private var heartBeatImageView = UIImageView().then {
+        $0.image = UIImage(named: RLIcon.heartBeat.name)
+    }
+    
+    private lazy var horizontalStackView = UIStackView(
+        arrangedSubviews: []
+    ).then {
+        $0.backgroundColor = .clear
+        $0.spacing = -4
+        $0.axis = .horizontal
+        $0.distribution = .fill
     }
     
     // MARK: - init
@@ -35,7 +52,7 @@ class CalendarViewCell: UICollectionViewCell {
     
     // MARK: - Setup UI
     private func setupUI() {
-        addSubviews(dayLabel)
+        addSubviews(dayLabel, lineView, horizontalStackView)
     }
     
     // MARK: - Setup Layout
@@ -45,10 +62,28 @@ class CalendarViewCell: UICollectionViewCell {
             $0.top.equalToSuperview()
             $0.centerX.equalToSuperview()
         }
+        
+        lineView.snp.makeConstraints {
+            $0.height.equalTo(2)
+            $0.horizontalEdges.equalToSuperview()
+            $0.centerY.equalToSuperview()
+        }
+        
+        horizontalStackView.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.centerY.equalToSuperview()
+        }
     }
     
     // MARK: - Configure
-    func configure(day: Int) {
-        self.dayLabel.text = day == .zero ? "" : "\(day)"
+    func configure(day: Int, heartBeatCount: Int) {
+        if day != .zero {
+            self.dayLabel.text = "\(day)"
+            self.lineView.backgroundColor = .LightPink
+            
+        } else {
+            self.dayLabel.text = ""
+            self.lineView.backgroundColor = .clear
+        }
     }
 }

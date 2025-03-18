@@ -183,7 +183,7 @@ extension CalendarViewController: UICollectionViewDelegate, UICollectionViewData
             withReuseIdentifier: CalendarViewCell.identifier,
             for: indexPath
         ) as! CalendarViewCell
-        cell.configure(day: currentMonthDays[indexPath.row])
+        cell.configure(day: currentMonthDays[indexPath.row], heartBeatCount: 2)
         return cell
     }
 }

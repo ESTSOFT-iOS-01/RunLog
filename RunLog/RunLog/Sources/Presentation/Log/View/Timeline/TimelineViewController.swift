@@ -100,7 +100,11 @@ extension TimelineViewController: UITableViewDelegate, UITableViewDataSource {
         if let dayLogs = viewModel.output.groupedDayLogs.value[key] {
             let dayLog = dayLogs[indexPath.row]
             cell.selectionStyle = .none
-            cell.configure(dayLog: dayLog)
+            cell.configure(
+                totalDistance: dayLog.totalDistance,
+                title: dayLog.title,
+                date: dayLog.date
+            )
         }
 
         return cell

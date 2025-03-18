@@ -21,6 +21,7 @@ enum RLIcon {
     case dumbell
     case fold
     case unfold
+    case heartBeat
 }
 
 extension RLIcon {
@@ -50,6 +51,8 @@ extension RLIcon {
             return "mappin.and.ellipse"
         case .dumbell:
             return "dumbbell"
+        case .heartBeat:
+            return "heartBeat"
         }
     }
 }

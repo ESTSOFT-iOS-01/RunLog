@@ -97,10 +97,14 @@ class TimelineViewCell: UITableViewCell {
     }
     
     // MARK: - Configure
-    func configure(dayLog: DayLog) {
-        self.distanceLabel.text = "\(dayLog.totalDistance.toString(withDecimal: 1))km"
-        self.titleLabel.text = "\(dayLog.title)"
-        self.dateLabel.text = "\(dayLog.date.formattedString(.fullDate))"
+    func configure(
+        totalDistance: Double,
+        title: String,
+        date: Date
+    ) {
+        self.distanceLabel.text = "\(totalDistance.toString(withDecimal: 1))km"
+        self.titleLabel.text = "\(title)"
+        self.dateLabel.text = "\(date.formattedString(.fullDate))"
     }
 }
 

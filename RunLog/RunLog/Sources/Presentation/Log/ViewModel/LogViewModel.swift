@@ -20,6 +20,7 @@ final class LogViewModel {
     struct Output {
         let groupedDayLogs = CurrentValueSubject<[Date: [DayLog]], Never>([:])
         let sortedKeys = CurrentValueSubject<[Date], Never>([])
+        let distanceUnit = PassthroughSubject<Double, Never>()
     }
     
     private(set) var output: Output = .init()
@@ -37,7 +38,7 @@ final class LogViewModel {
             .sink { [weak self] event in
                 switch event {
                 case .viewWillAppear:
-                    self?.loadAllDayLogs()
+                    self?.loadDatas()
                 }
             }
             .store(in: &cancellables)
@@ -51,16 +52,18 @@ final class LogViewModel {
 
 extension LogViewModel {
     // MARK: - private Functions
-    private func loadAllDayLogs() {
-        
-        // TODO: 데이터 연결
+    private func loadDatas() {
+        // TODO: 데이터 연결(DayLogs, AppConfig)
         let dayLogs = DummyData.dummyDayLogs
+        let distanceUnit = 5.0
         
         let groupedDayLogs = Dictionary(grouping: dayLogs) { dayLog in
             let calendar = Calendar.current
             let components = calendar.dateComponents([.year, .month], from: dayLog.date)
             return calendar.date(from: components) ?? dayLog.date
         }
+        
+        output.distanceUnit.send(distanceUnit)
         output.groupedDayLogs.send(groupedDayLogs)
         output.sortedKeys.send(groupedDayLogs.keys.sorted(by: >))
     }
