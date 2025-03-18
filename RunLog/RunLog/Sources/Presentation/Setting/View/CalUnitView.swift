@@ -6,16 +6,12 @@
 //
 
 import UIKit
-import Combine
 import SnapKit
 import Then
 
 final class CalUnitView: UIView {
     
     // MARK: - Properties
-    private let viewModel: CalUnitViewModel
-    private var cancellables = Set<AnyCancellable>()
-    
     private let placeHolderString = "최대 100km까지 입력 가능합니다"
     
     // MARK: - UI Components 선언
@@ -40,12 +36,10 @@ final class CalUnitView: UIView {
     }
     
     // MARK: - Init
-    init(viewModel: CalUnitViewModel) {
-        self.viewModel = viewModel
+    init() {
         super.init(frame: .zero)
         setupUI()
         setupLayout()
-        bindViewModel()
     }
 
     required init?(coder: NSCoder) {
@@ -83,22 +77,6 @@ final class CalUnitView: UIView {
             $0.top.equalTo(exampleView.snp.bottom).offset(48)
             $0.horizontalEdges.equalToSuperview()
         }
-    }
-    
-    // MARK: - Data Bind
-    private func bindViewModel() {
-        viewModel.bindTextField(unitField.publisher)
-
-        viewModel.output
-            .sink { [weak self] output in
-                switch output {
-                case .unitUpdated(let value):
-                    self?.updateDescriptionText(with: value)
-                default:
-                    break
-                }
-            }
-            .store(in: &cancellables)
     }
     
     // MARK: - Configure

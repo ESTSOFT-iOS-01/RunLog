@@ -12,13 +12,12 @@ import Combine
 
 final class ChangeCalUnitViewController: UIViewController {
     
-    // MARK: - DI
+    // MARK: - Properties
     private let viewModel = CalUnitViewModel()
-    private lazy var calUnitView = CalUnitView(viewModel: viewModel)
-    
     private var cancellables = Set<AnyCancellable>()
     
-    // MARK: - Init
+    // MARK: - UI
+    private lazy var calUnitView = CalUnitView()
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -85,7 +84,6 @@ final class ChangeCalUnitViewController: UIViewController {
         if viewModel.unit != 0 {
             calUnitView.unitField.setTextWithUnderline(String(viewModel.unit))
         }
-        
         calUnitView.updateDescriptionText(with: viewModel.unit)
     }
 
@@ -98,8 +96,8 @@ final class ChangeCalUnitViewController: UIViewController {
                 switch output {
                 case .saveSuccess:
                     self?.navigationController?.popViewController(animated: true)
-                default:
-                    break
+                case .unitUpdated(let value):
+                    self?.calUnitView.updateDescriptionText(with: value)
                 }
             }
             .store(in: &cancellables)
