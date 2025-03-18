@@ -77,7 +77,7 @@ open class RLTextField: UITextField {
         attributedPlaceholder = .RLAttributedString(text: text, font: .Headline2, color: color)
     }
     
-    // MARK: - Observers
+    // MARK: - Bindings
     private func setupBinding() {
         self.publisher
             .sink { [weak self] text in
