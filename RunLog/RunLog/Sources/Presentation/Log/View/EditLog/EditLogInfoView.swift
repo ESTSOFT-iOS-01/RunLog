@@ -33,7 +33,6 @@ final class EditLogInfoView: UIView {
     public lazy var tableView = UITableView(frame: .zero, style: .plain).then {
         $0.backgroundColor = .clear
         $0.separatorStyle = .none
-//        $0.rowHeight = 48
         $0.contentInsetAdjustmentBehavior = .never
         $0.isScrollEnabled = false
         $0.bounces = false

@@ -12,12 +12,9 @@ import Combine
 
 final class EditLogInfoViewController: UIViewController {
     
-    // MARK: - DI
-//    private let viewModel: ViewModelType
+    // MARK: - Properties
+    private let viewModel = EditLogInfoViewModel()
     private var cancellables = Set<AnyCancellable>()
-    
-    private var items : [String] = ["매우 쉬움", "쉬움", "보통", "어려움", "매우 어려움"]
-    var selectedIndexPath: IndexPath?
 
     // MARK: - UI
     private var editView = EditLogInfoView()
@@ -27,8 +24,9 @@ final class EditLogInfoViewController: UIViewController {
         super.viewDidLoad()
         setupUI()
         setupNavigationBar()
-        setupGesture()
         setupTableView()
+        setupTextField()
+        setupGesture()
         setupData()
         bindViewModel()
     }
@@ -58,13 +56,12 @@ final class EditLogInfoViewController: UIViewController {
     
     // MARK: - Setup Navigation Bar
     private func setupNavigationBar() {
-        // 네비게이션바 디테일 설정
         navigationItem.title = "기록 관리하기"
         self.navigationController?.setupAppearance()
         navigationController?
             .addRightButton(title: "완료")
             .sink { [weak self] in
-//                self?.validateAndSaveNickname()
+                self?.viewModel.input.send(.saveButtonTapped)
             }
             .store(in: &cancellables)
     }
@@ -74,31 +71,64 @@ final class EditLogInfoViewController: UIViewController {
         editView.tableView.dataSource = self
     }
 
+    private func setupTextField() {
+        editView.nameField.delegate = self
+    }
+
     // MARK: - Setup Gesture
     private func setupGesture() {
-        // 제스처 추가
+        setupTapGestureToDismissKeyboard()
     }
     
     // MARK: - Setup Data
     private func setupData() {
         // 초기 데이터 로드
+        editView.nameField.setTextWithUnderline(viewModel.logName)
     }
 
     // MARK: - Bind ViewModel
     private func bindViewModel() {
+        viewModel.bindTextField(editView.nameField.publisher)
         
+        viewModel.output
+            .sink { [weak self] output in
+                switch output {
+                case .logLevelUpdated(let index):
+                    self?.updateSelectedCell(index)
+                case .saveSuccess:
+                    self?.navigationController?.popViewController(animated: true)
+                case .logNameUpdated(let text):
+                    self?.editView.nameField.setTextWithUnderline(text)
+                }
+            }
+            .store(in: &cancellables)
+    }
+    
+    private func updateSelectedCell(_ selectedIndex: Int?) {
+        for (index, cell) in editView.tableView.visibleCells.enumerated() {
+            guard let radioButtonCell = cell as? RadioButtonCell else { continue }
+            radioButtonCell.changeState(index == selectedIndex)
+        }
     }
 }
 
-
-extension EditLogInfoViewController : UITableViewDelegate {
+extension EditLogInfoViewController: UITextFieldDelegate {
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        let currentText = textField.text ?? ""
+        let newText = (currentText as NSString).replacingCharacters(in: range, with: string)
+        
+        return newText.count <= 14
+    }
     
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
+    }
 }
-
 
 extension EditLogInfoViewController : UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return items.count
+        return viewModel.items.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -106,30 +136,21 @@ extension EditLogInfoViewController : UITableViewDataSource {
             return UITableViewCell()
         }
         
-        let lvlString = items[indexPath.row]
+        let lvlString = viewModel.items[indexPath.row]
         cell.configure(title: lvlString)
         
-//         이전에 저장한 정보가 있으면 그거 선택해줌
-        guard let selectedIndexPath = self.selectedIndexPath else { return cell }
-        let isSelected = indexPath == selectedIndexPath
+        let isSelected = indexPath.row == viewModel.selectedIndex
         cell.changeState(isSelected)
         
         return cell
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        // 이전에 선택된 셀을 초기화 (기존 선택이 있었다면)
-        if let previousIndexPath = selectedIndexPath,
-           let previousCell = tableView.cellForRow(at: previousIndexPath) as? RadioButtonCell {
-            previousCell.changeState(false)
-        }
-        
-        if let selectedCell = tableView.cellForRow(at: indexPath) as? RadioButtonCell {
-            selectedCell.changeState(true)
-        }
-        
-        selectedIndexPath = indexPath
-    }
-
-    
 }
+
+extension EditLogInfoViewController : UITableViewDelegate {
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        viewModel.input.send(.logLevelSelected(indexPath.row))
+    }
+}
+
