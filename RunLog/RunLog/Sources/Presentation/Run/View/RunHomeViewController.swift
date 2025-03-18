@@ -47,7 +47,7 @@ final class RunHomeViewController: UIViewController {
         setupUI()
         setupNavigationBar()
         setupTabBar()
-        setupGesture()
+        bindGesture()
         setupData()
         bindViewModel()
     }
@@ -106,8 +106,8 @@ final class RunHomeViewController: UIViewController {
         // 탭바 디테일 설정
         self.setupTabBarAppearance()
     }
-    // MARK: - Setup Gesture
-    private func setupGesture() {
+    // MARK: - Bind Gesture
+    private func bindGesture() {
         // 제스처 추가
         startButton.publisher
             .sink {

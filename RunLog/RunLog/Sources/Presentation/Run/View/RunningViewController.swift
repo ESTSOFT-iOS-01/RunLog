@@ -69,7 +69,7 @@ final class RunningViewController: UIViewController {
         super.viewDidLoad()
         setupUI()
         setupNavigationBar()
-        setupGesture()
+        bindGesture()
         setupData()
         bindViewModel()
     }
@@ -117,8 +117,8 @@ final class RunningViewController: UIViewController {
         // 네비게이션바 디테일 설정
     }
 
-    // MARK: - Setup Gesture
-    private func setupGesture() {
+    // MARK: - Bind Gesture
+    private func bindGesture() {
         // 제스처 추가
         cardView.finishButton.publisher
             .sink { [weak self] in
