@@ -12,24 +12,12 @@ import Combine
 
 final class MyPageViewController: UIViewController {
     
-    // MARK: - DI
-//    private let viewModel: ViewModelType
+    // MARK: - Properties
+    private let viewModel = MyPageViewModel()
     private var cancellables = Set<AnyCancellable>()
-    private let menuItems: [SettingMenuType] = SettingMenuType.allCases
     
     // MARK: - UI
-    private var mypageView = MypageProfileView(nickname: "행복한쿼카러너", totalDistance: 100, logCount: 1000, streakCount: 14)
-    
-    
-    // MARK: - Init
-//    init(viewModel: ViewModelType) {
-//        self.viewModel = viewModel
-//        super.init(nibName: nil, bundle: nil)
-//    }
-
-//    required init?(coder: NSCoder) {
-//        fatalError("init(coder:) has not been implemented")
-//    }
+    private var mypageView = MypageProfileView()
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -37,9 +25,8 @@ final class MyPageViewController: UIViewController {
         setupUI()
         setupNavigationBar()
         setupTableView()
-        setupGesture()
-        setupData()
         bindViewModel()
+        viewModel.input.send(.loadData)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -68,16 +55,7 @@ final class MyPageViewController: UIViewController {
     private func setupNavigationBar() {
         // 네비게이션바 디테일 설정
         navigationItem.title = "LOGO"
-    }
-
-    // MARK: - Setup Gesture
-    private func setupGesture() {
-        // 제스처 추가
-    }
-    
-    // MARK: - Setup Data
-    private func setupData() {
-        // 초기 데이터 로드
+        self.navigationController?.setupAppearance()
     }
     
     private func setupTableView() {
@@ -87,11 +65,16 @@ final class MyPageViewController: UIViewController {
 
     // MARK: - Bind ViewModel
     private func bindViewModel() {
-//        viewModel.output.something
-//            .sink { [weak self] value in
-//                // View 업데이트 로직
-//            }
-//            .store(in: &cancellables)
+        viewModel.output
+            .sink { [weak self] output in
+                switch output {
+                case .profileDataUpdated(let config):
+                    self?.mypageView.configure(with: config)
+                case .navigateToViewController(let viewController):
+                    self?.navigationController?.pushViewController(viewController, animated: true)
+                }
+            }
+            .store(in: &cancellables)
     }
 }
 
@@ -112,7 +95,7 @@ extension MyPageViewController: UITableViewDelegate {
 
 extension MyPageViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return menuItems.count
+        return viewModel.numberOfMenuItems()
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -120,16 +103,14 @@ extension MyPageViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         
-        let menuType = menuItems[indexPath.row]
+        let menuType = viewModel.menuItem(at: indexPath.row)
         cell.configure(title: menuType.title)
         return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        // 이후 페이지 완성되면 연결
-        // coordinator 패턴쓰면 그걸로도 처리할 수 있을 듯?
-        print("\(menuItems[indexPath.row].viewControllerType) 선택됨")
+        viewModel.input.send(.menuItemSelected(indexPath.row))
     }
     
 }

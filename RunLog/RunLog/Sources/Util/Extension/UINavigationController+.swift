@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Combine
 
 extension UINavigationController {
     
@@ -42,10 +43,8 @@ extension UINavigationController {
         if let title = title {
             rightButton.setTitle(title, for: .normal)
             rightButton.setTitleColor(.label, for: .normal)
-            rightButton.titleLabel?.font = .systemFont(
-                ofSize: 16,
-                weight: .medium
-            )
+            
+            rightButton.titleLabel?.attributedText = .RLAttributedString(text: title, font: .Label1, color: .LightGreen, align: .center)
         } else if let icon = icon {
             rightButton.setImage(UIImage(systemName: icon), for: .normal)
             rightButton.tintColor = .LightGreen
@@ -55,5 +54,33 @@ extension UINavigationController {
         topViewController?.navigationItem.rightBarButtonItem = UIBarButtonItem(
             customView: rightButton
         )
+    }
+    
+    func addRightButton(
+        title: String? = nil,
+        icon: String? = nil
+    ) -> AnyPublisher<Void, Never> {
+        let rightButton = UIButton(type: .system)
+        
+        if let title = title {
+            let attributedTitle = NSAttributedString.RLAttributedString(
+                text: title,
+                font: .Label1,
+                color: .LightGreen,
+                align: .center
+            )
+            
+            rightButton.setAttributedTitle(attributedTitle, for: .normal)
+        } else if let icon = icon {
+            rightButton.setImage(UIImage(systemName: icon), for: .normal)
+            rightButton.tintColor = .LightGreen
+        }
+        
+        let publisher = rightButton.publisher
+        topViewController?.navigationItem.rightBarButtonItem = UIBarButtonItem(
+            customView: rightButton
+        )
+        
+        return publisher
     }
 }
