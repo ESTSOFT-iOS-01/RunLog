@@ -13,7 +13,7 @@ import MapKit
 
 final class RunHomeViewController: UIViewController {
     
-    // MARK: - DI
+    // MARK: - Property
     private var cancellables = Set<AnyCancellable>()
     private let viewModel = RunHomeViewModel()
     

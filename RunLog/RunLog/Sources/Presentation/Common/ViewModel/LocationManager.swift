@@ -34,7 +34,6 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
     private let weatherService = WeatherService()
     
     // MARK: - Combine
-    var runHomeViewModel: RunHomeViewModel?
     private let locationSubject = PassthroughSubject<CLPlacemark, Never>()
     private let weatherSubject = PassthroughSubject<WeatherData, Never>()
     var locationPublisher: AnyPublisher<CLPlacemark, Never> {
@@ -43,7 +42,6 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
     var weatherPublisher: AnyPublisher<WeatherData, Never> {
         weatherSubject.eraseToAnyPublisher()
     }
-    
     // MARK: - Init
     override init() {
         super.init()
@@ -61,8 +59,8 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
     // MARK: - 이동하면 위치를 받아 ViewModel에 input넣음
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last else { return }
+//        let location = CLLocation(latitude: 36.5040736, longitude: 127.2494855) // 원하는 위치 띄우기
         print("현재 위치: \(location.coordinate.latitude), \(location.coordinate.longitude)")
-        
         fetchCityName(location: location)
         fetchWeatherData(location: location)
     }
@@ -76,8 +74,7 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
                 print("Geocoding 실패: \(error!.localizedDescription)")
                 return
             }
-            runHomeViewModel?.input.send(.locationUpdate(placemark))
-//            self.locationSubject.send(placemark)
+            self.locationSubject.send(placemark)
         }
     }
     // MARK: - 날씨 데이터 가져오기
@@ -91,11 +88,9 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
                 condition: weather.condition,
                 airQuality: aqi.aqi
             )
-            runHomeViewModel?.input.send(.weatherUpdate(weatherData))
-//            self.weatherSubject.send(weatherData)
+            self.weatherSubject.send(weatherData)
         }
     }
-    
     // MARK: - weatherKit으로 날씨를 받아옴
     private func fetchWeatherKitData(location: CLLocation) async -> DummyWeather {
         return DummyWeather(temperature: Int.random(in: -10...35), condition: .clear)

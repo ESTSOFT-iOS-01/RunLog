@@ -12,11 +12,6 @@ import WeatherKit
 
 final class RunHomeViewModel {
     // MARK: - Input & Output
-    enum Input {
-        case locationUpdate(CLPlacemark)
-        case weatherUpdate(WeatherData)
-    }
-    let input = PassthroughSubject<Input, Never>()
     enum Output {
         case locationUpdate(String) // 가공된 위치 데이터
         case weatherUpdate(String)  // 가공된 날씨 데이터
@@ -28,59 +23,55 @@ final class RunHomeViewModel {
     // MARK: - Init
     init() {
         bind()
-        locationManager.runHomeViewModel = self
     }
     // MARK: - Bind (Input -> Output)
     private func bind() {
-        input.receive(on: DispatchQueue.main)
-            .sink { [weak self] input in
-                switch input {
-                case .locationUpdate(let placemark): // 도시명 변경
-                    let city = self?.placemarksToString(placemark) ?? "알 수 없음"
-                    self?.output.send(.locationUpdate(city))
-                case .weatherUpdate(let weather): // 날씨 변경
-                    let condition = self?.conditionToString(weather.condition) ?? weather.condition.rawValue
-                    let temperature = "\(weather.temperature)°C"
-                    let aqi = self?.aqiToString(weather.airQuality) ?? "정보 없음"
-                    
-                    let formattedString = "\(condition) | \(temperature), 미세먼지 \(aqi)"
-                    self?.output.send(.weatherUpdate(formattedString))
-                }
+        // 도시명 변경 구독
+        locationManager.locationPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] placemark in
+                let city = self?.placemarksToString(placemark) ?? "알 수 없음"
+                self?.output.send(.locationUpdate(city))
             }
             .store(in: &cancellables)
-//        // 도시명 변경 구독
-//        locationManager.locationPublisher
-//            .receive(on: DispatchQueue.main)
-//            .sink { [weak self] placemark in
-//                let city = self?.placemarksToString(placemark) ?? "알 수 없음"
-//                self?.output.send(.locationUpdate(city))
-//            }
-//            .store(in: &cancellables)
-//        // 날씨 변경 구독
-//        locationManager.weatherPublisher
-//            .receive(on: DispatchQueue.main)
-//            .sink { [weak self] weather in
-//                print("날씨: \(weather)")
-//                let condition = self?.conditionToString(weather.condition) ?? weather.condition.rawValue
-//                let temperature = "\(weather.temperature)°C"
-//                let aqi = self?.aqiToString(weather.airQuality) ?? "정보 없음"
-//                
-//                let formattedString = "\(condition) | \(temperature), 미세먼지 \(aqi)"
-//                self?.output.send(.weatherUpdate(formattedString))
-//            }
-//            .store(in: &cancellables)
+        // 날씨 변경 구독
+        locationManager.weatherPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] weather in
+                print("날씨: \(weather)")
+                let condition = self?.conditionToString(weather.condition) ?? weather.condition.rawValue
+                let temperature = "\(weather.temperature)°C"
+                let aqi = self?.aqiToString(weather.airQuality) ?? "정보 없음"
+                
+                let formattedString = "\(condition) | \(temperature), 미세먼지 \(aqi)"
+                self?.output.send(.weatherUpdate(formattedString))
+            }
+            .store(in: &cancellables)
     }
     // MARK: - 위치 정보 데이터 -> 한글
     private func placemarksToString(_ placemark: CLPlacemark) -> String {
-        let state = placemark.administrativeArea ?? ""  // 도, 광역시
-        let city = placemark.locality ?? ""             // 시, 군, 구
-        let district = placemark.subLocality ?? ""      // 동, 읍, 면
+        var state: String = "" // 도, 광역시
+        var city: String = "" // 시, 군, 구
+        var district: String = "" // 동, 읍, 면
         
-        if district.isEmpty {
-            return "\(state) \(city)에서"
-        } else {
-            return "\(state) \(city) \(district)에서"
+        let description: String = String(
+            placemark
+                .description
+                .split(separator: ",")
+                .filter{ $0.contains("대한민국") }
+                .first
+            ?? "")
+        let components = description.split(separator: " ").map { String($0) }
+        for component in components {
+            if component.hasSuffix("특별시") || component.hasSuffix("광역시") || component.hasSuffix("도") {
+                state = component
+            }else if component.hasSuffix("시") || component.hasSuffix("군") || component.hasSuffix("구") {
+                city = component
+            }else if component.hasSuffix("동") || component.hasSuffix("읍") || component.hasSuffix("면") {
+                district = component
+            }
         }
+        return district.isEmpty ? "\(state) \(city)에서" : "\(state) \(city) \(district)에서"
     }
     // MARK: - 날씨 정보 데이터 -> 한글
     private func conditionToString(_ condition: WeatherCondition) -> String {
