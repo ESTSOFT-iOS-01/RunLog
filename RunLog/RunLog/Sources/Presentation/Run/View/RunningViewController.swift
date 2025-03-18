@@ -71,6 +71,8 @@ final class RunningViewController: UIViewController {
         bindGesture()
         setupData()
         bindViewModel()
+        
+        LocationManager.shared.startDummyLocationUpdates()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -154,7 +156,7 @@ final class RunningViewController: UIViewController {
             .sink { [weak self] output in
                 switch output {
                 case .locationUpdate(let location):
-                    self?.mapView.centerToLocation(location)
+                    self?.mapView.centerToLocation(location, region: self?.mapView.region)
                 case .timerUpdate(let time):
                     self?.cardView.timeLabel.setConfigure(text: time)
                 case .distanceUpdate:
@@ -179,9 +181,10 @@ extension RunningViewController: MKMapViewDelegate {
     // 트래킹모드 .none이 되면 시야조정
     func mapView(_ mapView: MKMapView, didChange mode: MKUserTrackingMode, animated: Bool) {
         guard let userLocation = mapView.userLocation.location else { return }
-        if mode == .none {
-            mapView.centerToLocation(userLocation)
-        }
+//        if mode == .none {
+//            
+//        }
+        mapView.centerToLocation(userLocation, region: self.mapView.region)
     }
     func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
         guard let polyLine = overlay as? MKPolyline
@@ -190,8 +193,8 @@ extension RunningViewController: MKMapViewDelegate {
             return MKOverlayRenderer()
         }
         let renderer = MKPolylineRenderer(polyline: polyLine)
-        renderer.strokeColor = .orange
-        renderer.lineWidth = 5.0
+        renderer.strokeColor = .LightGreen
+        renderer.lineWidth = 3.0
         renderer.alpha = 1.0
         
         return renderer

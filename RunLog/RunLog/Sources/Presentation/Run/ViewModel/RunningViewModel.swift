@@ -58,9 +58,7 @@ final class RunningViewModel {
         locationManager.locationPublisher
             .receive(on: DispatchQueue.main)
             .sink { [weak self] location in
-                
                 if let previousCoordinate = self?.previousCoordinate {
-
                     let point1 = CLLocationCoordinate2DMake(
                         previousCoordinate.latitude,
                         previousCoordinate.longitude

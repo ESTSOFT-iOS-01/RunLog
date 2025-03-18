@@ -28,7 +28,22 @@ struct DummyAirQuality {
     let aqi: Int
 }
 final class LocationManager: NSObject, CLLocationManagerDelegate {
-    private let dummyLocation = CLLocation(latitude: 37.552525, longitude: 126.925036)
+    // MARK: - Dummy
+    private var dummyIndex = 0
+    private var timer: Timer?
+    func startDummyLocationUpdates() {
+        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+            guard let self = self else { return }
+            guard dummyIndex < DummyLocation.route.count else {
+                self.timer?.invalidate()
+                return
+            }
+            let dummyLocation = DummyLocation.route[self.dummyIndex]
+            self.dummyIndex += 1
+            self.locationSubject.send(dummyLocation) // ViewModel로 위치 데이터 전송
+        }
+    }
+    
     // MARK: - Singleton
     static let shared = LocationManager()
     
@@ -57,10 +72,10 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
     // MARK: - Init
     override init() {
         super.init()
-        locationManager.delegate = self
         setupLocationManager()
     }
     deinit {
+        timer?.invalidate()
         locationManager.stopUpdatingLocation()
     }
     // MARK: - CLLocationManager 설정
@@ -68,7 +83,7 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         // 배터리를 아낄려면 kCLLocationAccuracyHundredMeters를 이용 - 정확도를 조절
-        locationManager.distanceFilter = 10  //100미터를 이동하면 다시 업데이트
+        locationManager.distanceFilter = 100  //100미터를 이동하면 다시 업데이트
         locationManager.allowsBackgroundLocationUpdates = true
 //        locationManager.pausesLocationUpdatesAutomatically = false // 이동이 없으면 업데이트를 멈출지
         getLocationUsagePermission()
@@ -76,9 +91,8 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
     // MARK: - 이동하면 위치를 받아 ViewModel에 input넣음
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last else { return }
-//        let location = dummyLocation
         print("현재 위치: \(location.coordinate.latitude), \(location.coordinate.longitude)")
-        self.locationSubject.send(location)
+//        self.locationSubject.send(location) // 더미 지우고 여기 풀면 현재 위치 기준으로 작성
         fetchCityName(location: location)
         fetchWeatherData(location: location)
     }
@@ -145,4 +159,32 @@ extension LocationManager {
             UIApplication.shared.open(url, options: [:], completionHandler: nil)
         }
     }
+}
+
+
+
+
+
+
+struct DummyLocation {
+    static let route: [CLLocation] = {
+        let center = CLLocationCoordinate2D(latitude: 37.554722, longitude: 126.970833) // 원의 중심 (서울역 근처)
+        let radius: Double = 0.00135 // 150m (위도/경도 변환값)
+        let totalPoints = 20 // 100개 좌표
+        
+        var locations: [CLLocation] = []
+        
+        for i in 0..<totalPoints {
+            let angle = Double(i) / Double(totalPoints) * 2 * .pi // 0 ~ 2π (360도)
+            let latOffset = radius * cos(angle) // 원 형태의 위도 변동
+            let lonOffset = radius * sin(angle) // 원 형태의 경도 변동
+            
+            let newLat = center.latitude + latOffset
+            let newLon = center.longitude + lonOffset
+            
+            locations.append(CLLocation(latitude: newLat, longitude: newLon))
+        }
+        
+        return locations
+    }()
 }
