@@ -17,6 +17,7 @@ final class EditLogInfoViewController: UIViewController {
     private var cancellables = Set<AnyCancellable>()
     
     private var items : [String] = ["매우 쉬움", "쉬움", "보통", "어려움", "매우 어려움"]
+    var selectedIndexPath: IndexPath?
 
     // MARK: - UI
     private var editView = EditLogInfoView()
@@ -27,6 +28,7 @@ final class EditLogInfoViewController: UIViewController {
         setupUI()
         setupNavigationBar()
         setupGesture()
+        setupTableView()
         setupData()
         bindViewModel()
     }
@@ -107,11 +109,27 @@ extension EditLogInfoViewController : UITableViewDataSource {
         let lvlString = items[indexPath.row]
         cell.configure(title: lvlString)
         
+//         이전에 저장한 정보가 있으면 그거 선택해줌
+        guard let selectedIndexPath = self.selectedIndexPath else { return cell }
+        let isSelected = indexPath == selectedIndexPath
+        cell.changeState(isSelected)
+        
         return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        // 이전에 선택된 셀을 초기화 (기존 선택이 있었다면)
+        if let previousIndexPath = selectedIndexPath,
+           let previousCell = tableView.cellForRow(at: previousIndexPath) as? RadioButtonCell {
+            previousCell.changeState(false)
+        }
         
+        if let selectedCell = tableView.cellForRow(at: indexPath) as? RadioButtonCell {
+            selectedCell.changeState(true)
+        }
+        
+        selectedIndexPath = indexPath
     }
+
     
 }

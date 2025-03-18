@@ -20,7 +20,7 @@ final class RadioButtonCell: UITableViewCell {
     
     private lazy var stateImageView = UIImageView().then {
         $0.image = UIImage(systemName: RLIcon.unslectedCircle.name)?
-            .applyingSymbolConfiguration(UIImage.SymbolConfiguration(pointSize: 20, weight: .regular))
+            .applyingSymbolConfiguration(UIImage.SymbolConfiguration(pointSize: 24, weight: .regular))
         $0.tintColor = .Gray500
         $0.contentMode = .scaleAspectFit
     }
@@ -53,8 +53,8 @@ final class RadioButtonCell: UITableViewCell {
     private func setupLayout() {
         stateImageView.snp.makeConstraints {
             $0.leading.equalToSuperview().offset(8)
-            $0.verticalEdges.equalToSuperview().inset(24)
-            $0.height.equalTo(20)
+            $0.verticalEdges.equalToSuperview().inset(10)
+            $0.height.equalTo(24)
         }
         
         
@@ -69,8 +69,28 @@ final class RadioButtonCell: UITableViewCell {
         titleLabel.attributedText = .RLAttributedString(text: title, font: .Headline2)
     }
     
-    func changeState() {
+    func changeState(_ isSelected : Bool) {
+        let styleConfig = UIImage.SymbolConfiguration(pointSize: 24, weight: .regular)
         
+        stateImageView.image = UIImage(systemName: isSelected ? RLIcon.selectedCircle.name : RLIcon.unslectedCircle.name)?
+            .applyingSymbolConfiguration(styleConfig)
+        stateImageView.tintColor = isSelected ? .LightGreen : .Gray500
     }
 
 }
+
+//#if canImport(SwiftUI) && DEBUG
+//import SwiftUI
+//
+//struct RadioButtonCellPreview: PreviewProvider {
+//    static var previews: some View {
+//        UIViewPreview {
+//            let cell = RadioButtonCell(style: .default, reuseIdentifier: RadioButtonCell.identifier)
+//            cell.configure(title: "매우 쉬움")
+//            cell.changeState(true)
+//            return cell
+//        }
+//        .previewLayout(.fixed(width: 440, height: 60))
+//    }
+//}
+//#endif

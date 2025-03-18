@@ -33,7 +33,7 @@ final class EditLogInfoView: UIView {
     public lazy var tableView = UITableView(frame: .zero, style: .plain).then {
         $0.backgroundColor = .clear
         $0.separatorStyle = .none
-        $0.rowHeight = 48
+//        $0.rowHeight = 48
         $0.contentInsetAdjustmentBehavior = .never
         $0.isScrollEnabled = false
         $0.bounces = false
@@ -65,7 +65,7 @@ final class EditLogInfoView: UIView {
         }
         
         nameField.snp.makeConstraints {
-            $0.top.equalTo(titleLabel.snp.bottom).offset(8)
+            $0.top.equalTo(titleLabel.snp.bottom).offset(4)
             $0.leading.trailing.equalToSuperview()
             $0.height.equalTo(64)
         }
@@ -82,3 +82,5 @@ final class EditLogInfoView: UIView {
     }
     
 }
+
+
