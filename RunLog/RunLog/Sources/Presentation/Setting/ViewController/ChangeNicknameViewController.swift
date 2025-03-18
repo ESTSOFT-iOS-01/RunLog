@@ -12,12 +12,12 @@ import Combine
 
 final class ChangeNicknameViewController: UIViewController {
     
-    // MARK: - DI
+    // MARK: - Properties
     private let viewModel = ChangeNicknameViewModel()
-    private lazy var nicknameView = ChangeNicknameView(viewModel: viewModel)
     private var cancellables = Set<AnyCancellable>()
     
-    // MARK: - Init
+    // MARK: - UI
+    private lazy var nicknameView = ChangeNicknameView()
     
     // MARK: - Lifecycle
     override func viewDidLoad() {

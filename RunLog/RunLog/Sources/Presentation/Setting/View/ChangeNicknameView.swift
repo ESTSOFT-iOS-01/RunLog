@@ -6,16 +6,12 @@
 //
 
 import UIKit
-import Combine
 import SnapKit
 import Then
 
 final class ChangeNicknameView: UIView {
     
     // MARK: - Properties
-    private let viewModel: ChangeNicknameViewModel
-    private var cancellables = Set<AnyCancellable>()
-    
     private let placeHolderString = "최대 10자까지 입력 가능합니다"
     
     lazy var nameField = RLTextField(placeholder: placeHolderString).then {
@@ -23,12 +19,10 @@ final class ChangeNicknameView: UIView {
     }
     
     // MARK: - Init
-    init(viewModel: ChangeNicknameViewModel) {
-        self.viewModel = viewModel
+    init() {
         super.init(frame: .zero)
         setupUI()
         setupLayout()
-        bindViewModel()
     }
 
     required init?(coder: NSCoder) {
@@ -47,22 +41,6 @@ final class ChangeNicknameView: UIView {
             $0.top.leading.trailing.equalToSuperview()
             $0.height.equalTo(64)
         }
-    }
-    
-    // MARK: - Bind ViewModel
-    private func bindViewModel() {
-        viewModel.bindTextField(nameField.publisher)
-        
-        viewModel.output
-            .sink { [weak self] output in
-                switch output {
-                case .nicknameUpdated(let text):
-                    self?.nameField.setTextWithUnderline(text)
-                default:
-                    break
-                }
-            }
-            .store(in: &cancellables)
     }
     
 }
