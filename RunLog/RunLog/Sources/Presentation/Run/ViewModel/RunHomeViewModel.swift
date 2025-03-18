@@ -13,7 +13,8 @@ import WeatherKit
 final class RunHomeViewModel {
     // MARK: - Input & Output
     enum Output {
-        case locationUpdate(String) // 가공된 위치 데이터
+        case locationUpdate(CLLocation) // 사용자 위치 데이터
+        case locationNameUpdate(String) // 가공된 위치 데이터
         case weatherUpdate(String)  // 가공된 날씨 데이터
     }
     let output = PassthroughSubject<Output, Never>()
@@ -26,12 +27,19 @@ final class RunHomeViewModel {
     }
     // MARK: - Bind (Input -> Output)
     private func bind() {
-        // 도시명 변경 구독
+        // 사용자 위치 변경 구독
         locationManager.locationPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] locaiton in
+                self?.output.send(.locationUpdate(locaiton))
+            }
+            .store(in: &cancellables)
+        // 도시명 변경 구독
+        locationManager.locationNamePublisher
             .receive(on: DispatchQueue.main)
             .sink { [weak self] placemark in
                 let city = self?.placemarksToString(placemark) ?? "알 수 없음"
-                self?.output.send(.locationUpdate(city))
+                self?.output.send(.locationNameUpdate(city))
             }
             .store(in: &cancellables)
         // 날씨 변경 구독

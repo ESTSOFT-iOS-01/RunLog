@@ -14,11 +14,13 @@ import MapKit
 final class RunHomeViewController: UIViewController {
     
     // MARK: - Property
-    private var cancellables = Set<AnyCancellable>()
     private let viewModel = RunHomeViewModel()
+    private var cancellables = Set<AnyCancellable>()
     
     // MARK: - UI
-    var mapView = MKMapView()
+    lazy var mapView = MKMapView().then {
+        $0.showsUserLocation = true
+    }
     var totalLabel = UILabel().then {
         $0.numberOfLines = 3
     }
@@ -128,7 +130,9 @@ final class RunHomeViewController: UIViewController {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] output in
                 switch output {
-                case .locationUpdate(let text):
+                case .locationUpdate(let location):
+                    self?.mapView.centerToLocation(location)
+                case .locationNameUpdate(let text):
                     self?.locationLabel.attributedText = .RLAttributedString(text: text, font: .Label2, align: .center)
                 case .weatherUpdate(let text):
                     self?.weatherLabel.attributedText = .RLAttributedString(text: text, font: .Label2)
@@ -137,7 +141,6 @@ final class RunHomeViewController: UIViewController {
             .store(in: &cancellables)
     }
 }
-
 // MARK: - private functions
 extension RunHomeViewController {
     private func totalLabelCreate() {

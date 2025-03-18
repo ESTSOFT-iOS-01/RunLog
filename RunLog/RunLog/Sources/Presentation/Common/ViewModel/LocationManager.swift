@@ -28,16 +28,28 @@ struct DummyAirQuality {
     let aqi: Int
 }
 final class LocationManager: NSObject, CLLocationManagerDelegate {
+    private let dummyLocation = CLLocation(latitude: 37.552525, longitude: 126.925036)
+    // MARK: - Singleton
     static let shared = LocationManager()
     
+    // MARK: - Property
     private var locationManager = CLLocationManager()
     private let weatherService = WeatherService()
+    var currentLocation: CLLocation {
+        // 현재 위치를 반환, 못찾으면 서울을 기본값으로 반환
+//        return dummyLocation
+        return locationManager.location ?? CLLocation(latitude: 37.5665, longitude: 126.9780)
+    }
     
     // MARK: - Combine
-    private let locationSubject = PassthroughSubject<CLPlacemark, Never>()
+    private let locationSubject = PassthroughSubject<CLLocation, Never>()
+    private let locationNameSubject = PassthroughSubject<CLPlacemark, Never>()
     private let weatherSubject = PassthroughSubject<WeatherData, Never>()
-    var locationPublisher: AnyPublisher<CLPlacemark, Never> {
+    var locationPublisher: AnyPublisher<CLLocation, Never> {
         locationSubject.eraseToAnyPublisher()
+    }
+    var locationNamePublisher: AnyPublisher<CLPlacemark, Never> {
+        locationNameSubject.eraseToAnyPublisher()
     }
     var weatherPublisher: AnyPublisher<WeatherData, Never> {
         weatherSubject.eraseToAnyPublisher()
@@ -52,15 +64,16 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         // 배터리를 아낄려면 kCLLocationAccuracyHundredMeters를 이용 - 정확도를 조절
-        locationManager.distanceFilter = 100 // 100미터를 이동하면 다시 업데이트
+        locationManager.distanceFilter = 100  //100미터를 이동하면 다시 업데이트
         locationManager.requestWhenInUseAuthorization() // 위치 권한 요청
         locationManager.startUpdatingLocation() //위치를 받아오기 시작
     }
     // MARK: - 이동하면 위치를 받아 ViewModel에 input넣음
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last else { return }
-//        let location = CLLocation(latitude: 36.5040736, longitude: 127.2494855) // 원하는 위치 띄우기
+//        let location = dummyLocation
         print("현재 위치: \(location.coordinate.latitude), \(location.coordinate.longitude)")
+        self.locationSubject.send(location)
         fetchCityName(location: location)
         fetchWeatherData(location: location)
     }
@@ -74,7 +87,7 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
                 print("Geocoding 실패: \(error!.localizedDescription)")
                 return
             }
-            self.locationSubject.send(placemark)
+            self.locationNameSubject.send(placemark)
         }
     }
     // MARK: - 날씨 데이터 가져오기

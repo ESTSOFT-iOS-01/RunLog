@@ -13,17 +13,19 @@ import MapKit
 
 final class RunningViewController: UIViewController {
     
-    // MARK: - DI
-//    private let viewModel: ViewModelType
+    // MARK: - Property
+    private let viewModel = RunningViewModel()
     private var cancellables = Set<AnyCancellable>()
-    // 더미데이터
-    var record = SectionRecord(
-        sectionTime: 12 * 60 + 23,
-        distance: 0.93,
-        steps: 3242
-    )
     // MARK: - UI
-    var mapView = MKMapView()
+    lazy var mapView = MKMapView().then {
+        $0.delegate = self
+        //최대 줌 거리 제한
+        let zoomRange = MKMapView.CameraZoomRange(maxCenterCoordinateDistance: 20000)
+        $0.setCameraZoomRange(zoomRange, animated: false)
+        $0.showsUserLocation = true
+        $0.showsUserTrackingButton = true
+        $0.userTrackingMode = .none
+    }
     var cardView = CardView()
     var foldButton = RLButton().then {
         $0.configureTitle(title: "닫기", titleColor: .Gray000, font: .RLLabel2)
@@ -35,7 +37,10 @@ final class RunningViewController: UIViewController {
         config.image = UIImage(systemName: RLIcon.fold.name)
         config.imagePadding = 4
         config.imagePlacement = .trailing
-        config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(pointSize: 12, weight: .medium)
+        config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(
+            pointSize: 12,
+            weight: .medium
+        )
         $0.configuration = config
     }
     var unfoldButton = UIButton().then {
@@ -49,8 +54,6 @@ final class RunningViewController: UIViewController {
     }
     
     // MARK: - Init
-//    init(viewModel: ViewModelType) {
-//        self.viewModel = viewModel
     init() {
         super.init(nibName: nil, bundle: nil)
     }
@@ -115,36 +118,69 @@ final class RunningViewController: UIViewController {
     // MARK: - Setup Gesture
     private func setupGesture() {
         // 제스처 추가
-        cardView.finishButton.addTarget(self, action: #selector(finishButtonTouch), for: .touchUpInside)
-        foldButton.addTarget(self, action: #selector(toggleCardView), for: .touchUpInside)
-        unfoldButton.addTarget(self, action: #selector(toggleCardView), for: .touchUpInside)
+        cardView.finishButton.publisher
+            .sink { [weak self] in
+                self?.dismiss(animated: false)
+            }
+            .store(in: &cancellables)
+        foldButton.publisher
+            .sink { [weak self] in
+                self?.toggleCardView()
+            }
+            .store(in: &cancellables)
+        unfoldButton.publisher
+            .sink { [weak self] in
+                self?.toggleCardView()
+            }
+            .store(in: &cancellables)
     }
     
     // MARK: - Setup Data
     private func setupData() {
-        // 초기 데이터 로드 - 현재 더미 데이터 상태
-        cardView.timeLabel.record = record
-        cardView.distanceLabel.record = record
-        cardView.stepsLabel.record = record
+        // 맵뷰 초기 데이터 설정
+        let currentLocation = LocationManager.shared.currentLocation
+        mapView.centerToLocation(currentLocation)
+        
+        // 뷰가 로드되면 운동이 시작된 상태
+        viewModel.input.send(.runningStart)
     }
 
     // MARK: - Bind ViewModel
     private func bindViewModel() {
-//        viewModel.output.something
-//            .sink { [weak self] value in
-//                // View 업데이트 로직
-//            }
-//            .store(in: &cancellables)
+        viewModel.output
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] output in
+                switch output {
+                case .locationUpdate(let location):
+                    self?.mapView.centerToLocation(location)
+                case .timerUpdate(let time):
+                    self?.cardView.timeLabel.setConfigure(text: time)
+                case .distanceUpdate:
+                    print("거리 변경")
+                case .stepsUpdate:
+                    print("걸음 수 변경")
+                }
+            }
+            .store(in: &cancellables)
     }
 }
 
-extension RunningViewController {
-    @objc private func finishButtonTouch(sender: UIButton) {
-        self.dismiss(animated: false)
-    }
-    @objc private func toggleCardView(sender: UIButton) {
+extension RunningViewController: MKMapViewDelegate {
+    private func toggleCardView() {
         self.cardView.isHidden.toggle()
         self.foldButton.isHidden.toggle()
         self.unfoldButton.isHidden.toggle()
+    }
+    
+    func mapView(_ mapView: MKMapView, didChange mode: MKUserTrackingMode, animated: Bool) {
+        guard let userLocation = mapView.userLocation.location else { return }
+        if mode == .none {
+            mapView.centerToLocation(userLocation)
+        }
+        
+    }
+    func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
+        let cameraHeight = mapView.camera.centerCoordinateDistance
+        print("📷 현재 카메라 높이 업데이트: \(cameraHeight)m")
     }
 }

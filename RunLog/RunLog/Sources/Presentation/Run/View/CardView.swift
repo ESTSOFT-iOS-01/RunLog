@@ -22,6 +22,7 @@ final class CardView: UIView {
         super.init(frame: frame)
         setupUI()
         setupLayout()
+        configure()
     }
 
     required init?(coder: NSCoder) {
@@ -65,5 +66,8 @@ final class CardView: UIView {
     // MARK: - Configure
     private func configure() {
         // 뷰 설정
+        timeLabel.setConfigure(text: "00 : 00")
+        distanceLabel.setConfigure(text: "0.0km")
+        stepsLabel.setConfigure(text: "0")
     }
 }
