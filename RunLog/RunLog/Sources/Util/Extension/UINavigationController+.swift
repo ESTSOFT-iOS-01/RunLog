@@ -86,11 +86,14 @@ extension UINavigationController {
     
     func addRightMenuButton(menuItems: [(title: String, attributes: UIMenuElement.Attributes)]) -> AnyPublisher<String, Never> {
         let rightButton = UIButton(type: .system)
-        rightButton.setImage(UIImage(systemName: "ellipsis"), for: .normal)
+        
+        // RLIcon 시스템에 등록된 ellipsis 아이콘 사용 (예: RLIcon.ellipsis)
+        rightButton.setImage(UIImage(systemName: RLIcon.ellipsis.name), for: .normal)
         rightButton.tintColor = .LightGreen
         
         let subject = PassthroughSubject<String, Never>()
         
+        // UIAction 배열 생성 (아이콘 없이 제목과 속성만 사용)
         let actions = menuItems.map { item in
             UIAction(title: item.title,
                      image: nil,
