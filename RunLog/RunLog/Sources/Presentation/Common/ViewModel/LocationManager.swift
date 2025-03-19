@@ -132,6 +132,7 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
     }
 }
 
+// MARK: - 위치 정보 권한 요청
 extension LocationManager {
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         getLocationUsagePermission()

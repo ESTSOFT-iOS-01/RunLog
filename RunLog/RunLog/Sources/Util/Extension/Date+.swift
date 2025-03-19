@@ -14,10 +14,11 @@ extension Date {
 }
 
 enum DateFormatStyle {
-    case fullDate      // "2025. 02. 13."
-    case monthDay     // "0월 0일 (수)"
-    case yearMonth     // "2025년 3월"
-    case yearMonthShort     // "25년 3월"
+    case fullDate       // "2025. 02. 13."
+    case monthDay       // "0월 0일 (수)"
+    case yearMonth      // "2025년 3월"
+    case yearMonthShort // "25년 3월"
+    case fullTime       // "12:23:34:456"
     
     var format: String {
         switch self {
@@ -29,6 +30,8 @@ enum DateFormatStyle {
             return "yyyy년 M월"
         case .yearMonthShort:
             return "yy년 M월"
+        case .fullTime:
+            return "HH:MM:ss:SSS"
         }
     }
 }

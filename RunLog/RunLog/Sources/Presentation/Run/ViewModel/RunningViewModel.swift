@@ -66,7 +66,7 @@ final class RunningViewModel {
         print("최종 경로")
         for location in section.route {
             print("경도: \(location.latitude), 위도: \(location.longitude)")
-            print("시간: \(location.timestamp.formattedString)")
+            print("시간: \(location.timestamp.formattedString(.fullTime))")
         }
     }
     // MARK: - Bind (Input -> Output)
