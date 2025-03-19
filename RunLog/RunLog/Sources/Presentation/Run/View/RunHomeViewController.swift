@@ -112,6 +112,9 @@ final class RunHomeViewController: UIViewController {
         startButton.publisher
             .sink {
                 print("운동 시작하기 버튼 클릭")
+                LocationManager.shared.isRunning = true
+//                PedometerManager.shared.startPedometerUpdate()
+                PedometerManager.shared.startDummyPedometerUpdates()
                 let vc = RunningViewController()
                 vc.modalPresentationStyle = .fullScreen
                 self.present(vc, animated: false)

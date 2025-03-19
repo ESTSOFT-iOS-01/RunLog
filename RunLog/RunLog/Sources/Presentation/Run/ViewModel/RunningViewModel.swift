@@ -17,7 +17,7 @@ final class RunningViewModel {
         var distance: Double // 거리
         var steps: Int // 걸음 수
     }
-    // 섹션
+    // 섹션 - 운동 시작 부터 종료 전까지
     var section: Section = Section(
         distance: 0,
         steps: 0,
@@ -36,19 +36,19 @@ final class RunningViewModel {
         case runningStart // 운동 시작 -> 시간 업데이트 필요
         // Q) 아마 거리랑 걸음 수도 location처럼 처리를 해야할 듯
         case distanceUpdate(Double) // 거리 업데이트 필요
-        case stepsUpdate(Int) // 걸음 수 업데이트 필요
     }
     enum Output {
         case locationUpdate(CLLocation) // 사용자 위치 데이터
         case timerUpdate(String) // 운동 시간 업데이트
         case distanceUpdate // 운동 거리 업데이트
-        case stepsUpdate // 운동 걸음 수 업데이트
+        case stepsUpdate(String) // 운동 걸음 수 업데이트
         case lineDraw(MKPolyline) // 지도에 라인을 그림
     }
     let input = PassthroughSubject<Input, Never>()
     let output = PassthroughSubject<Output, Never>()
     private var cancellables = Set<AnyCancellable>()
     private let locationManager = LocationManager.shared
+    private let pedometerManager = PedometerManager.shared
     
     // MARK: - Init
     init() {
@@ -61,13 +61,14 @@ final class RunningViewModel {
     }
     private func saveLog() {
         print("⏹ 운동 종료 ⏹")
-        print("최종 시간: \(record.sectionTime)초")
+        print("최종 시간: \(record.sectionTime)초") // - section에 담긴 route의 끝에서 처음을 뺀 시간
         print("최종 경로 핀 수: \(section.route.count)")
-        print("최종 경로")
-        for location in section.route {
-            print("경도: \(location.latitude), 위도: \(location.longitude)")
-            print("시간: \(location.timestamp.formattedString(.fullTime))")
-        }
+//        print("최종 경로")
+//        for location in section.route {
+//            print("경도: \(location.latitude), 위도: \(location.longitude)")
+//            print("시간: \(location.timestamp.formattedString(.fullTime))")
+//        }
+        print("최종 걸음 수: \(section.steps)")
     }
     // MARK: - Bind (Input -> Output)
     private func bind() {
@@ -76,6 +77,16 @@ final class RunningViewModel {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] location in
                 self?.lindDraw(location: location)
+            }
+            .store(in: &cancellables)
+        // 사용자 걸음 수 변경 구독
+        pedometerManager.pedometerPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] step in
+                // 걸음 수 업데이트
+                self?.section.steps = step
+                let stepString = "\(step)"
+                self?.output.send(.stepsUpdate(stepString))
             }
             .store(in: &cancellables)
         // input에 따라 처리
@@ -88,11 +99,10 @@ final class RunningViewModel {
                     timerUpdate()
                 case .distanceUpdate(let distance):
                     print(distance)
-                case .stepsUpdate(let steps):
-                    print(steps)
                 }
             }
             .store(in: &cancellables)
+        
     }
     // 운동 시작하면 초당 운동시간 업데이트
     private func timerUpdate() {

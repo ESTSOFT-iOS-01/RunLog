@@ -120,18 +120,22 @@ final class RunningViewController: UIViewController {
 
     // MARK: - Bind Gesture
     private func bindGesture() {
-        // 제스처 추가
+        // 종료 버튼 클릭
         cardView.finishButton.publisher
             .sink { [weak self] in
-                
+                LocationManager.shared.isRunning = false
+//                PedometerManager.shared.stopPedometerUpdate()
+                PedometerManager.shared.stopDummyPedometerUpdates()
                 self?.dismiss(animated: false)
             }
             .store(in: &cancellables)
+        // 접기 버튼 클릭
         foldButton.publisher
             .sink { [weak self] in
                 self?.toggleCardView()
             }
             .store(in: &cancellables)
+        // 펼치기 버튼 클릭
         unfoldButton.publisher
             .sink { [weak self] in
                 self?.toggleCardView()
@@ -147,7 +151,6 @@ final class RunningViewController: UIViewController {
         mapView.centerToLocation(currentLocation)
         // 뷰가 로드되면 운동이 시작된 상태
         viewModel.input.send(.runningStart)
-        
     }
 
     // MARK: - Bind ViewModel
@@ -162,10 +165,10 @@ final class RunningViewController: UIViewController {
                     self?.cardView.timeLabel.setConfigure(text: time)
                 case .distanceUpdate:
                     print("거리 변경")
-                case .stepsUpdate:
-                    print("걸음 수 변경")
+                case .stepsUpdate(let step):
+                    self?.cardView.stepsLabel.setConfigure(text: step)
                 case .lineDraw(let lineDraw):
-                    print("라인 그리는 중")
+//                    print("라인 그리는 중")
                     self?.mapView.addOverlay(lineDraw)
                 }
             }

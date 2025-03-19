@@ -36,6 +36,7 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
     // MARK: - Singleton
     static let shared = LocationManager()
     // MARK: - Properties
+    var isRunning: Bool = false
     private var locationManager = CLLocationManager()
     private let weatherService = WeatherService()
     private let openWeatherService = OpenWeatherService()
@@ -84,14 +85,16 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
     }
     // MARK: - 이동하면 위치를 받아 ViewModel에 input넣음
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        guard let location = locations.last else { return }
-        print("현재 위치: \(location.coordinate.latitude), \(location.coordinate.longitude)")
+//        guard let location = locations.last else { return }
+        let location = CLLocation(latitude: 37.5665, longitude: 126.9780)
 //        self.locationSubject.send(location) // 더미 지우고 여기 풀면 현재 위치 기준으로 작성
         // 도시명 패치 - 이걸 위치 따라 지정
         fetchCityName(location: location)
-        // location 정보 10km정도 멀어지면 새로호출
-        fetchWeatherData(location: location) // 날씨 정보 패치
-        fetchAqiData(location: location) // 대기질 정보 패치
+        // location 정보 10km정도 멀어지면 새로호출 하고 싶다
+        if !isRunning { // 운동중이 아닐때만 날씨랑 대기질 정보를 받아옴
+            fetchWeatherData(location: location) // 날씨 정보 패치
+            fetchAqiData(location: location) // 대기질 정보 패치
+        }
     }
     // MARK: - 도시명 가져오기
     private func fetchCityName(location: CLLocation) {
@@ -123,8 +126,6 @@ extension LocationManager {
         } receiveValue: { response in
             let temperature: Double = response.main.temp
             let condition: String = response.weather.first?.description ?? "알 수 없음"
-//            print("온도 및 상태 값: \(temperature)°C \(condition)")
-            //°C
             self.weatherUpdateSubject.send((condition, temperature))
         }
         .store(in: &cancellables)

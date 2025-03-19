@@ -188,6 +188,7 @@
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "운동 거리 기록 및 시각화 정보 제공을 위한 위치 권한을 항상 혹은 앱 활성 시에만 허용하시겠습니까?";
 				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "운동 거리 기록 및 시각화 정보 제공을 위한 위치 권한을 항상 허용하시겠습니까?";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "운동 거리 기록 및 시각화 정보 제공을 위한 위치 권한을 앱 활성 시에만 허용하시겠습니까?";
+				INFOPLIST_KEY_NSMotionUsageDescription = "이 앱은 걸음 수를 측정하여 운동 데이터를 제공합니다.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -225,6 +226,7 @@
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "운동 거리 기록 및 시각화 정보 제공을 위한 위치 권한을 항상 혹은 앱 활성 시에만 허용하시겠습니까?";
 				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "운동 거리 기록 및 시각화 정보 제공을 위한 위치 권한을 항상 허용하시겠습니까?";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "운동 거리 기록 및 시각화 정보 제공을 위한 위치 권한을 앱 활성 시에만 허용하시겠습니까?";
+				INFOPLIST_KEY_NSMotionUsageDescription = "이 앱은 걸음 수를 측정하여 운동 데이터를 제공합니다.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";

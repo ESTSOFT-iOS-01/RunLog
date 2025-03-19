@@ -91,7 +91,9 @@ extension RunHomeViewModel {
         var state: String = "" // 도, 광역시
         var city: String = "" // 시, 군, 구
         var district: String = "" // 동, 읍, 면
-        
+        if let subLocal = placemark.subLocality, subLocal.hasSuffix("동") {
+            district = subLocal
+        }
         let description: String = String(
             placemark
                 .description
@@ -101,11 +103,11 @@ extension RunHomeViewModel {
             ?? "")
         let components = description.split(separator: " ").map { String($0) }
         for component in components {
-            if component.hasSuffix("특별시") || component.hasSuffix("광역시") || component.hasSuffix("도") {
+            if state == "" && (component.hasSuffix("특별시") || component.hasSuffix("광역시") || component.hasSuffix("도")) {
                 state = component
-            }else if component.hasSuffix("시") || component.hasSuffix("군") || component.hasSuffix("구") {
+            }else if city == "" && (component.hasSuffix("시") || component.hasSuffix("군") || component.hasSuffix("구")) {
                 city = component
-            }else if component.hasSuffix("동") || component.hasSuffix("읍") || component.hasSuffix("면") {
+            }else if district == "" && (component.hasSuffix("동") || component.hasSuffix("읍") || component.hasSuffix("면") || component.hasSuffix("로")) {
                 district = component
             }
         }
