@@ -1,0 +1,36 @@
+name: Project Automation
+
+on:
+  issues:
+    types:
+      - opened
+      - closed
+
+jobs:
+  update_project:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 이슈 생성 시 프로젝트 보드에 추가
+        if: github.event.action == 'opened'
+        uses: actions/add-to-project@v1
+        with:
+          project-url: "https://github.com/orgs/ESTSOFT-iOS-01/projects/6"
+          github-token: ${{ secrets.PAT_TOKEN }}
+
+      - name: 🏷️ 이슈 생성 시 `startDate` 설정
+        if: github.event.action == 'opened'
+        uses: actions/update-project-fields@v1
+        with:
+          project-url: "https://github.com/orgs/ESTSOFT-iOS-01/projects/6"
+          github-token: ${{ secrets.PAT_TOKEN }}
+          field-name: "startDate"
+          field-value: "${{ github.event.issue.created_at }}"
+
+      - name: ✅ 이슈 닫힐 때 `endDate` 설정
+        if: github.event.action == 'closed'
+        uses: actions/update-project-fields@v1
+        with:
+          project-url: "https://github.com/orgs/ESTSOFT-iOS-01/projects/6"
+          github-token: ${{ secrets.PAT_TOKEN }}
+          field-name: "endDate"
+          field-value: "${{ github.event.issue.closed_at }}"
