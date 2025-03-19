@@ -17,7 +17,7 @@ class TimelineViewCell: UITableViewCell {
         $0.layer.cornerRadius = 8
     }
     
-    lazy var distanceLabel = UILabel().then {
+    private lazy var distanceLabel = UILabel().then {
         $0.attributedText = .RLAttributedString(
             text: "25km",
             font: .Heading4,
@@ -25,7 +25,7 @@ class TimelineViewCell: UITableViewCell {
         )
     }
     
-    lazy var titleLabel = UILabel().then {
+    private lazy var titleLabel = UILabel().then {
         $0.attributedText = .RLAttributedString(
             text: "하트런",
             font: .Heading1,
@@ -33,7 +33,7 @@ class TimelineViewCell: UITableViewCell {
         )
     }
     
-    lazy var dateLabel = UILabel().then {
+    private lazy var dateLabel = UILabel().then {
         $0.attributedText = .RLAttributedString(
             text: "2025. 02. 03.",
             font: .Label2,
@@ -41,10 +41,13 @@ class TimelineViewCell: UITableViewCell {
         )
     }
     
-    lazy var trackImageView = UIView().then {
+    private lazy var trackImageView = UIImageView().then {
         // TODO: ImageView로 바꾸기
-        $0.backgroundColor = .black
+        $0.image = UIImage()
+        $0.backgroundColor = .Gray900
+        $0.contentMode = .scaleToFill
         $0.layer.cornerRadius = 4
+        $0.clipsToBounds = true
     }
     
     // MARK: - Init
@@ -92,6 +95,17 @@ class TimelineViewCell: UITableViewCell {
             $0.trailing.equalToSuperview().offset(-24)
         }
     }
+    
+    // MARK: - Configure
+    func configure(
+        totalDistance: Double,
+        title: String,
+        date: Date
+    ) {
+        self.distanceLabel.text = "\(totalDistance.toString(withDecimal: 1))km"
+        self.titleLabel.text = "\(title)"
+        self.dateLabel.text = "\(date.formattedString(.fullDate))"
+    }
 }
 
 
@@ -132,5 +146,10 @@ class TimelineHeaderView: UITableViewHeaderFooterView {
             $0.top.equalToSuperview().offset(24)
             $0.bottom.equalToSuperview().offset(-16)
         }
+    }
+    
+    // MARK: - Configure
+    func configure(date: Date) {
+        self.headerLabel.text = date.formattedString(.yearMonth)
     }
 }

@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Combine
 import SnapKit
 import Then
 
@@ -14,6 +15,7 @@ open class RLTextField: UITextField {
     // MARK: - Properties
     public var padding: UIEdgeInsets
     private let underline = UIView()
+    private var cancellables = Set<AnyCancellable>()
     
     // MARK: - Init
     public init(
@@ -25,7 +27,7 @@ open class RLTextField: UITextField {
         
         setupUI()
         setupLayout()
-        setupObservers()
+        setupBinding()
         
         if let placeholder = placeholder {
             setPlaceholder(placeholder)
@@ -45,6 +47,7 @@ open class RLTextField: UITextField {
         
         underline.backgroundColor = .Gray200
         addSubview(underline)
+        setupBinding()
     }
     
     // MARK: - Setup Layout
@@ -74,13 +77,18 @@ open class RLTextField: UITextField {
         attributedPlaceholder = .RLAttributedString(text: text, font: .Headline2, color: color)
     }
     
-    // MARK: - Observers
-    private func setupObservers() {
-        addTarget(self, action: #selector(textDidChange), for: .editingChanged)
+    // MARK: - Bindings
+    private func setupBinding() {
+        self.publisher
+            .sink { [weak self] text in
+                self?.attributedText = .RLAttributedString(text: text, font: .Headline1)
+                self?.underline.backgroundColor = text.isEmpty ? .Gray200 : .LightGreen
+            }
+            .store(in: &cancellables)
     }
     
-    @objc private func textDidChange() {
-        attributedText = .RLAttributedString(text: text ?? "", font: .Headline1)
-        underline.backgroundColor = (text?.isEmpty ?? true) ? .Gray200 : .LightGreen
+    public func setTextWithUnderline(_ value: String) {
+        attributedText = .RLAttributedString(text: value, font: .Headline1)
+        underline.backgroundColor = value.isEmpty ? .Gray200 : .LightGreen
     }
 }

@@ -15,15 +15,30 @@ class MainTabBarController: UITabBarController {
         
         let runView = UINavigationController(rootViewController: RunHomeViewController())
         runView.title = "Run"
-        runView.tabBarItem = UITabBarItem(title: "Run", image: UIImage(systemName: "star"), selectedImage: UIImage(systemName: "star.fill"))
+        runView.tabBarItem = UITabBarItem(
+            title: "Run",
+            image: UIImage(systemName: "star"),
+            selectedImage: UIImage(systemName: "star.fill")
+        )
         
-        let logView = UINavigationController(rootViewController: LogViewController())
+        let logView = UINavigationController(
+            rootViewController: LogViewController()
+        )
+        logView.view.backgroundColor = .blue
         logView.title = "Log"
-        logView.tabBarItem = UITabBarItem(title: "Log", image: UIImage(systemName: "star"), selectedImage: UIImage(systemName: "star.fill"))
+        logView.tabBarItem = UITabBarItem(
+            title: "Log",
+            image: UIImage(systemName: "star"),
+            selectedImage: UIImage(systemName: "star.fill")
+        )
         
         let settingView = UINavigationController(rootViewController: MyPageViewController())
         settingView.title = "Setting"
-        settingView.tabBarItem = UITabBarItem(title: "Setting", image: UIImage(systemName: "star"), selectedImage: UIImage(systemName: "star.fill"))
+        settingView.tabBarItem = UITabBarItem(
+            title: "Setting",
+            image: UIImage(systemName: "star"),
+            selectedImage: UIImage(systemName: "star.fill")
+        )
         
         self.viewControllers = [runView, logView, settingView]
     }

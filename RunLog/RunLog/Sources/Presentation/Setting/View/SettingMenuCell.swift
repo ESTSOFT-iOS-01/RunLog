@@ -44,7 +44,7 @@ final class SettingMenuCell: UITableViewCell {
     
     // MARK: - Setup UI
     private func setupUI() {
-        contentView.backgroundColor = .clear
+        contentView.backgroundColor = .Gray900
         selectionStyle = .none
         contentView.addSubviews(titleLabel, arrowImageView)
     }

@@ -36,9 +36,8 @@ final class ProfileCardView: UIView {
     }
     
     // MARK: - Init
-    init(property: ProfileCardType, value: Int) {
+    init() {
         super.init(frame: .zero)
-        configure(property: property, value: value)
         setupUI()
         setupLayout()
     }

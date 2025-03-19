@@ -2,18 +2,33 @@
 //  Date+.swift
 //  RunLog
 //
-//  Created by 심근웅 on 3/18/25.
-//
-
 import Foundation
+
 extension Date {
-    var formattedString: String {
+    func formattedString(_ style: DateFormatStyle) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm:ss.SSS" // 24시간제, 밀리초 포함
-        formatter.locale = Locale(identifier: "ko_KR") // 한국 시간 기준
-        formatter.timeZone = TimeZone.current // 현재 타임존 적용
-        
-        let formattedDate = formatter.string(from: self)
-        return formattedDate
+        formatter.locale = Locale(identifier: "ko_KR")
+        formatter.dateFormat = style.format
+        return formatter.string(from: self)
+    }
+}
+
+enum DateFormatStyle {
+    case fullDate      // "2025. 02. 13."
+    case monthDay     // "0월 0일 (수)"
+    case yearMonth     // "2025년 3월"
+    case yearMonthShort     // "25년 3월"
+    
+    var format: String {
+        switch self {
+        case .fullDate:
+            return "yyyy. MM. dd."
+        case .monthDay:
+            return "M월 d일 (E)"
+        case .yearMonth:
+            return "yyyy년 M월"
+        case .yearMonthShort:
+            return "yy년 M월"
+        }
     }
 }

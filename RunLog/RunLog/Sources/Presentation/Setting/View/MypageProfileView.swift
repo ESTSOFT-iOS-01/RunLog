@@ -10,35 +10,19 @@ import SnapKit
 import Then
 
 final class MypageProfileView: UIView {
-    public var nickname: String
-    public var totalDistance: Double
-    public var logCount: Int
-    public var streakCount: Int
     
     // MARK: - UI Components 선언
     lazy var nameLabel = UILabel().then {
         $0.numberOfLines = 1
-        $0.attributedText = .RLAttributedString(text: "\(nickname) 님", font: .Title, color: .Gray000)
     }
     
     lazy var despLabel = UILabel().then {
         $0.numberOfLines = 1
         $0.textAlignment = .left
-        
-        let totalDistanceString = totalDistance.toString(withDecimal: 1)
-        let fullText = "지금까지 총 \(totalDistanceString)km를 걸으셨어요!"
-        
-        $0.attributedText = fullText.styledText(
-            highlightText: totalDistanceString,
-            baseFont: .RLHeadline2,
-            baseColor: .Gray000,
-            highlightFont: .RLHeadline3,
-            highlightColor: .LightPink
-        )
     }
     
-    lazy var logCard = ProfileCardView(property: .logCount, value: logCount)
-    lazy var streakCard = ProfileCardView(property: .streak, value: streakCount)
+    lazy var logCard = ProfileCardView()
+    lazy var streakCard = ProfileCardView()
     
     lazy var cardStackView: UIStackView = {
         let stackView = UIStackView(arrangedSubviews: [logCard, streakCard])
@@ -61,11 +45,7 @@ final class MypageProfileView: UIView {
     }
     
     // MARK: - Init
-    init(nickname: String = "사용자", totalDistance: Double = 0.0, logCount: Int = 0, streakCount: Int = 0) {
-        self.nickname = nickname
-        self.totalDistance = totalDistance
-        self.logCount = logCount
-        self.streakCount = streakCount
+    init() {
         super.init(frame: .zero)
         
         setupUI()
@@ -78,7 +58,8 @@ final class MypageProfileView: UIView {
     
     // MARK: - Setup UI
     private func setupUI() {
-        self.addSubviews(nameLabel, despLabel, cardStackView, tableView)
+        backgroundColor = .Gray900
+        addSubviews(nameLabel, despLabel, cardStackView, tableView)
     }
     
     // MARK: - Setup Layout
@@ -105,8 +86,22 @@ final class MypageProfileView: UIView {
     }
     
     // MARK: - Configure
-    private func configure() {
-        // 뷰 설정
+    func configure(with config: AppConfig) {
+        nameLabel.attributedText = .RLAttributedString(text: "\(config.nickname) 님", font: .Title, color: .Gray000)
+        
+        let totalDistanceString = config.totalDistance.toString(withDecimal: 1) + "km"
+        let fullText = "지금까지 총 \(totalDistanceString)를 걸으셨어요!"
+        
+        despLabel.attributedText = fullText.styledText(
+            highlightText: totalDistanceString,
+            baseFont: .RLHeadline2,
+            baseColor: .Gray000,
+            highlightFont: .RLHeadline3,
+            highlightColor: .LightPink
+        )
+
+        logCard.configure(property: .logCount, value: config.totalDays)
+        streakCard.configure(property: .streak, value: config.streakDays)
     }
 }
 
