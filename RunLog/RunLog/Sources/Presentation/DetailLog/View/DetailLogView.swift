@@ -34,7 +34,7 @@ final class DetailLogView: UIView {
     let movingTrackButton = UIButton(type: .system).then {
         $0.configuration = nil
         
-        let attributedTitle = NSAttributedString.RLAttributedString(text: "무빙트랙", font: .Label2, color: .Gray000)
+        let attributedTitle = NSAttributedString.RLAttributedString(text: "무빙트랙", font: .Label2)
         $0.setAttributedTitle(attributedTitle, for: .normal)
         $0.backgroundColor = .Gray300
         $0.layer.cornerRadius = 10
