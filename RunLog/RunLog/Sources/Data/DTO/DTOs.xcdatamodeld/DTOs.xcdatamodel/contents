@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23605" systemVersion="24D60" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithSwiftData="YES" userDefinedModelVersionIdentifier="">
+    <entity name="AppConfigDTO" representedClassName="AppConfigDTO" syncable="YES" codeGenerationType="class">
+        <attribute name="nickname" attributeType="String" defaultValueString="RunLogger"/>
+        <attribute name="streakDays" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="totalDays" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="totalDistance" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="unitDistance" attributeType="Double" defaultValueString="10" usesScalarValueType="YES"/>
+    </entity>
+    <entity name="DayLogDTO" representedClassName="DayLogDTO" syncable="YES" codeGenerationType="class">
+        <attribute name="date" attributeType="Date" defaultDateTimeInterval="763978080" usesScalarValueType="NO"/>
+        <attribute name="level" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="locationName" attributeType="String"/>
+        <attribute name="temperature" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="title" attributeType="String"/>
+        <attribute name="totalDistance" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="totalSteps" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="totalTime" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="trackImage" attributeType="Binary" allowsExternalBinaryDataStorage="YES"/>
+        <attribute name="weather" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="sections" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="SectionDTO" inverseName="dayLog" inverseEntity="SectionDTO"/>
+    </entity>
+    <entity name="PointDTO" representedClassName="PointDTO" syncable="YES" codeGenerationType="class">
+        <attribute name="latitude" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="longitude" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="timestamp" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="section" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SectionDTO" inverseName="route" inverseEntity="SectionDTO"/>
+    </entity>
+    <entity name="SectionDTO" representedClassName="SectionDTO" syncable="YES" codeGenerationType="class">
+        <attribute name="distance" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="steps" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="dayLog" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="DayLogDTO" inverseName="sections" inverseEntity="DayLogDTO"/>
+        <relationship name="route" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="PointDTO" inverseName="section" inverseEntity="PointDTO"/>
+    </entity>
+</model>
