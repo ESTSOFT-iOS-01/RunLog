@@ -16,7 +16,6 @@ final class EditLogInfoView: UIView {
     
     private lazy var titleLabel = UILabel().then {
         $0.numberOfLines = 1
-        $0.textAlignment = .left
         $0.attributedText = .RLAttributedString(text: "제목", font: .Heading2)
     }
     
@@ -26,7 +25,6 @@ final class EditLogInfoView: UIView {
     
     private lazy var levelLabel = UILabel().then {
         $0.numberOfLines = 1
-        $0.textAlignment = .left
         $0.attributedText = .RLAttributedString(text: "운동 난이도", font: .Heading2)
     }
     
