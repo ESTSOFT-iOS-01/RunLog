@@ -31,10 +31,10 @@ final class DetailLogView: UIView {
     }
     
     /// 지도 위에 오버레이될 무빙트랙 버튼
-    private let movingTrackButton = UIButton(type: .system).then {
+    let movingTrackButton = UIButton(type: .system).then {
         $0.configuration = nil
         
-        let attributedTitle = NSAttributedString.RLAttributedString(text: "무빙트랙", font: .Label2, color: .Gray000)
+        let attributedTitle = NSAttributedString.RLAttributedString(text: "무빙트랙", font: .Label2)
         $0.setAttributedTitle(attributedTitle, for: .normal)
         $0.backgroundColor = .Gray300
         $0.layer.cornerRadius = 10
@@ -46,8 +46,6 @@ final class DetailLogView: UIView {
         
         $0.titleEdgeInsets = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 0)
     }
-    
-    var onMovingTrackButtonTapped: (() -> Void)?
     
     /// 타이틀 라벨
     private let titleLabel = RLLabel(
@@ -206,11 +204,6 @@ final class DetailLogView: UIView {
         // UI 요소 추가
         backgroundColor = .Gray900
         
-        // 버튼 타겟팅
-        movingTrackButton.addTarget(self,
-                                    action: #selector(movingTrackButtonDidTap),
-                                    for: .touchUpInside)
-        
         addSubview(scrollView)
         scrollView.addSubview(contentView)
         
@@ -286,37 +279,33 @@ final class DetailLogView: UIView {
         // 뷰 설정
     }
     
-    // MARK: - Actions
-    @objc private func movingTrackButtonDidTap() {
-        onMovingTrackButtonTapped?()
-    }
 }
-
-#if canImport(SwiftUI) && DEBUG
-import SwiftUI
-
-struct DetailLogView_Preview: PreviewProvider {
-    static var previews: some View {
-        UIViewPreview {
-            DetailLogView()
-        }
-        .previewLayout(.sizeThatFits) // 크기를 적절하게 조절하여 미리보기 가능
-        .padding()
-    }
-}
-
-// UIKit 뷰를 SwiftUI에서 렌더링하는 Helper
-struct UIViewPreview<T: UIView>: UIViewRepresentable {
-    let viewBuilder: () -> T
-    
-    init(_ viewBuilder: @escaping () -> T) {
-        self.viewBuilder = viewBuilder
-    }
-    
-    func makeUIView(context: Context) -> T {
-        return viewBuilder()
-    }
-    
-    func updateUIView(_ uiView: T, context: Context) {}
-}
-#endif
+//
+//#if canImport(SwiftUI) && DEBUG
+//import SwiftUI
+//
+//struct DetailLogView_Preview: PreviewProvider {
+//    static var previews: some View {
+//        UIViewPreview {
+//            DetailLogView()
+//        }
+//        .previewLayout(.sizeThatFits) // 크기를 적절하게 조절하여 미리보기 가능
+//        .padding()
+//    }
+//}
+//
+//// UIKit 뷰를 SwiftUI에서 렌더링하는 Helper
+//struct UIViewPreview<T: UIView>: UIViewRepresentable {
+//    let viewBuilder: () -> T
+//    
+//    init(_ viewBuilder: @escaping () -> T) {
+//        self.viewBuilder = viewBuilder
+//    }
+//    
+//    func makeUIView(context: Context) -> T {
+//        return viewBuilder()
+//    }
+//    
+//    func updateUIView(_ uiView: T, context: Context) {}
+//}
+//#endif
