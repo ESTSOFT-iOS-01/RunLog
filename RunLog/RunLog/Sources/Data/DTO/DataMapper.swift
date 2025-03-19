@@ -49,6 +49,17 @@ final class DataMapper {
         dto.timestamp = entity.timestamp
         return dto
     }
+    
+    static func toDTO(_ entity: AppConfig, context: NSManagedObjectContext) -> AppConfigDTO {
+        let dto = AppConfigDTO(context: context)
+        dto.nickname = entity.nickname
+        dto.streakDays = Int32(entity.streakDays)
+        dto.totalDays = Int32(entity.totalDays)
+        dto.totalDistance = entity.totalDistance
+        dto.unitDistance = entity.unitDistance
+
+        return dto
+    }
 }
 
 
@@ -100,4 +111,18 @@ extension DataMapper {
             timestamp: timestamp
         )
     }
+    
+    static func toEntity(_ dto: AppConfigDTO) -> AppConfig? {
+        
+        guard let nickname = dto.nickname else { return nil }
+        
+        return AppConfig(
+            nickname: nickname,
+            totalDistance: dto.totalDistance,
+            streakDays: Int(dto.streakDays),
+            totalDays: Int(dto.totalDays),
+            unitDistance: dto.unitDistance
+        )
+    }
+    
 }
