@@ -33,6 +33,8 @@ final class RecordDetailView: UIView {
         super.init(frame: frame)
         setupUI()
         setupLayout()
+        configure()
+       
     }
     
     required init?(coder: NSCoder) {
@@ -58,6 +60,7 @@ final class RecordDetailView: UIView {
     // MARK: - Configure
     private func configure() {
         // 뷰 설정
+        observeTableViewContentSize()
     }
     
     // MARK: - KVO: contentSize 관찰 및 높이 업데이트 + 디버그 출력
@@ -78,12 +81,6 @@ final class RecordDetailView: UIView {
             // 업데이트 후 실제 테이블뷰의 높이 출력
             print("디버그: 업데이트 후 tableView의 frame.height: \(self.tableView.frame.height), 시각: \(Date())")
         }
-    }
-    
-    // 필요에 따라 layoutSubviews에도 디버그 로그 추가 가능
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        print("디버그: layoutSubviews 호출됨, tableView의 frame.height: \(tableView.frame.height), 시각: \(Date())")
     }
     
     deinit {
