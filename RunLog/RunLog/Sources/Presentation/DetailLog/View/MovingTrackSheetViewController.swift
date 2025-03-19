@@ -43,22 +43,6 @@ final class MovingTrackSheetViewController: UIViewController {
         bindViewModel()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        self.navigationController?.setNavigationBarHidden(false, animated: animated)
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        self.navigationController?.setNavigationBarHidden(true, animated: false)
-    }
-    
-    
-    // MARK: - Setup UI
-    private func setupUI() {
-        // UI 요소 추가
-    }
-    
     // MARK: - Setup Navigation Bar
     private func setupNavigationBar() {
         // 네비게이션바 디테일 설정
