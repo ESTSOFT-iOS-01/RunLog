@@ -154,7 +154,24 @@ final class DetailLogViewController: UIViewController {
                     self?.present(activityVC, animated: true)
                     
                 case .delete:
-                    print("삭제하기 탭됨 → 삭제 로직")
+                    let alert = UIAlertController(
+                        title: "기록 삭제하기",
+                        message: "2024년 3월 3일 기록을 정말 삭제하시겠습니까?",
+                        preferredStyle: .alert
+                    )
+                    
+                    let confirmAction = UIAlertAction(title: "네", style: .destructive) { _ in
+                        // 여기서 실제 삭제 로직 처리
+                        print("기록 삭제 완료 로직")
+                    }
+                    
+                    let cancelAction = UIAlertAction(title: "아니오", style: .cancel, handler: nil)
+                    
+                    alert.addAction(confirmAction)
+                    alert.addAction(cancelAction)
+                    
+                    self?.present(alert, animated: true)
+                    
                 }
             }
             .store(in: &cancellables)
