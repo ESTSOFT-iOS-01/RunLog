@@ -13,13 +13,21 @@ class CalendarViewCell: UICollectionViewCell {
     
     static let identifier = "DayCell"
     
-    var dayLabel = UILabel().then {
+    private var dayLabel = UILabel().then {
         $0.attributedText = .RLAttributedString(
-            text: "1",
+            text: "",
             font: .Label2,
             color: .Gray000
         )
         $0.textAlignment = .center
+    }
+    
+    private var lineView = UIView().then {
+        $0.backgroundColor = .clear
+    }
+    
+    private var heartBeatImageView = UIImageView().then {
+        $0.image = UIImage()
     }
     
     // MARK: - init
@@ -35,7 +43,7 @@ class CalendarViewCell: UICollectionViewCell {
     
     // MARK: - Setup UI
     private func setupUI() {
-        addSubviews(dayLabel)
+        addSubviews(dayLabel, heartBeatImageView)
     }
     
     // MARK: - Setup Layout
@@ -44,6 +52,33 @@ class CalendarViewCell: UICollectionViewCell {
             $0.height.equalTo(19)
             $0.top.equalToSuperview()
             $0.centerX.equalToSuperview()
+        }
+        
+        heartBeatImageView.snp.makeConstraints {
+            $0.horizontalEdges.equalToSuperview()
+            $0.centerY.equalToSuperview()
+        }
+    }
+    
+    // MARK: - Configure
+    func configure(day: Int, heartBeatCount: Int) {
+        if day != .zero {
+            self.dayLabel.text = "\(day)"
+            var imageName = ""
+            switch heartBeatCount {
+            case 1:
+                imageName = RLIcon.oneBeat.name
+            case 2:
+                imageName = RLIcon.twoBeats.name
+            case 3:
+                imageName = RLIcon.threeBeats.name
+            default:
+                imageName = RLIcon.noneBeat.name
+            }
+            heartBeatImageView.image = UIImage(named: imageName)
+        } else {
+            self.dayLabel.text = ""
+            heartBeatImageView.image = nil
         }
     }
 }

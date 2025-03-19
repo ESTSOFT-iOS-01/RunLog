@@ -12,11 +12,16 @@ import Combine
 
 final class CalendarViewController: UIViewController {
     
-    // MARK: - DI
+    // MARK: - Properties
     private let calendarView = CalendarView()
     private let viewModel: LogViewModel
+    
+    // 화면에 표시되고 있는 달력을 관리하는 변수
+    private var currentKeyIndex = 0
+    private var currentMonthDays:[CalendarDay] = []
+    
     private var cancellables = Set<AnyCancellable>()
-    private var days: [String] = []
+    
     
     // MARK: - Init
     init(viewModel: LogViewModel) {
@@ -32,8 +37,7 @@ final class CalendarViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        setupGesture()
-        setupData()
+        bindGesture()
         bindViewModel()
     }
     
@@ -59,51 +63,131 @@ final class CalendarViewController: UIViewController {
         calendarView.collectionView.delegate = self
     }
     
-    // MARK: - Setup Gesture
-    private func setupGesture() {
-        // 제스처 추가
-    }
     
-    // MARK: - Setup Data
-    private func setupData() {
-        // 초기 데이터 로드
-        self.days = generateDaysForMonth(year: 2025, month: 3)
+    // MARK: - Bind Gesture
+    private func bindGesture() {
+        calendarView.leftArrowButton.publisher
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                let keys = self.viewModel.output.sortedKeys.value
+                let newIndex = self.currentKeyIndex + 1
+                
+                guard newIndex >= 0 && newIndex < keys.count else { return }
+                
+                self.updateCalendar(newIndex: newIndex)
+                self.updateArrowButtons()
+            }.store(in: &cancellables)
+        
+        calendarView.rightArrowButton.publisher
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                let keys = self.viewModel.output.sortedKeys.value
+                let newIndex = self.currentKeyIndex - 1
+                
+                guard newIndex >= 0 && newIndex < keys.count else { return }
+                
+                self.updateCalendar(newIndex: newIndex)
+                self.updateArrowButtons()
+            }.store(in: &cancellables)
     }
     
     // MARK: - Bind ViewModel
     private func bindViewModel() {
-        //        viewModel.output.something
-        //            .sink { [weak self] value in
-        //                // View 업데이트 로직
-        //            }
-        //            .store(in: &cancellables)
+        viewModel.output.sortedKeys
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] keys in
+                guard let self = self, !keys.isEmpty else { return }
+                
+                let month = viewModel.output.sortedKeys.value.first ?? Date()
+                self.currentMonthDays = generateDaysFor(date: month)
+                calendarView.calendarTitleLabel.text = month.formattedString(
+                    .yearMonthShort
+                )
+                self.updateArrowButtons()
+                
+            }
+            .store(in: &cancellables)
+        
+        viewModel.output.groupedDayLogs
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.calendarView.collectionView.reloadData()
+            }
+            .store(in: &cancellables)
     }
 }
 
 extension CalendarViewController {
-    func generateDaysForMonth(year: Int, month: Int) -> [String] {
+    // 캘린더 업데이트 함수
+    private func updateCalendar(newIndex: Int) {
+        let keys = viewModel.output.sortedKeys.value
+        currentKeyIndex = newIndex
+        currentMonthDays = generateDaysFor(date: keys[newIndex])
+        calendarView.calendarTitleLabel.text = keys[newIndex].formattedString(.yearMonthShort)
+        calendarView.collectionView.reloadData()
+    }
+
+    // 버튼 상태 업데이트 함수
+    // TODO: 리팩토링~
+    private func updateArrowButtons() {
+        let sortedKeysCount = viewModel.output.sortedKeys.value.count
+        let isLeftEnabled = currentKeyIndex + 1 < sortedKeysCount
+        let isRightEnabled = currentKeyIndex - 1 >= 0
+        
+        calendarView.leftArrowButton.isEnabled = isLeftEnabled
+        calendarView.leftArrowButton.tintColor = isLeftEnabled ? .Gray000 : .Gray200
+
+        calendarView.rightArrowButton.isEnabled = isRightEnabled
+        calendarView.rightArrowButton.tintColor = isRightEnabled ? .Gray000 : .Gray200
+    }
+    
+    // date를 기반으로 그 달의 days를 만들어내는 함수
+    // TODO: 리팩토링~
+    private func generateDaysFor(date: Date) -> [CalendarDay] {
         let calendar = Calendar.current
-        let components = DateComponents(year: year, month: month)
+        let components = calendar.dateComponents([.year, .month], from: date)
         
-        guard let firstDayOfMonth = calendar.date(
-            from: components
-        ) else { return [] }
-        
-        guard let totalDays = calendar.range(
-            of: .day,
-            in: .month,
-            for: firstDayOfMonth
-        )?.count else { return [] }
+        guard let firstDayOfMonth = calendar.date(from: components),
+              let totalDays = calendar.range(of: .day, in: .month, for: firstDayOfMonth)?.count else {
+            return []
+        }
         
         let firstWeekday = calendar.component(.weekday, from: firstDayOfMonth)
+        var calendarDays: [CalendarDay] = []
         
-        var daysArray: [String] = []
-        let emptyDays = firstWeekday - 1
-        daysArray.append(contentsOf: Array(repeating: "", count: emptyDays))
+        // 현재 month에 해당하는 log 가져오기
+        let dayLogs = viewModel.output.groupedDayLogs.value[date] ?? []
+        let unit = viewModel.output.distanceUnit.value
         
-        daysArray.append(contentsOf: (1...totalDays).map { "\($0)" })
+        // 비어있는 날짜 채우기
+        for _ in 0..<(firstWeekday - 1) {
+            calendarDays.append(CalendarDay(day: 0, heartBeatCount: 0))
+        }
         
-        return daysArray
+        // 날짜 채우기 + heartBeatCount 계산
+        for day in 1...totalDays {
+            let matchingLogs = dayLogs.filter {
+                calendar.component(.day, from: $0.date) == day
+            }
+            
+            var heartBeatCount = 0
+            if let log = matchingLogs.first {
+                let distance = log.totalDistance
+                if distance == 0 {
+                    heartBeatCount = 0
+                } else if distance < unit * (1.0 / 3.0) {
+                    heartBeatCount = 1
+                } else if distance < unit * (2.0 / 3.0) {
+                    heartBeatCount = 2
+                } else {
+                    heartBeatCount = 3
+                }
+            }
+            
+            calendarDays.append(CalendarDay(day: day, heartBeatCount: heartBeatCount))
+        }
+        
+        return calendarDays
     }
 }
 
@@ -112,7 +196,7 @@ extension CalendarViewController: UICollectionViewDelegate, UICollectionViewData
         _ collectionView: UICollectionView,
         numberOfItemsInSection section: Int
     ) -> Int {
-        return days.count
+        return currentMonthDays.count
     }
     
     func collectionView(
@@ -123,7 +207,8 @@ extension CalendarViewController: UICollectionViewDelegate, UICollectionViewData
             withReuseIdentifier: CalendarViewCell.identifier,
             for: indexPath
         ) as! CalendarViewCell
-        cell.dayLabel.text = days[indexPath.row]
+        let dayInfo = currentMonthDays[indexPath.row]
+        cell.configure(day: dayInfo.day, heartBeatCount: dayInfo.heartBeatCount)
         return cell
     }
 }
