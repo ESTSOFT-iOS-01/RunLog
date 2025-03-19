@@ -91,6 +91,11 @@ extension MyPageViewController: UITableViewDelegate {
         header.textLabel?.textAlignment = .left
         header.textLabel?.attributedText = .RLAttributedString(text: header.textLabel?.text ?? "설정", font: .Label1, color: .Gray100)
     }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        viewModel.input.send(.menuItemSelected(indexPath.row))
+    }
 }
 
 extension MyPageViewController: UITableViewDataSource {
@@ -106,11 +111,6 @@ extension MyPageViewController: UITableViewDataSource {
         let menuType = viewModel.menuItem(at: indexPath.row)
         cell.configure(title: menuType.title)
         return cell
-    }
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
-        viewModel.input.send(.menuItemSelected(indexPath.row))
     }
     
 }

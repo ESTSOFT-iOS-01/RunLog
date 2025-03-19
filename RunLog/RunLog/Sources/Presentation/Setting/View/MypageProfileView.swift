@@ -47,7 +47,6 @@ final class MypageProfileView: UIView {
     // MARK: - Init
     init() {
         super.init(frame: .zero)
-        
         setupUI()
         setupLayout()
     }

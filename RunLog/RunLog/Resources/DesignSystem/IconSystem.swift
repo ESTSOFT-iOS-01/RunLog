@@ -21,6 +21,10 @@ enum RLIcon {
     case dumbell
     case fold
     case unfold
+    
+    case selectedCircle
+    case unslectedCircle
+  
     case noneBeat
     case oneBeat
     case twoBeats
@@ -54,6 +58,12 @@ extension RLIcon {
             return "mappin.and.ellipse"
         case .dumbell:
             return "dumbbell"
+
+        case .selectedCircle:
+            return "inset.filled.circle"
+        case .unslectedCircle:
+            return "circle"
+
         case .noneBeat:
             return "noneBeat"
         case .oneBeat:
