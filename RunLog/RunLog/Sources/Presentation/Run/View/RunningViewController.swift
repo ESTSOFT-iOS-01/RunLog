@@ -11,26 +11,22 @@ import Then
 import Combine
 import MapKit
 
-// RunningView랑 CardView에서만 사용하는 타입 - 어디로빼야할지 고민
-struct SectionRecord {
-    var sectionTime: TimeInterval // 시간
-    var distance: Double // 거리
-    var steps: Int // 걸음 수
-}
-
 final class RunningViewController: UIViewController {
     
-    // MARK: - DI
-//    private let viewModel: ViewModelType
+    // MARK: - Property
+    private let viewModel = RunningViewModel()
     private var cancellables = Set<AnyCancellable>()
-    // 더미데이터
-    var record = SectionRecord(
-        sectionTime: 12 * 60 + 23,
-        distance: 0.93,
-        steps: 3242
-    )
     // MARK: - UI
-    var mapView = MKMapView()
+    lazy var mapView = MKMapView().then {
+        $0.delegate = self
+        //최대 줌 거리 제한
+        let zoomRange = MKMapView.CameraZoomRange(maxCenterCoordinateDistance: 20000)
+        $0.setCameraZoomRange(zoomRange, animated: false)
+        $0.showsUserLocation = true
+        $0.showsUserTrackingButton = true
+        $0.pitchButtonVisibility = .visible
+//        $0.overrideUserInterfaceStyle = .light  밝은 지도 - 궁금해서 넣어봄
+    }
     var cardView = CardView()
     var foldButton = RLButton().then {
         $0.configureTitle(title: "닫기", titleColor: .Gray000, font: .RLLabel2)
@@ -42,7 +38,10 @@ final class RunningViewController: UIViewController {
         config.image = UIImage(systemName: RLIcon.fold.name)
         config.imagePadding = 4
         config.imagePlacement = .trailing
-        config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(pointSize: 12, weight: .medium)
+        config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(
+            pointSize: 12,
+            weight: .medium
+        )
         $0.configuration = config
     }
     var unfoldButton = UIButton().then {
@@ -56,8 +55,6 @@ final class RunningViewController: UIViewController {
     }
     
     // MARK: - Init
-//    init(viewModel: ViewModelType) {
-//        self.viewModel = viewModel
     init() {
         super.init(nibName: nil, bundle: nil)
     }
@@ -71,9 +68,11 @@ final class RunningViewController: UIViewController {
         super.viewDidLoad()
         setupUI()
         setupNavigationBar()
-        setupGesture()
+        bindGesture()
         setupData()
         bindViewModel()
+        
+        LocationManager.shared.startDummyLocationUpdates()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -119,39 +118,86 @@ final class RunningViewController: UIViewController {
         // 네비게이션바 디테일 설정
     }
 
-    // MARK: - Setup Gesture
-    private func setupGesture() {
+    // MARK: - Bind Gesture
+    private func bindGesture() {
         // 제스처 추가
-        cardView.finishButton.addTarget(self, action: #selector(finishButtonTouch), for: .touchUpInside)
-        foldButton.addTarget(self, action: #selector(toggleCardView), for: .touchUpInside)
-        unfoldButton.addTarget(self, action: #selector(toggleCardView), for: .touchUpInside)
+        cardView.finishButton.publisher
+            .sink { [weak self] in
+                
+                self?.dismiss(animated: false)
+            }
+            .store(in: &cancellables)
+        foldButton.publisher
+            .sink { [weak self] in
+                self?.toggleCardView()
+            }
+            .store(in: &cancellables)
+        unfoldButton.publisher
+            .sink { [weak self] in
+                self?.toggleCardView()
+            }
+            .store(in: &cancellables)
     }
     
     // MARK: - Setup Data
     private func setupData() {
-        // 초기 데이터 로드 - 현재 더미 데이터 상태
-        cardView.timeLabel.record = record
-        cardView.distanceLabel.record = record
-        cardView.stepsLabel.record = record
+        // 맵뷰 초기 데이터 설정
+        let currentLocation = LocationManager.shared.currentLocation
+        mapView.setUserTrackingMode(.follow, animated: true)
+        mapView.centerToLocation(currentLocation)
+        // 뷰가 로드되면 운동이 시작된 상태
+        viewModel.input.send(.runningStart)
+        
     }
 
     // MARK: - Bind ViewModel
     private func bindViewModel() {
-//        viewModel.output.something
-//            .sink { [weak self] value in
-//                // View 업데이트 로직
-//            }
-//            .store(in: &cancellables)
+        viewModel.output
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] output in
+                switch output {
+                case .locationUpdate(let location):
+                    self?.mapView.centerToLocation(location, region: self?.mapView.region)
+                case .timerUpdate(let time):
+                    self?.cardView.timeLabel.setConfigure(text: time)
+                case .distanceUpdate:
+                    print("거리 변경")
+                case .stepsUpdate:
+                    print("걸음 수 변경")
+                case .lineDraw(let lineDraw):
+                    print("라인 그리는 중")
+                    self?.mapView.addOverlay(lineDraw)
+                }
+            }
+            .store(in: &cancellables)
     }
 }
 
-extension RunningViewController {
-    @objc private func finishButtonTouch(sender: UIButton) {
-        self.dismiss(animated: false)
-    }
-    @objc private func toggleCardView(sender: UIButton) {
+extension RunningViewController: MKMapViewDelegate {
+    private func toggleCardView() {
         self.cardView.isHidden.toggle()
         self.foldButton.isHidden.toggle()
         self.unfoldButton.isHidden.toggle()
+    }
+    // 트래킹모드 .none이 되면 시야조정
+    func mapView(_ mapView: MKMapView, didChange mode: MKUserTrackingMode, animated: Bool) {
+        guard let userLocation = mapView.userLocation.location else { return }
+//        if mode == .none {
+//            
+//        }
+        mapView.centerToLocation(userLocation, region: self.mapView.region)
+    }
+    func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+        guard let polyLine = overlay as? MKPolyline
+        else {
+            print("can't draw polyline")
+            return MKOverlayRenderer()
+        }
+        let renderer = MKPolylineRenderer(polyline: polyLine)
+        renderer.strokeColor = .LightGreen
+        renderer.lineWidth = 3.0
+        renderer.alpha = 1.0
+        
+        return renderer
     }
 }

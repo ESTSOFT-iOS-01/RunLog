@@ -15,7 +15,7 @@ final class SettingMenuCell: UITableViewCell {
     
     // MARK: - UI Components
     lazy var titleLabel = UILabel().then {
-        $0.attributedText = .RLAttributedString(text: "메뉴", font: .Body2, color: .Gray000)
+        $0.attributedText = .RLAttributedString(text: "메뉴", font: .Body2)
     }
     
     private lazy var arrowImageView = UIImageView().then {

@@ -11,24 +11,37 @@ import Then
 
 final class CardElementView: UIView {
     // record로 안받고 value로 값만 받을려면 Any로 선언해서 configue에서 캐스팅 해줘도 될듯?
-    var record: SectionRecord? {
-        didSet {
-            configure()
+    enum ElementType: String {
+        case time = "시간"
+        case distance = "거리"
+        case steps = "걸음수"
+        
+        var titleFont: RLFont {
+            switch self {
+            case .time: return .Heading1
+            case .distance: return .Headline1
+            case .steps: return .Headline1
+            }
         }
-    }
-    enum ElementType {
-        case time
-        case distance
-        case steps
+        var valueFont: RLFont {
+            switch self {
+            case .time: return .Heading4
+            case .distance: return .Title
+            case .steps: return .Title
+            }
+        }
+        var color: UIColor {
+            switch self {
+            case .time: return .LightOrange
+            case .distance: return .LightPink
+            case .steps: return .LightBlue
+            }
+        }
     }
     // MARK: - UI Components 선언
     var type: ElementType
-    var title = UILabel().then {
-        $0.text = "title"
-    }
-    var value = UILabel().then {
-        $0.text = "value"
-    }
+    var title = UILabel()
+    var value = UILabel()
     // MARK: - Init
     init(type: ElementType) {
         self.type = type
@@ -45,6 +58,7 @@ final class CardElementView: UIView {
     private func setupUI() {
         // UI 요소 추가
         self.addSubviews(title, value)
+        title.attributedText = .RLAttributedString(text: type.rawValue, font: type.titleFont)
     }
     
     // MARK: - Setup Layout
@@ -60,19 +74,11 @@ final class CardElementView: UIView {
     }
     
     // MARK: - Configure
-    private func configure() {
-        guard let record = self.record else { return }
-        // 뷰 설정
-        switch type {
-        case .time:
-            title.attributedText = .RLAttributedString(text: "시간", font: .Heading1, color: .Gray000)
-            value.attributedText = .RLAttributedString(text: "\(record.sectionTime.asTimeString)", font: .Heading4, color: .LightOrange)
-        case .distance:
-            title.attributedText = .RLAttributedString(text: "거리", font: .Headline1, color: .Gray000)
-            value.attributedText = .RLAttributedString(text: "\(record.distance.asTimeString)km", font: .Title, color: .LightPink)
-        case .steps:
-            title.attributedText = .RLAttributedString(text: "걸음수", font: .Headline1, color: .Gray000)
-            value.attributedText = .RLAttributedString(text: "\(record.steps.formattedString)", font: .Title, color: .LightBlue)
-        }
+    func setConfigure(text: String) {
+        value.attributedText = .RLAttributedString(
+            text: text,
+            font: type.valueFont,
+            color: type.color
+        )
     }
 }

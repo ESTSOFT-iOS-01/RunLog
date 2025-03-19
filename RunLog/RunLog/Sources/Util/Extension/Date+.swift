@@ -2,9 +2,6 @@
 //  Date+.swift
 //  RunLog
 //
-//  Created by 신승재 on 3/17/25.
-//
-
 import Foundation
 
 extension Date {

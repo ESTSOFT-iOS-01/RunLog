@@ -13,12 +13,14 @@ import MapKit
 
 final class RunHomeViewController: UIViewController {
     
-    // MARK: - DI
-//    private let viewModel: ViewModelType
+    // MARK: - Property
+    private let viewModel = RunHomeViewModel()
     private var cancellables = Set<AnyCancellable>()
     
     // MARK: - UI
-    var mapView = MKMapView()
+    lazy var mapView = MKMapView().then {
+        $0.showsUserLocation = true
+    }
     var totalLabel = UILabel().then {
         $0.numberOfLines = 3
     }
@@ -32,7 +34,6 @@ final class RunHomeViewController: UIViewController {
     }
     // MARK: - Init
     init() {
-//        self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -46,7 +47,7 @@ final class RunHomeViewController: UIViewController {
         setupUI()
         setupNavigationBar()
         setupTabBar()
-        setupGesture()
+        bindGesture()
         setupData()
         bindViewModel()
     }
@@ -54,6 +55,7 @@ final class RunHomeViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationController?.setNavigationBarHidden(false, animated: animated)
+        self.mapView.centerToLocation(LocationManager.shared.currentLocation)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -104,30 +106,42 @@ final class RunHomeViewController: UIViewController {
         // 탭바 디테일 설정
         self.setupTabBarAppearance()
     }
-    // MARK: - Setup Gesture
-    private func setupGesture() {
+    // MARK: - Bind Gesture
+    private func bindGesture() {
         // 제스처 추가
-        startButton.addTarget(self, action: #selector(startButtonTouch), for: .touchUpInside)
+        startButton.publisher
+            .sink {
+                print("운동 시작하기 버튼 클릭")
+                let vc = RunningViewController()
+                vc.modalPresentationStyle = .fullScreen
+                self.present(vc, animated: false)
+            }
+            .store(in: &cancellables)
     }
     
     // MARK: - Setup Data
     private func setupData() {
         // 초기 데이터 로드
-        locationLabel.attributedText = LocationManager.shared.curLocationStr
-        weatherLabel.attributedText = LocationManager.shared.curWeatherStr
         totalLabelCreate()
     }
 
     // MARK: - Bind ViewModel
     private func bindViewModel() {
-//        viewModel.output.something
-//            .sink { [weak self] value in
-//                // View 업데이트 로직
-//            }
-//            .store(in: &cancellables)
+        viewModel.output
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] output in
+                switch output {
+                case .locationUpdate(let location):
+                    self?.mapView.centerToLocation(location)
+                case .locationNameUpdate(let text):
+                    self?.locationLabel.attributedText = .RLAttributedString(text: text, font: .Label2, align: .center)
+                case .weatherUpdate(let text):
+                    self?.weatherLabel.attributedText = .RLAttributedString(text: text, font: .Label2)
+                }
+            }
+            .store(in: &cancellables)
     }
 }
-
 // MARK: - private functions
 extension RunHomeViewController {
     private func totalLabelCreate() {
@@ -141,11 +155,5 @@ extension RunHomeViewController {
             baseFont: .RLMainTitle,
             highlightFont: .RLMainTitle
         )
-    }
-    @objc private func startButtonTouch(sender: UIButton) {
-        print("운동 시작하기 버튼 클릭")
-        let vc = RunningViewController()
-        vc.modalPresentationStyle = .fullScreen
-        self.present(vc, animated: false)
     }
 }
