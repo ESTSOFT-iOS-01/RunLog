@@ -1,7 +1,7 @@
 <div align=center>
 
 # RunLog
-** 야외 운동 시 거리와 걸음수를 측정하고 기록을 공유하여 재미를 더하는 서비스 **
+**야외 운동 시 거리와 걸음수를 측정하고 기록을 공유하여 재미를 더하는 서비스**
 사용자의 야외 운동 데이터를 기반으로 거리, 걸음 수를 측정하고 경로를 시각적으로 표현해줍니다. 나아가, 이 기록을 바탕으로 무빙트랙 영상까지 자동 생성해 누구나 쉽게 공유하고 재미를 느낄 수 있는 서비스입니다.
 
 [📑 RunLog FigJam 📑](https://www.figma.com/board/zYmssJJqQJ7GctcqUV3Jo4/%EB%B8%8C%EB%A0%88%EC%9D%B8%EC%8A%A4%ED%86%A0%EB%B0%8D?node-id=64-408&t=b1natT9ZZemZOsmq-0)
