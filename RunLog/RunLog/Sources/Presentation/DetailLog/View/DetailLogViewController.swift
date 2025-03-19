@@ -148,7 +148,11 @@ final class DetailLogViewController: UIViewController {
                 case .edit:
                     print("수정하기 탭됨 → 수정 로직")
                 case .share:
-                    print("공유하기 탭됨 → 공유 로직")
+                    let shareText = "하트런 기록 공유!"
+                    let shareItems: [Any] = [shareText]
+                    let activityVC = UIActivityViewController(activityItems: shareItems, applicationActivities: nil)
+                    self?.present(activityVC, animated: true)
+                    
                 case .delete:
                     print("삭제하기 탭됨 → 삭제 로직")
                 }
