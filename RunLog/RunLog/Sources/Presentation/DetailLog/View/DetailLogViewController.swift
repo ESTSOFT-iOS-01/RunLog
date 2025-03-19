@@ -94,19 +94,18 @@ final class DetailLogViewController: UIViewController {
                 let sheetVC = MovingTrackSheetViewController(viewModel: MovingTrackSheetViewModel())
                 
                 if let sheet = sheetVC.sheetPresentationController {
-                    if #available(iOS 16.0, *) {
-                        let customDetent = UISheetPresentationController.Detent.custom(identifier: .init("myCustomDetent")) { _ in
-                            820
-                        }
-                        sheet.detents = [customDetent]
-                        sheet.selectedDetentIdentifier = customDetent.identifier
-                        sheet.prefersScrollingExpandsWhenScrolledToEdge = false
-                        sheet.prefersEdgeAttachedInCompactHeight = true
-                        sheet.widthFollowsPreferredContentSizeWhenEdgeAttached = true
-                    } else {
-                        sheet.detents = [.medium(), .large()]
+                    let customDetent = UISheetPresentationController.Detent.custom(identifier: .init("myCustomDetent")) { _ in
+                        820
                     }
-                    sheet.prefersGrabberVisible = true
+                    sheet.detents = [customDetent]
+                    sheet.selectedDetentIdentifier = customDetent.identifier
+                    
+                    // Grabber 제거
+                    sheet.prefersGrabberVisible = false
+                    
+                    sheet.prefersScrollingExpandsWhenScrolledToEdge = false
+                    sheet.prefersEdgeAttachedInCompactHeight = true
+                    sheet.widthFollowsPreferredContentSizeWhenEdgeAttached = true
                     sheet.preferredCornerRadius = 16
                 }
                 

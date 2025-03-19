@@ -89,7 +89,7 @@ final class MovingTrackSheetView: UIView {
         mapView.snp.makeConstraints { make in
             make.top.equalTo(subtitleLabel.snp.bottom).offset(48)
             make.leading.trailing.equalToSuperview().inset(24)
-            make.height.equalTo(498)
+            make.height.equalTo(mapView.snp.width).multipliedBy(498.0 / 392.0)
         }
         
         // 저장하기 버튼
