@@ -75,28 +75,7 @@ final class RunningViewModel {
         locationManager.locationPublisher
             .receive(on: DispatchQueue.main)
             .sink { [weak self] location in
-                // 경로 그리기
-                if let previousCoordinate = self?.previousCoordinate {
-                    let point1 = CLLocationCoordinate2DMake(
-                        previousCoordinate.latitude,
-                        previousCoordinate.longitude
-                    )
-                    let point2 = CLLocationCoordinate2DMake(
-                        location.coordinate.latitude,
-                        location.coordinate.longitude
-                    )
-                    let points: [CLLocationCoordinate2D] = [point1, point2]
-                    let lineDraw = MKPolyline(coordinates: points, count: points.count)
-                    self?.output.send(.lineDraw(lineDraw))
-                }
-                self?.previousCoordinate = location.coordinate
-                // 위치 변경
-                let point: Point = Point(
-                    latitude: location.coordinate.latitude,
-                    longitude: location.coordinate.longitude,
-                    timestamp: Date())
-                self?.section.route.append(point)
-                self?.output.send(.locationUpdate(location))
+                self?.lindDraw(location: location)
             }
             .store(in: &cancellables)
         // input에 따라 처리
@@ -123,5 +102,32 @@ final class RunningViewModel {
             let timeString = self.record.sectionTime.asTimeString
             self.output.send(.timerUpdate(timeString))
         }
+    }
+}
+// MARK: - 지도에 그리기
+extension RunningViewModel {
+    private func lindDraw(location: CLLocation) {
+        // 경로 그리기
+        if let previousCoordinate = self.previousCoordinate {
+            let point1 = CLLocationCoordinate2DMake(
+                previousCoordinate.latitude,
+                previousCoordinate.longitude
+            )
+            let point2 = CLLocationCoordinate2DMake(
+                location.coordinate.latitude,
+                location.coordinate.longitude
+            )
+            let points: [CLLocationCoordinate2D] = [point1, point2]
+            let lineDraw = MKPolyline(coordinates: points, count: points.count)
+            self.output.send(.lineDraw(lineDraw))
+        }
+        self.previousCoordinate = location.coordinate
+        // 위치 변경
+        let point: Point = Point(
+            latitude: location.coordinate.latitude,
+            longitude: location.coordinate.longitude,
+            timestamp: Date())
+        self.section.route.append(point)
+        self.output.send(.locationUpdate(location))
     }
 }
