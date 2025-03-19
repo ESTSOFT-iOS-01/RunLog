@@ -143,38 +143,41 @@ final class DetailLogViewController: UIViewController {
     private func bindViewModel() {
         viewModel.output
             .sink { [weak self] output in
-                guard let output = output else { return }
+                guard let self = self, let output = output else { return }
                 switch output {
                 case .edit:
                     print("수정하기 탭됨 → 수정 로직")
                 case .share:
-                    let shareText = "하트런 기록 공유!"
-                    let shareItems: [Any] = [shareText]
-                    let activityVC = UIActivityViewController(activityItems: shareItems, applicationActivities: nil)
-                    self?.present(activityVC, animated: true)
+                    self.handleShare(in: self, shareText: "하트런 기록 공유!")
                     
                 case .delete:
-                    let alert = UIAlertController(
-                        title: "기록 삭제하기",
-                        message: "2024년 3월 3일 기록을 정말 삭제하시겠습니까?",
-                        preferredStyle: .alert
-                    )
-                    
-                    let confirmAction = UIAlertAction(title: "네", style: .destructive) { _ in
-                        // 여기서 실제 삭제 로직 처리
-                        print("기록 삭제 완료 로직")
-                    }
-                    
-                    let cancelAction = UIAlertAction(title: "아니오", style: .cancel, handler: nil)
-                    
-                    alert.addAction(confirmAction)
-                    alert.addAction(cancelAction)
-                    
-                    self?.present(alert, animated: true)
-                    
+                    self.handleDelete(in: self, dateString: "2024년 3월 3일")
                 }
             }
             .store(in: &cancellables)
+    }
+    
+    // MARK: - Action Handlers (함수 분리)
+    private func handleShare(in targetVC: UIViewController, shareText: String) {
+        let shareItems: [Any] = [shareText]
+        let activityVC = UIActivityViewController(activityItems: shareItems, applicationActivities: nil)
+        targetVC.present(activityVC, animated: true)
+    }
+    
+    private func handleDelete(in targetVC: UIViewController, dateString: String) {
+        let alert = UIAlertController(
+            title: "기록 삭제하기",
+            message: "\(dateString) 기록을 정말 삭제하시겠습니까?",
+            preferredStyle: .alert
+        )
+        let confirmAction = UIAlertAction(title: "네", style: .destructive) { _ in
+            // 실제 삭제 로직 처리
+            print("기록 삭제 완료 로직")
+        }
+        let cancelAction = UIAlertAction(title: "아니오", style: .cancel, handler: nil)
+        alert.addAction(confirmAction)
+        alert.addAction(cancelAction)
+        targetVC.present(alert, animated: true)
     }
 }
 
