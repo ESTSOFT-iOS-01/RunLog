@@ -36,7 +36,6 @@ final class MovingTrackSheetViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupUI()
         setupNavigationBar()
         bindGesture()
         setupData()
