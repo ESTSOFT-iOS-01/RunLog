@@ -12,12 +12,6 @@ import WeatherKit
 import CoreLocation
 import Combine
 
-// MARK: - WeatherData (날씨 + 대기질 정보)
-struct WeatherData {
-    let temperature: Int
-    let condition: WeatherCondition
-    let airQuality: Int
-}
 struct DummyWeather {
     let temperature: Int
     let condition: WeatherCondition
@@ -41,26 +35,34 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
     }
     // MARK: - Singleton
     static let shared = LocationManager()
-    // MARK: - Property
+    // MARK: - Properties
     private var locationManager = CLLocationManager()
     private let weatherService = WeatherService()
+    private let openWeatherService = OpenWeatherService()
+    private var cancellables = Set<AnyCancellable>()
     var currentLocation: CLLocation {
         // 현재 위치를 반환, 못찾으면 서울을 기본값으로 반환
         return locationManager.location ?? CLLocation(latitude: 37.5665, longitude: 126.9780)
     }
-    // MARK: - Combine
+    // MARK: - Combine Subjects
     private let locationSubject = PassthroughSubject<CLLocation, Never>()
     private let locationNameSubject = PassthroughSubject<CLPlacemark, Never>()
-    private let weatherSubject = PassthroughSubject<WeatherData, Never>()
+    private let weatherUpdateSubject = PassthroughSubject<(String, Double), Never>()
+    private let aqiUpdateSubject = PassthroughSubject<Int, Never>()
+    // MARK: - Publisher
     var locationPublisher: AnyPublisher<CLLocation, Never> {
         locationSubject.eraseToAnyPublisher()
     }
     var locationNamePublisher: AnyPublisher<CLPlacemark, Never> {
         locationNameSubject.eraseToAnyPublisher()
     }
-    var weatherPublisher: AnyPublisher<WeatherData, Never> {
-        weatherSubject.eraseToAnyPublisher()
+    var weatherUpdatePublisher: AnyPublisher<(String, Double), Never> {
+        weatherUpdateSubject.eraseToAnyPublisher()
     }
+    var aqiUpdatePublisher: AnyPublisher<Int, Never> {
+        aqiUpdateSubject.eraseToAnyPublisher()
+    }
+    
     // MARK: - Init
     private override init() {
         super.init()
@@ -85,8 +87,11 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
         guard let location = locations.last else { return }
         print("현재 위치: \(location.coordinate.latitude), \(location.coordinate.longitude)")
 //        self.locationSubject.send(location) // 더미 지우고 여기 풀면 현재 위치 기준으로 작성
+        // 도시명 패치 - 이걸 위치 따라 지정
         fetchCityName(location: location)
-        fetchWeatherData(location: location)
+        // location 정보 10km정도 멀어지면 새로호출
+        fetchWeatherData(location: location) // 날씨 정보 패치
+        fetchAqiData(location: location) // 대기질 정보 패치
     }
     // MARK: - 도시명 가져오기
     private func fetchCityName(location: CLLocation) {
@@ -101,72 +106,59 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
             self.locationNameSubject.send(placemark)
         }
     }
-    // MARK: - 날씨, 온도, 대기질 데이터 가져오기
-    private func fetchWeatherData(location: CLLocation) {
-        Task {
-            async let weather = fetchWeatherKitData(location: location)
-            async let aqi = fetchOpenWeatherData(location: location)
-            
-            let weatherData = await WeatherData(
-                temperature: weather.temperature,
-                condition: weather.condition,
-                airQuality: aqi
-            )
-            self.weatherSubject.send(weatherData)
-        }
-    }
 }
 // MARK: - 날씨 정보
 extension LocationManager {
-    // MARK: - weatherKit으로 날씨를 받아옴
-    private func fetchWeatherKitData(location: CLLocation) async -> DummyWeather {
-        return DummyWeather(temperature: Int.random(in: -10...35), condition: .clear)
+    // MARK: - openWeather로 날씨를 받아옴
+    private func fetchWeatherData(location: CLLocation) {
+        openWeatherService.fetchWeather(
+            lat: location.coordinate.latitude,
+            lon: location.coordinate.longitude
+        )
+        .receive(on: DispatchQueue.main)
+        .sink { completion in
+            if case let .failure(error) = completion {
+                print("데이터 요청 실패: \(error.errorMessage)")
+            }
+        } receiveValue: { response in
+            let temperature: Double = response.main.temp
+            let condition: String = response.weather.first?.description ?? "알 수 없음"
+//            print("온도 및 상태 값: \(temperature)°C \(condition)")
+            //°C
+            self.weatherUpdateSubject.send((condition, temperature))
+        }
+        .store(in: &cancellables)
     }
 }
-
 // MARK: - 대기질 정보
 extension LocationManager {
-    private struct AQIResponse: Codable {
-        struct AQIList: Codable {
-            struct Main: Codable {
-                let aqi: Int
+    // MARK: - openWeather로 대기질을 받아옴
+    private func fetchAqiData(location: CLLocation) {
+        openWeatherService.fetchAirQuality(
+            lat: location.coordinate.latitude,
+            lon: location.coordinate.longitude
+        )
+        .receive(on: DispatchQueue.main)
+        .sink { completion in
+            if case let .failure(error) = completion {
+                print("데이터 요청 실패: \(error.errorMessage)")
+                self.aqiUpdateSubject.send(-1)
             }
-            let main: Main
+        } receiveValue: { response in
+            let aqi = response.list.first?.main.aqi ?? 3 // 기본값 '나쁨(3)' 설정
+            print("현재 Aqi 값: \(aqi)")
+            self.aqiUpdateSubject.send(aqi)
         }
-        let list: [AQIList]
-    }
-    // MARK: - openWeatherMap으로 대기질을 받아옴
-    private func fetchOpenWeatherData(location: CLLocation) async -> Int {
-        guard let apiKey = Bundle.main.weatherKey else {
-            print("API 키를 로드하지 못했습니다.")
-            return -1
-        }
-        let urlString: String = "http://api.openweathermap.org/data/2.5/air_pollution?lat=\(location.coordinate.latitude)&lon=\(location.coordinate.longitude)&appid=\(apiKey)"
-            
-        guard let url = URL(string: urlString) else {
-            print("url 생성 실패")
-            return -1
-        }
-        do {
-            let (data, _) = try await URLSession.shared.data(from: url)
-            let decodeData = try JSONDecoder().decode(AQIResponse.self, from: data)
-            if let aqi = decodeData.list.first?.main.aqi {
-                print("현재 aqi값 : \(aqi)")
-                return aqi
-            }else {
-                print("데이터 없음")
-            }
-        }catch {
-            print("AQI 데이터 가져오기 실패: \(error.localizedDescription)")
-        }
-        return -1
+        .store(in: &cancellables)
     }
 }
 // MARK: - 위치 정보 권한 요청
 extension LocationManager {
+    // MARK: - 권한 정보가 바뀌면 실행
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         getLocationUsagePermission()
     }
+    // MARK: - 권한 정보에 따른 분기 처리
     private func getLocationUsagePermission() {
         let status = locationManager.authorizationStatus
         switch status {
@@ -183,38 +175,11 @@ extension LocationManager {
             return
         }
     }
+    // MARK: - 앱 설정 열기
     private func openAppSettings() {
         guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
         if UIApplication.shared.canOpenURL(url) {
             UIApplication.shared.open(url, options: [:], completionHandler: nil)
         }
     }
-}
-
-
-
-
-
-
-struct DummyLocation {
-    static let route: [CLLocation] = {
-        let center = CLLocationCoordinate2D(latitude: 37.554722, longitude: 126.970833) // 원의 중심 (서울역 근처)
-        let radius: Double = 0.00135 // 150m (위도/경도 변환값)
-        let totalPoints = 20 // 100개 좌표
-        
-        var locations: [CLLocation] = []
-        
-        for i in 0..<totalPoints {
-            let angle = Double(i) / Double(totalPoints) * 2 * .pi // 0 ~ 2π (360도)
-            let latOffset = radius * cos(angle) // 원 형태의 위도 변동
-            let lonOffset = radius * sin(angle) // 원 형태의 경도 변동
-            
-            let newLat = center.latitude + latOffset
-            let newLon = center.longitude + lonOffset
-            
-            locations.append(CLLocation(latitude: newLat, longitude: newLon))
-        }
-        
-        return locations
-    }()
 }
