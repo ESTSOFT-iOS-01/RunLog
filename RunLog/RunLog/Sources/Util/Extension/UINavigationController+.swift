@@ -83,4 +83,35 @@ extension UINavigationController {
         
         return publisher
     }
+    
+    func addRightMenuButton(menuItems: [(title: String, attributes: UIMenuElement.Attributes)]) -> AnyPublisher<String, Never> {
+        let rightButton = UIButton(type: .system)
+        
+        // RLIcon 시스템에 등록된 ellipsis 아이콘 사용 (예: RLIcon.ellipsis)
+        rightButton.setImage(UIImage(systemName: RLIcon.ellipsis.name), for: .normal)
+        rightButton.tintColor = .LightGreen
+        
+        let subject = PassthroughSubject<String, Never>()
+        
+        // UIAction 배열 생성 (아이콘 없이 제목과 속성만 사용)
+        let actions = menuItems.map { item in
+            UIAction(title: item.title,
+                     image: nil,
+                     attributes: item.attributes) { _ in
+                subject.send(item.title)
+            }
+        }
+        
+        let menu = UIMenu(title: "", children: actions)
+        
+        if #available(iOS 14.0, *) {
+            rightButton.showsMenuAsPrimaryAction = true
+            rightButton.menu = menu
+        }
+        
+        let barButtonItem = UIBarButtonItem(customView: rightButton)
+        topViewController?.navigationItem.rightBarButtonItem = barButtonItem
+        
+        return subject.eraseToAnyPublisher()
+    }
 }
