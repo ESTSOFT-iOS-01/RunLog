@@ -31,7 +31,7 @@ final class DetailLogView: UIView {
     }
     
     /// 지도 위에 오버레이될 무빙트랙 버튼
-    private let movingTrackButton = UIButton(type: .system).then {
+    let movingTrackButton = UIButton(type: .system).then {
         $0.configuration = nil
         
         let attributedTitle = NSAttributedString.RLAttributedString(text: "무빙트랙", font: .Label2, color: .Gray000)
@@ -46,8 +46,6 @@ final class DetailLogView: UIView {
         
         $0.titleEdgeInsets = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 0)
     }
-    
-    var onMovingTrackButtonTapped: (() -> Void)?
     
     /// 타이틀 라벨
     private let titleLabel = RLLabel(
@@ -206,11 +204,6 @@ final class DetailLogView: UIView {
         // UI 요소 추가
         backgroundColor = .Gray900
         
-        // 버튼 타겟팅
-        movingTrackButton.addTarget(self,
-                                    action: #selector(movingTrackButtonDidTap),
-                                    for: .touchUpInside)
-        
         addSubview(scrollView)
         scrollView.addSubview(contentView)
         
@@ -286,10 +279,6 @@ final class DetailLogView: UIView {
         // 뷰 설정
     }
     
-    // MARK: - Actions
-    @objc private func movingTrackButtonDidTap() {
-        onMovingTrackButtonTapped?()
-    }
 }
 
 #if canImport(SwiftUI) && DEBUG

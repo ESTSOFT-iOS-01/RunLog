@@ -50,12 +50,9 @@ final class DetailLogViewController: UIViewController {
         tableView.delegate = self
         setupUI()
         setupNavigationBar()
-        setupGesture()
+        bindGesture()
         setupData()
         bindViewModel()
-        detailLogView.onMovingTrackButtonTapped = { [weak self] in
-            print("VC에서 버튼 탭 로직 처리")
-        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -88,8 +85,35 @@ final class DetailLogViewController: UIViewController {
     }
     
     // MARK: - Setup Gesture
-    private func setupGesture() {
+    private func bindGesture() {
         // 제스처 추가
+        detailLogView.movingTrackButton.controlPublisher(for: .touchUpInside)
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                
+                let sheetVC = MovingTrackSheetViewController(viewModel: MovingTrackSheetViewModel())
+                
+                if let sheet = sheetVC.sheetPresentationController {
+                    if #available(iOS 16.0, *) {
+                        let customDetent = UISheetPresentationController.Detent.custom(identifier: .init("myCustomDetent")) { _ in
+                            820
+                        }
+                        sheet.detents = [customDetent]
+                        sheet.selectedDetentIdentifier = customDetent.identifier
+                        sheet.prefersScrollingExpandsWhenScrolledToEdge = false
+                        sheet.prefersEdgeAttachedInCompactHeight = true
+                        sheet.widthFollowsPreferredContentSizeWhenEdgeAttached = true
+                    } else {
+                        sheet.detents = [.medium(), .large()]
+                    }
+                    sheet.prefersGrabberVisible = true
+                    sheet.preferredCornerRadius = 16
+                }
+                
+                sheetVC.modalPresentationStyle = .pageSheet
+                self.present(sheetVC, animated: true)
+            }
+            .store(in: &cancellables)
     }
     
     // MARK: - Setup Data

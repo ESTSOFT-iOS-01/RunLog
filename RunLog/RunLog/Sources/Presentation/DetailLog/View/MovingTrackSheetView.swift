@@ -29,7 +29,7 @@ final class MovingTrackSheetView: UIView {
         font: .RLBody1
     )
     
-    private let closeButton = UIButton(type: .system).then {
+    let closeButton = UIButton(type: .system).then {
         $0.setImage(UIImage(systemName: "xmark"), for: .normal)
         $0.tintColor = .white
     }
@@ -40,7 +40,7 @@ final class MovingTrackSheetView: UIView {
         $0.clipsToBounds = true
     }
     
-    var saveButton = RLButton(title: "라이브러리에 저장하기", titleColor: .Gray900).then {
+    let saveButton = RLButton(title: "라이브러리에 저장하기", titleColor: .Gray900).then {
         $0.configureBackgroundColor(.LightGreen)
     }
     
