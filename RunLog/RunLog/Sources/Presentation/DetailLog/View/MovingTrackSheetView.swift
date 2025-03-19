@@ -94,7 +94,6 @@ final class MovingTrackSheetView: UIView {
         
         // 저장하기 버튼
         saveButton.snp.makeConstraints { make in
-            make.top.equalTo(mapView.snp.bottom).offset(45)
             make.leading.trailing.equalToSuperview().inset(52)
             make.height.equalTo(63)
             // 바텀 마진
@@ -108,18 +107,18 @@ final class MovingTrackSheetView: UIView {
     }
 }
 
-#if canImport(SwiftUI) && DEBUG
-import SwiftUI
-
-struct MypageProfileView_Preview: PreviewProvider {
-    static var previews: some View {
-        UIViewPreview {
-            MovingTrackSheetView()
-        }
-        .previewLayout(.sizeThatFits) // 크기를 적절하게 조절하여 미리보기 가능
-        .padding()
-    }
-}
-
-
-#endif
+//#if canImport(SwiftUI) && DEBUG
+//import SwiftUI
+//
+//struct MypageProfileView_Preview: PreviewProvider {
+//    static var previews: some View {
+//        UIViewPreview {
+//            MovingTrackSheetView()
+//        }
+//        .previewLayout(.sizeThatFits) // 크기를 적절하게 조절하여 미리보기 가능
+//        .padding()
+//    }
+//}
+//
+//
+//#endif
