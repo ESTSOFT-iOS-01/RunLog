@@ -33,6 +33,12 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
             self.locationSubject.send(dummyLocation) // ViewModel로 위치 데이터 전송
         }
     }
+    func stopDummyLocationUpdates() {
+        timer?.invalidate()
+        timer = nil
+        dummyIndex = 0
+    }
+    
     // MARK: - Singleton
     static let shared = LocationManager()
     // MARK: - Properties

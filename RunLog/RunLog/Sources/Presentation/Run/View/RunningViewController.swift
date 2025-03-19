@@ -126,6 +126,7 @@ final class RunningViewController: UIViewController {
                 LocationManager.shared.isRunning = false
 //                PedometerManager.shared.stopPedometerUpdate()
                 PedometerManager.shared.stopDummyPedometerUpdates()
+                LocationManager.shared.stopDummyLocationUpdates()
                 self?.dismiss(animated: false)
             }
             .store(in: &cancellables)

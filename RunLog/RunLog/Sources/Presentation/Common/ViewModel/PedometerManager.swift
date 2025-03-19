@@ -24,6 +24,7 @@ final class PedometerManager {
     func stopDummyPedometerUpdates() {
         timer?.invalidate()
         timer = nil
+        dummyStepCount = 0
         print("🛑 더미 걸음 수 측정 중지")
     }
     
