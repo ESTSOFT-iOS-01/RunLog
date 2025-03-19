@@ -46,7 +46,6 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
     
     // MARK: - Singleton
     static let shared = LocationManager()
-    
     // MARK: - Property
     private var locationManager = CLLocationManager()
     private let weatherService = WeatherService()
@@ -70,7 +69,7 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
         weatherSubject.eraseToAnyPublisher()
     }
     // MARK: - Init
-    override init() {
+    private override init() {
         super.init()
         setupLocationManager()
     }

@@ -25,7 +25,7 @@ final class RunningViewController: UIViewController {
         $0.showsUserLocation = true
         $0.showsUserTrackingButton = true
         $0.pitchButtonVisibility = .visible
-        $0.overrideUserInterfaceStyle = .light // 밝은 지도 - 궁금해서 넣어봄
+//        $0.overrideUserInterfaceStyle = .light  밝은 지도 - 궁금해서 넣어봄
     }
     var cardView = CardView()
     var foldButton = RLButton().then {
