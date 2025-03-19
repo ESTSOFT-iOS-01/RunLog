@@ -23,7 +23,7 @@ jobs:
         with:
           project-url: "https://github.com/orgs/ESTSOFT-iOS-01/projects/6"
           github-token: ${{ secrets.PAT_TOKEN }}
-          field-name: "startDate"
+          field-name: "Start date"
           field-value: "${{ github.event.issue.created_at }}"
 
       - name: ✅ 이슈 닫힐 때 `endDate` 설정
@@ -32,5 +32,5 @@ jobs:
         with:
           project-url: "https://github.com/orgs/ESTSOFT-iOS-01/projects/6"
           github-token: ${{ secrets.PAT_TOKEN }}
-          field-name: "endDate"
+          field-name: "End date"
           field-value: "${{ github.event.issue.closed_at }}"
