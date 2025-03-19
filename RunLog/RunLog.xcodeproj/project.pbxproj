@@ -11,10 +11,12 @@
 		16F688C52D82972900C2163F /* Then in Frameworks */ = {isa = PBXBuildFile; productRef = 16F688C42D82972900C2163F /* Then */; };
 		16F688C82D82974E00C2163F /* CombineMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 16F688C72D82974E00C2163F /* CombineMoya */; };
 		16F688CA2D82974E00C2163F /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = 16F688C92D82974E00C2163F /* Moya */; };
+		5EB036452D8A57120030DA8F /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 5EB036442D8A57120030DA8F /* Secrets.xcconfig */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		16F686B72D827D6C00C2163F /* RunLog.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RunLog.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5EB036442D8A57120030DA8F /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -66,6 +68,7 @@
 		16F686AE2D827D6C00C2163F = {
 			isa = PBXGroup;
 			children = (
+				5EB036442D8A57120030DA8F /* Secrets.xcconfig */,
 				16F686B92D827D6C00C2163F /* RunLog */,
 				16F686B82D827D6C00C2163F /* Products */,
 			);
@@ -154,6 +157,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5EB036452D8A57120030DA8F /* Secrets.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -172,6 +176,7 @@
 /* Begin XCBuildConfiguration section */
 		16F686CB2D827D6F00C2163F /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5EB036442D8A57120030DA8F /* Secrets.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -208,6 +213,7 @@
 		};
 		16F686CC2D827D6F00C2163F /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5EB036442D8A57120030DA8F /* Secrets.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;

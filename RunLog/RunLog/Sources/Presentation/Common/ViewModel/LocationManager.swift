@@ -128,6 +128,13 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
     }
     // MARK: - openWeatherMap으로 대기질을 받아옴
     private func fetchOpenWeatherData(location: CLLocation) async -> DummyAirQuality {
+        guard let apiKey = Bundle.main.weatherKey else {
+            print("API 키를 로드하지 못했습니다.")
+            return DummyAirQuality(aqi: Int.random(in: 1...5))
+        }
+        
+        
+        
         return DummyAirQuality(aqi: Int.random(in: 1...5))
     }
 }
