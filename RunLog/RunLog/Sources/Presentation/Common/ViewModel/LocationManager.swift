@@ -23,10 +23,6 @@ struct DummyWeather {
     let condition: WeatherCondition
     //    let aqi: Int
 }
-// MARK: - 더미 데이터 (Air Quality)
-struct DummyAirQuality {
-    let aqi: Int
-}
 final class LocationManager: NSObject, CLLocationManagerDelegate {
     // MARK: - Dummy
     private var dummyIndex = 0
@@ -43,7 +39,6 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
             self.locationSubject.send(dummyLocation) // ViewModel로 위치 데이터 전송
         }
     }
-    
     // MARK: - Singleton
     static let shared = LocationManager()
     // MARK: - Property
@@ -51,10 +46,8 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
     private let weatherService = WeatherService()
     var currentLocation: CLLocation {
         // 현재 위치를 반환, 못찾으면 서울을 기본값으로 반환
-//        return dummyLocation
         return locationManager.location ?? CLLocation(latitude: 37.5665, longitude: 126.9780)
     }
-    
     // MARK: - Combine
     private let locationSubject = PassthroughSubject<CLLocation, Never>()
     private let locationNameSubject = PassthroughSubject<CLPlacemark, Never>()
@@ -108,7 +101,7 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
             self.locationNameSubject.send(placemark)
         }
     }
-    // MARK: - 날씨 데이터 가져오기
+    // MARK: - 날씨, 온도, 대기질 데이터 가져오기
     private func fetchWeatherData(location: CLLocation) {
         Task {
             async let weather = fetchWeatherKitData(location: location)
@@ -117,28 +110,58 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
             let weatherData = await WeatherData(
                 temperature: weather.temperature,
                 condition: weather.condition,
-                airQuality: aqi.aqi
+                airQuality: aqi
             )
             self.weatherSubject.send(weatherData)
         }
     }
+}
+// MARK: - 날씨 정보
+extension LocationManager {
     // MARK: - weatherKit으로 날씨를 받아옴
     private func fetchWeatherKitData(location: CLLocation) async -> DummyWeather {
         return DummyWeather(temperature: Int.random(in: -10...35), condition: .clear)
     }
-    // MARK: - openWeatherMap으로 대기질을 받아옴
-    private func fetchOpenWeatherData(location: CLLocation) async -> DummyAirQuality {
-        guard let apiKey = Bundle.main.weatherKey else {
-            print("API 키를 로드하지 못했습니다.")
-            return DummyAirQuality(aqi: Int.random(in: 1...5))
-        }
-        
-        
-        
-        return DummyAirQuality(aqi: Int.random(in: 1...5))
-    }
 }
 
+// MARK: - 대기질 정보
+extension LocationManager {
+    private struct AQIResponse: Codable {
+        struct AQIList: Codable {
+            struct Main: Codable {
+                let aqi: Int
+            }
+            let main: Main
+        }
+        let list: [AQIList]
+    }
+    // MARK: - openWeatherMap으로 대기질을 받아옴
+    private func fetchOpenWeatherData(location: CLLocation) async -> Int {
+        guard let apiKey = Bundle.main.weatherKey else {
+            print("API 키를 로드하지 못했습니다.")
+            return -1
+        }
+        let urlString: String = "http://api.openweathermap.org/data/2.5/air_pollution?lat=\(location.coordinate.latitude)&lon=\(location.coordinate.longitude)&appid=\(apiKey)"
+            
+        guard let url = URL(string: urlString) else {
+            print("url 생성 실패")
+            return -1
+        }
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            let decodeData = try JSONDecoder().decode(AQIResponse.self, from: data)
+            if let aqi = decodeData.list.first?.main.aqi {
+                print("현재 aqi값 : \(aqi)")
+                return aqi
+            }else {
+                print("데이터 없음")
+            }
+        }catch {
+            print("AQI 데이터 가져오기 실패: \(error.localizedDescription)")
+        }
+        return -1
+    }
+}
 // MARK: - 위치 정보 권한 요청
 extension LocationManager {
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
