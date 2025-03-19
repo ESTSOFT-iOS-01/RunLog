@@ -45,6 +45,7 @@ final class DetailLogViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        print("디버그: viewDidLoad 호출됨, 시각: \(Date())")
         let tableView = detailLogView.recordDetailView.tableView
         tableView.dataSource = self
         tableView.delegate = self
@@ -53,6 +54,19 @@ final class DetailLogViewController: UIViewController {
         bindGesture()
         setupData()
         bindViewModel()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        print("디버그: viewDidAppear 호출됨, 시각: \(Date())")
+        let tableView = detailLogView.recordDetailView.tableView
+        print("디버그: viewDidAppear에서 tableView의 contentSize: \(tableView.contentSize), frame: \(tableView.frame)")
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        let tableView = detailLogView.recordDetailView.tableView
+        print("디버그: viewDidLayoutSubviews 호출됨, tableView의 frame: \(tableView.frame), 시각: \(Date())")
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -137,6 +151,12 @@ final class DetailLogViewController: UIViewController {
         self.recordDetails = dummyRecords
         
         detailLogView.recordDetailView.tableView.reloadData()
+        
+        // reloadData 후 테이블뷰 상태 확인 (비동기)
+        DispatchQueue.main.async {
+            let tableView = self.detailLogView.recordDetailView.tableView
+            print("디버그: reloadData 이후 tableView의 contentSize: \(tableView.contentSize), frame: \(tableView.frame), 시각: \(Date())")
+        }
     }
     
     // MARK: - Bind ViewModel
@@ -204,6 +224,7 @@ extension DetailLogViewController: UITableViewDataSource, UITableViewDelegate {
                 return UITableViewCell()
             }
             cell.configureAsHeader()
+            print("디버그: 헤더 셀 생성됨, 시각: \(Date())")
             return cell
         } else {
             let record = recordDetails[indexPath.row - 1]
@@ -214,6 +235,7 @@ extension DetailLogViewController: UITableViewDataSource, UITableViewDelegate {
                 return UITableViewCell()
             }
             cell.configure(with: record)
+            print("디버그: 데이터 셀 (인덱스 \(indexPath.row - 1)) 생성됨, 시각: \(Date())")
             return cell
         }
     }
