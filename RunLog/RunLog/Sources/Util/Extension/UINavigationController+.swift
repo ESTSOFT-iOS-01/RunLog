@@ -83,4 +83,32 @@ extension UINavigationController {
         
         return publisher
     }
+    
+    func addRightMenuButton(menuItems: [(title: String, attributes: UIMenuElement.Attributes)]) -> AnyPublisher<String, Never> {
+        let rightButton = UIButton(type: .system)
+        rightButton.setImage(UIImage(systemName: "ellipsis"), for: .normal)
+        rightButton.tintColor = .LightGreen
+        
+        let subject = PassthroughSubject<String, Never>()
+        
+        let actions = menuItems.map { item in
+            UIAction(title: item.title,
+                     image: nil,
+                     attributes: item.attributes) { _ in
+                subject.send(item.title)
+            }
+        }
+        
+        let menu = UIMenu(title: "", children: actions)
+        
+        if #available(iOS 14.0, *) {
+            rightButton.showsMenuAsPrimaryAction = true
+            rightButton.menu = menu
+        }
+        
+        let barButtonItem = UIBarButtonItem(customView: rightButton)
+        topViewController?.navigationItem.rightBarButtonItem = barButtonItem
+        
+        return subject.eraseToAnyPublisher()
+    }
 }

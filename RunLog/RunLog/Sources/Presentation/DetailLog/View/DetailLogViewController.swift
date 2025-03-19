@@ -77,11 +77,16 @@ final class DetailLogViewController: UIViewController {
         title = "0월 0일 (수)"
         navigationController?.setupAppearance() // 스타일 설정
         navigationController?.navigationItem.backButtonTitle = "chevron.left"
-        navigationController?.addRightButton(
-            icon: "ellipsis",
-            target: self,
-            action: #selector(buttonTapped)
-        )
+        navigationController?
+            .addRightMenuButton(menuItems: [
+                ("수정하기", .init()),
+                ("공유하기", .init()),
+                ("삭제하기", .destructive)
+            ])
+            .sink { [weak self] selectedTitle in
+                self?.viewModel.input.send(.menuSelected(selectedTitle))
+            }
+            .store(in: &cancellables)
     }
     
     // MARK: - Setup Gesture
@@ -136,16 +141,19 @@ final class DetailLogViewController: UIViewController {
     
     // MARK: - Bind ViewModel
     private func bindViewModel() {
-        //        viewModel.output.something
-        //            .sink { [weak self] value in
-        //                // View 업데이트 로직
-        //            }
-        //            .store(in: &cancellables)
-    }
-    
-    // MARK: - Actions
-    @objc private func buttonTapped() {
-        print("오른쪽 네비게이션 버튼 탭됨")
+        viewModel.output
+            .sink { [weak self] output in
+                guard let output = output else { return }
+                switch output {
+                case .edit:
+                    print("수정하기 탭됨 → 수정 로직")
+                case .share:
+                    print("공유하기 탭됨 → 공유 로직")
+                case .delete:
+                    print("삭제하기 탭됨 → 삭제 로직")
+                }
+            }
+            .store(in: &cancellables)
     }
 }
 
