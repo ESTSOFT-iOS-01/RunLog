@@ -55,6 +55,9 @@
 | <img src="https://img.shields.io/badge/-figma-5856D6?style=flat&logo=figma&logoColor=white"> | 피그마 |
 | <img src="https://img.shields.io/badge/Swift-252323?style=flat&logo=Swift&logoColor=white"> | iOS 로컬 데이터 관리를 위한 DB 프레임워크.|
 
+## ✏️ Project Design ✏️
+![프로젝트 아키텍쳐](https://github.com/user-attachments/assets/56edce6a-8ff1-4fdf-83f5-5cb8029031f5)
+
 ## 💻 Convention 💻
 
 ## 🌲 Branch Convention 🌲
@@ -158,3 +161,5 @@
 ```markdown
 📦 RunLog
 ```
+
+## 🔥 Trouble Shooting 🔥
