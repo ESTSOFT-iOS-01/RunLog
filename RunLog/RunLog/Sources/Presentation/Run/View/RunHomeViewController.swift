@@ -29,18 +29,19 @@ final class RunHomeViewController: UIViewController {
     }
     var blurView = MapBlurView()
     var locationLabel = UILabel()
-    var startButton = RLButton(title: "운동 시작하기", titleColor: .Gray900).then {
+    var startButton = RLButton(
+        title: "운동 시작하기",
+        titleColor: .Gray900
+    ).then {
         $0.clipsToBounds = true
     }
     // MARK: - Init
     init() {
         super.init(nibName: nil, bundle: nil)
     }
-
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -51,18 +52,15 @@ final class RunHomeViewController: UIViewController {
         setupData()
         bindViewModel()
     }
-    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationController?.setNavigationBarHidden(false, animated: animated)
         self.mapView.centerToLocation(LocationManager.shared.currentLocation)
     }
-    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         self.navigationController?.setNavigationBarHidden(true, animated: false)
     }
-    
     // MARK: - Setup UI
     private func setupUI() {
         // UI 요소 추가
@@ -94,7 +92,6 @@ final class RunHomeViewController: UIViewController {
             $0.centerX.equalToSuperview()
         }
     }
-    
     // MARK: - Setup Navigation Bar
     private func setupNavigationBar() {
         // 네비게이션바 디테일 설정
@@ -110,23 +107,21 @@ final class RunHomeViewController: UIViewController {
     private func bindGesture() {
         // 제스처 추가
         startButton.publisher
+            .receive(on: DispatchQueue.main)
             .sink {
-                print("운동 시작하기 버튼 클릭")
-//                LocationManager.shared.isRunning = true
-                PedometerManager.shared.startPedometerUpdate()
+                // Q) 코디네이터를 쓰면 해당 부분들이 전부 거기로 넘어갈듯
+                PedometerManager.shared.input.send(.startPedometer)
                 let vc = RunningViewController()
                 vc.modalPresentationStyle = .fullScreen
                 self.present(vc, animated: false)
             }
             .store(in: &cancellables)
     }
-    
     // MARK: - Setup Data
     private func setupData() {
         // 초기 데이터 로드
         totalLabelCreate(value: ("올레길", "2.5"))
     }
-
     // MARK: - Bind ViewModel
     private func bindViewModel() {
         viewModel.output

@@ -8,7 +8,6 @@
 import UIKit
 import Combine
 import MapKit
-import WeatherKit
 
 final class RunHomeViewModel {
     // MARK: - Input & Output
@@ -21,6 +20,8 @@ final class RunHomeViewModel {
     private var cancellables = Set<AnyCancellable>()
     // MARK: - Properties
     private let locationManager = LocationManager.shared
+    private let openWeatherService = OpenWeatherService.shared
+    private var previousLocation: CLLocation?
     // MARK: - Init
     init() {
         bind()
@@ -38,18 +39,25 @@ final class RunHomeViewModel {
         locationManager.locationNamePublisher
             .receive(on: DispatchQueue.main)
             .sink { [weak self] value in
+                guard let self = self else { return }
                 let location = value.0
                 let placemark = value.1
-                let city = self?.placemarksToString(placemark) ?? "알 수 없음"
-                // 여기서 기존의 지역과 다르면 locationNameUpdate를 부르고 날씨 변경도 부름
-                OpenWeatherService.shared.input.send(.requestUpdate(location))
-                self?.output.send(.locationNameUpdate(city))
+                let city = self.placemarksToString(placemark)
+                print(city)
+                
+                // +) 여기서 기존의 지역과 다르면 locationNameUpdate를 부르고 날씨 변경도 부름
+                if previousLocation != location {
+                    print("날씨정보 업데이트")
+                    self.openWeatherService.input.send(.requestUpdate(location))
+                    self.output.send(.locationNameUpdate(city))
+                }
+                previousLocation = location
             }
             .store(in: &cancellables)
         // 날씨 및 대기질 변경 구독
         Publishers.Zip(
-            OpenWeatherService.shared.weatherUpdatePublisher,
-            OpenWeatherService.shared.aqiUpdatePublisher
+            openWeatherService.weatherUpdatePublisher,
+            openWeatherService.aqiUpdatePublisher
         )
         .receive(on: DispatchQueue.main)
         .sink { completion in
@@ -60,34 +68,9 @@ final class RunHomeViewModel {
         }
         .store(in: &cancellables)
     }
-    
-    
-    
-    
-    
-   
-    
-    
-//    private var condition: WeatherCondition?
-//    private var temperature: Int?
-//    private var airQuality: Int?
-//    
-   
-    
 }
 // MARK: - 정보 한글화
 extension RunHomeViewModel {
-    // MARK: - 날씨 컨디션 정보 -> 한글
-    private func conditionToString(_ condition: WeatherCondition) -> String {
-        switch condition {
-        case .clear: return "맑음"
-        case .cloudy: return "흐림"
-        case .rain: return "비"
-        case .snow: return "눈"
-        case .strongStorms: return "폭풍"
-        default: return condition.rawValue
-        }
-    }
     // MARK: - 대기질 정보 -> 한글
     private func aqiToString(_ aqi: Int) -> String {
         switch aqi {
