@@ -7,13 +7,13 @@
 
 import Foundation
 
-struct Section {
+struct Section: Equatable {
     var distance: Double
     var steps: Int
     var route: [Point]
 }
 
-struct Point {
+struct Point: Equatable {
     var latitude: Double
     var longitude: Double
     var timestamp: Date

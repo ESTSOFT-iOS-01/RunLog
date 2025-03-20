@@ -21,7 +21,7 @@ final class DayLogRepositoryImpl: DayLogRepository {
         
         try await context.perform {
             let data = DataMapper.toDTO(dayLog, context: self.context)
-            self.context.insert(data)
+            //self.context.insert(data)
             try self.context.save()
         }
     }
@@ -74,9 +74,6 @@ final class DayLogRepositoryImpl: DayLogRepository {
                 throw CoreDataError.modelNotFound
             }
             
-            data.locationName = dayLog.locationName
-            data.weather = Int16(dayLog.weather)
-            data.temperature = Int32(dayLog.temperature)
             data.trackImage = dayLog.trackImage
             data.title = dayLog.title
             data.level = Int16(dayLog.level)
