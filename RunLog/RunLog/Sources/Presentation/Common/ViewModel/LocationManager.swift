@@ -164,7 +164,7 @@ extension LocationManager {
 
 
 
-
+// -MARK: 더미데이터
 struct DummyLocation {
     static let route: [CLLocation] = {
         let center = CLLocationCoordinate2D(latitude: 37.554722, longitude: 126.970833) // 원의 중심 (서울역 근처)

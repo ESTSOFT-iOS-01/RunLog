@@ -10,18 +10,6 @@ import MapKit
 import SnapKit
 import Then
 
-// MARK: - DisplayDayLog Model
-struct DisplayDayLog {
-    let date: Date
-    let locationName: String
-    let weather: String
-    let temperature: Int
-    let title: String
-    let level: String
-    let totalTime: TimeInterval
-    let totalDistance: Double
-    let totalSteps: Int
-}
 
 final class DetailLogView: UIView {
     
@@ -42,6 +30,8 @@ final class DetailLogView: UIView {
         $0.layer.cornerRadius = 10
         $0.clipsToBounds = true
     }
+    
+    
     
     /// 지도 위에 오버레이될 무빙트랙 버튼
     let movingTrackButton = UIButton(type: .system).then {
@@ -331,44 +321,51 @@ extension DetailLogView {
     }
 }
 
-// MARK: - Dummy Data
-let dummyDisplayLog = DisplayDayLog(
-    date: Date(),
-    locationName: "서울",
-    weather: "맑음",
-    temperature: 20,
-    title: "아침 달리기",
-    level: "보통",
-    totalTime: 3600,       // 1시간
-    totalDistance: 5.0,    // 5.0km
-    totalSteps: 7000
-)
-//
-//#if canImport(SwiftUI) && DEBUG
-//import SwiftUI
-//
-//struct DetailLogView_Preview: PreviewProvider {
-//    static var previews: some View {
-//        UIViewPreview {
-//            DetailLogView()
-//        }
-//        .previewLayout(.sizeThatFits) // 크기를 적절하게 조절하여 미리보기 가능
-//        .padding()
-//    }
-//}
-//
-//// UIKit 뷰를 SwiftUI에서 렌더링하는 Helper
-//struct UIViewPreview<T: UIView>: UIViewRepresentable {
-//    let viewBuilder: () -> T
-//    
-//    init(_ viewBuilder: @escaping () -> T) {
-//        self.viewBuilder = viewBuilder
-//    }
-//    
-//    func makeUIView(context: Context) -> T {
-//        return viewBuilder()
-//    }
-//    
-//    func updateUIView(_ uiView: T, context: Context) {}
-//}
-//#endif
+extension DetailLogView {
+    // MARK: - MapView Helper Methods
+    /// 외부에서 MKMapViewDelegate를 주입하기 위한 헬퍼 메서드
+    func setMapViewDelegate(_ delegate: MKMapViewDelegate) {
+        mapView.delegate = delegate
+    }
+    
+    /// 폴리라인 등의 오버레이를 추가
+    func addMapOverlay(_ overlay: MKOverlay) {
+        mapView.addOverlay(overlay)
+    }
+    
+    /// 맵뷰 영역 설정
+    func setMapRegion(_ region: MKCoordinateRegion, animated: Bool) {
+        mapView.setRegion(region, animated: animated)
+    }
+    
+}
+
+// MARK: - DisplayDayLog Model
+struct DisplayDayLog {
+    let date: Date
+    let locationName: String
+    let weather: String
+    let temperature: Int
+    let title: String
+    let level: String
+    let totalTime: TimeInterval
+    let totalDistance: Double
+    let totalSteps: Int
+}
+
+
+// MARK: - DisplayDayLog 초기화 추가
+extension DisplayDayLog {
+    init(from dayLog: DayLog) {
+        self.date = dayLog.date
+        self.locationName = dayLog.locationName
+        self.weather = dayLog.weather.toWeatherDescription()
+        self.temperature = dayLog.temperature
+        self.title = dayLog.title
+        self.level = dayLog.level.toLevelDescription()
+        self.totalTime = dayLog.totalTime
+        self.totalDistance = dayLog.totalDistance
+        self.totalSteps = dayLog.totalSteps
+    }
+}
+

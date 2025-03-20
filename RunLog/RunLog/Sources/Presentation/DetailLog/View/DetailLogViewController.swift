@@ -9,12 +9,7 @@ import UIKit
 import SnapKit
 import Then
 import Combine
-
-struct RecordDetail {
-    let timeRange: String    // 예: "06:12 - 06:18"
-    let distance: String     // 예: "1.81km"
-    let steps: String        // 예: "345"
-}
+import MapKit
 
 final class DetailLogViewController: UIViewController {
     
@@ -54,6 +49,7 @@ final class DetailLogViewController: UIViewController {
         bindGesture()
         setupData()
         bindViewModel()
+        setupMapView()
         detailLogView.configure(with: dummyDisplayLog)
     }
     
@@ -125,46 +121,16 @@ final class DetailLogViewController: UIViewController {
     // MARK: - Setup Data
     private func setupData() {
         // 초기 데이터 로드
-        // 더미 데이터
-        let dummyRecords = [
-            RecordDetail(timeRange: "06:12 - 06:18", distance: "1.81km", steps: "345"),
-            RecordDetail(timeRange: "12:13 - 12:30", distance: "1.57km", steps: "1,232"),
-            RecordDetail(timeRange: "13:50 - 14:04", distance: "1.61km", steps: "1,234"),
-            RecordDetail(timeRange: "18:09 - 18:24", distance: "2.5km", steps: "3,235"),
-            RecordDetail(timeRange: "12:13 - 12:30", distance: "100.81km", steps: "1,234"),
-            RecordDetail(timeRange: "12:13 - 12:30", distance: "100.81km", steps: "2,237,345"),
-            RecordDetail(timeRange: "12:13 - 12:30", distance: "100.81km", steps: "2,237,345"),
-            RecordDetail(timeRange: "06:12 - 06:18", distance: "1.81km", steps: "345"),
-            RecordDetail(timeRange: "12:13 - 12:30", distance: "1.57km", steps: "1,232"),
-            RecordDetail(timeRange: "13:50 - 14:04", distance: "1.61km", steps: "1,234"),
-            RecordDetail(timeRange: "18:09 - 18:24", distance: "2.5km", steps: "3,235"),
-            RecordDetail(timeRange: "12:13 - 12:30", distance: "100.81km", steps: "1,234"),
-            RecordDetail(timeRange: "12:13 - 12:30", distance: "100.81km", steps: "2,237,345"),
-            RecordDetail(timeRange: "12:13 - 12:30", distance: "100.81km", steps: "2,237,345"),
-            RecordDetail(timeRange: "06:12 - 06:18", distance: "1.81km", steps: "345"),
-            RecordDetail(timeRange: "12:13 - 12:30", distance: "1.57km", steps: "1,232"),
-            RecordDetail(timeRange: "13:50 - 14:04", distance: "1.61km", steps: "1,234"),
-            RecordDetail(timeRange: "18:09 - 18:24", distance: "2.5km", steps: "3,235"),
-            RecordDetail(timeRange: "12:13 - 12:30", distance: "100.81km", steps: "1,234"),
-            RecordDetail(timeRange: "12:13 - 12:30", distance: "100.81km", steps: "2,237,345"),
-            RecordDetail(timeRange: "12:13 - 12:30", distance: "100.81km", steps: "2,237,345"),
-            RecordDetail(timeRange: "06:12 - 06:18", distance: "1.81km", steps: "345"),
-            RecordDetail(timeRange: "12:13 - 12:30", distance: "1.57km", steps: "1,232"),
-            RecordDetail(timeRange: "13:50 - 14:04", distance: "1.61km", steps: "1,234"),
-            RecordDetail(timeRange: "18:09 - 18:24", distance: "2.5km", steps: "3,235"),
-            RecordDetail(timeRange: "12:13 - 12:30", distance: "100.81km", steps: "1,234"),
-            RecordDetail(timeRange: "12:13 - 12:30", distance: "100.81km", steps: "2,237,345"),
-            RecordDetail(timeRange: "12:13 - 12:30", distance: "100.81km", steps: "2,237,345")
-        ]
-        print("DetailLogViewController - 더미데이터 개수: \(dummyRecords.count)")
-        self.recordDetails = dummyRecords
+        let recordDetailsFromDayLog = dummyDayLog.toRecordDetails()
+        print("DetailLogViewController - 더미데이터 개수: \(recordDetailsFromDayLog.count)")
+        self.recordDetails = recordDetailsFromDayLog
         
         detailLogView.recordDetailView.tableView.reloadData()
         
         // reloadData 후 테이블뷰 상태 확인 (비동기)
         DispatchQueue.main.async {
             let tableView = self.detailLogView.recordDetailView.tableView
-            print("디버그: reloadData 이후 tableView의 contentSize: \(tableView.contentSize), frame: \(tableView.frame), 시각: \(Date())")
+            //print("디버그: reloadData 이후 tableView의 contentSize: \(tableView.contentSize), frame: \(tableView.frame), 시각: \(Date())")
         }
     }
     
@@ -253,3 +219,206 @@ extension DetailLogViewController: UITableViewDataSource, UITableViewDelegate {
         }
     }
 }
+
+// MARK: - Setup MapView & 폴리라인 그리기
+// MARK: - Setup MapView & 폴리라인
+extension DetailLogViewController {
+    
+    /// 맵뷰 초기 설정(Delegate, 데이터 세팅, 폴리라인 표시 등)
+    private func setupMapView() {
+        // 1) 맵뷰 델리게이트 설정
+        detailLogView.setMapViewDelegate(self)
+        
+        // 2) 데이터 세팅 (dummyDisplayLog 활용)
+        detailLogView.configure(with: dummyDisplayLog)
+        
+        // 3) 폴리라인 그리기
+        drawPolyline(from: dummyDayLog)
+    }
+    
+    /// dummyDayLog의 모든 Section을 순회하여 폴리라인을 그리고, 적절히 확대
+    private func drawPolyline(from dayLog: DayLog) {
+        // 기존에 폴리라인 그리기 코드 ...
+        var coordinates: [CLLocationCoordinate2D] = []
+        for section in dayLog.sections {
+            for point in section.route {
+                let coord = CLLocationCoordinate2D(latitude: point.latitude, longitude: point.longitude)
+                coordinates.append(coord)
+            }
+        }
+        
+        let polyline = MKPolyline(coordinates: coordinates, count: coordinates.count)
+        detailLogView.addMapOverlay(polyline)
+        
+        // 첫 경로의 첫지점과 마지막 경로의 끝지점을 기준으로 줌 지정
+        zoomToAllPoints(dayLog: dayLog)
+    }
+    
+    /// 모든 경로 점들을 순회하여 바운딩 박스(최소·최대 위도/경도) 구하기
+    private func zoomToAllPoints(dayLog: DayLog) {
+        // 1) 모든 Point 추출
+        let allPoints = dayLog.sections.flatMap { $0.route }
+        guard !allPoints.isEmpty else { return }
+
+        // 2) min/max lat, lon 구하기
+        var minLat = Double.greatestFiniteMagnitude
+        var maxLat = -Double.greatestFiniteMagnitude
+        var minLon = Double.greatestFiniteMagnitude
+        var maxLon = -Double.greatestFiniteMagnitude
+        
+        for point in allPoints {
+            minLat = min(minLat, point.latitude)
+            maxLat = max(maxLat, point.latitude)
+            minLon = min(minLon, point.longitude)
+            maxLon = max(maxLon, point.longitude)
+        }
+        
+        // 3) 중심좌표 = (minLat ~ maxLat)의 중앙, (minLon ~ maxLon)의 중앙
+        let centerLat = (minLat + maxLat) / 2
+        let centerLon = (minLon + maxLon) / 2
+        let center = CLLocationCoordinate2D(latitude: centerLat, longitude: centerLon)
+        
+        // 4) 가장 멀리 떨어진 두 점 = (minLat, minLon) vs (maxLat, maxLon) 라고 가정
+        let corner1 = CLLocation(latitude: minLat, longitude: minLon)
+        let corner2 = CLLocation(latitude: maxLat, longitude: maxLon)
+        
+        // 5) 두 지점 사이의 거리(미터)
+        var distance = corner1.distance(from: corner2)
+        // 거리에 여유를 주고 싶다면 1.2배 등 곱해주기
+        if distance == 0 {
+            distance = 5000
+        } else {
+            distance *= 1.2
+        }
+        
+        // 6) region 설정
+        let region = MKCoordinateRegion(
+            center: center,
+            latitudinalMeters: distance,
+            longitudinalMeters: distance
+        )
+        
+        detailLogView.setMapRegion(region, animated: true)
+    }
+
+
+}
+
+
+
+// MARK: - MKMapViewDelegate
+extension DetailLogViewController: MKMapViewDelegate {
+    /// 폴리라인을 어떤 스타일로 그릴지 결정
+    func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+        guard let polyline = overlay as? MKPolyline else {
+            return MKOverlayRenderer()
+        }
+        let renderer = MKPolylineRenderer(polyline: polyline)
+        renderer.strokeColor = .systemBlue
+        renderer.lineWidth = 5
+        return renderer
+    }
+}
+
+
+// MARK: 더미데이터
+let dummyDayLog = DayLog(
+    date: Calendar.current.date(from: DateComponents(year: 2025, month: 3, day: 17)) ?? Date(),
+    locationName: "광진구",
+    weather: 1,
+    temperature: 20,
+    trackImage: Data(),
+    title: "아침 달리기",
+    level: 2,
+    totalTime: 3600,        // 1시간
+    totalDistance: 5.0,     // 5km
+    totalSteps: 7000,
+    sections: [
+        // --- 나가는 구간 5개 ---
+        Section(
+            distance: 0.5,
+            steps: 300,
+            route: [
+                Point(latitude: 37.5470, longitude: 127.0800, timestamp: Date()),
+                Point(latitude: 37.5473, longitude: 127.0804, timestamp: Date().addingTimeInterval(60))
+            ]
+        ),
+        Section(
+            distance: 0.5,
+            steps: 310,
+            route: [
+                Point(latitude: 37.5473, longitude: 127.0804, timestamp: Date().addingTimeInterval(70)),
+                Point(latitude: 37.5475, longitude: 127.0810, timestamp: Date().addingTimeInterval(130))
+            ]
+        ),
+        Section(
+            distance: 0.5,
+            steps: 320,
+            route: [
+                Point(latitude: 37.5475, longitude: 127.0810, timestamp: Date().addingTimeInterval(140)),
+                Point(latitude: 37.5480, longitude: 127.0815, timestamp: Date().addingTimeInterval(200))
+            ]
+        ),
+        Section(
+            distance: 0.5,
+            steps: 330,
+            route: [
+                Point(latitude: 37.5480, longitude: 127.0815, timestamp: Date().addingTimeInterval(210)),
+                Point(latitude: 37.5483, longitude: 127.0822, timestamp: Date().addingTimeInterval(270))
+            ]
+        ),
+        Section(
+            distance: 0.5,
+            steps: 340,
+            route: [
+                Point(latitude: 37.5483, longitude: 127.0822, timestamp: Date().addingTimeInterval(280)),
+                Point(latitude: 37.5486, longitude: 127.0827, timestamp: Date().addingTimeInterval(340))
+            ]
+        ),
+        
+        // --- 돌아오는 구간 5개 ---
+        Section(
+            distance: 0.5,
+            steps: 350,
+            route: [
+                Point(latitude: 37.5486, longitude: 127.0827, timestamp: Date().addingTimeInterval(350)),
+                Point(latitude: 37.5483, longitude: 127.0820, timestamp: Date().addingTimeInterval(410))
+            ]
+        ),
+        Section(
+            distance: 0.5,
+            steps: 360,
+            route: [
+                Point(latitude: 37.5483, longitude: 127.0820, timestamp: Date().addingTimeInterval(420)),
+                Point(latitude: 37.5480, longitude: 127.0813, timestamp: Date().addingTimeInterval(480))
+            ]
+        ),
+        Section(
+            distance: 0.5,
+            steps: 370,
+            route: [
+                Point(latitude: 37.5480, longitude: 127.0813, timestamp: Date().addingTimeInterval(490)),
+                Point(latitude: 37.5476, longitude: 127.0810, timestamp: Date().addingTimeInterval(550))
+            ]
+        ),
+        Section(
+            distance: 0.5,
+            steps: 380,
+            route: [
+                Point(latitude: 37.5476, longitude: 127.0810, timestamp: Date().addingTimeInterval(560)),
+                Point(latitude: 37.5473, longitude: 127.0806, timestamp: Date().addingTimeInterval(620))
+            ]
+        ),
+        Section(
+            distance: 0.5,
+            steps: 390,
+            route: [
+                Point(latitude: 37.5473, longitude: 127.0806, timestamp: Date().addingTimeInterval(630)),
+                Point(latitude: 37.5470, longitude: 127.0800, timestamp: Date().addingTimeInterval(690))
+            ]
+        )
+    ]
+)
+
+// dummyDayLog를 기반으로 DisplayDayLog 생성
+let dummyDisplayLog = DisplayDayLog(from: dummyDayLog)
