@@ -12,9 +12,13 @@ final class DetailLogViewModel {
     
     // MARK: - Input & Output
     enum Input {
+        case menuSelected(String)
     }
     
     enum Output {
+        case edit
+        case share
+        case delete
     }
     
     let input = PassthroughSubject<Input, Never>()
@@ -31,8 +35,19 @@ final class DetailLogViewModel {
         input
             .receive(on: DispatchQueue.main)
             .sink { [weak self] event in
+                guard let self = self else { return }
                 switch event {
-                    
+                case .menuSelected(let title):
+                    switch title {
+                    case "수정하기":
+                        self.output.send(.edit)
+                    case "공유하기":
+                        self.output.send(.share)
+                    case "삭제하기":
+                        self.output.send(.delete)
+                    default:
+                        break
+                    }
                 }
             }
             .store(in: &cancellables)
