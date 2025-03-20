@@ -45,6 +45,7 @@ final class DetailLogViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        print("디버그: viewDidLoad 호출됨, 시각: \(Date())")
         let tableView = detailLogView.recordDetailView.tableView
         tableView.dataSource = self
         tableView.delegate = self
@@ -77,11 +78,16 @@ final class DetailLogViewController: UIViewController {
         title = "0월 0일 (수)"
         navigationController?.setupAppearance() // 스타일 설정
         navigationController?.navigationItem.backButtonTitle = "chevron.left"
-        navigationController?.addRightButton(
-            icon: "ellipsis",
-            target: self,
-            action: #selector(buttonTapped)
-        )
+        navigationController?
+            .addRightMenuButton(menuItems: [
+                ("수정하기", .init()),
+                ("공유하기", .init()),
+                ("삭제하기", .destructive)
+            ])
+            .sink { [weak self] selectedTitle in
+                self?.viewModel.input.send(.menuSelected(selectedTitle))
+            }
+            .store(in: &cancellables)
     }
     
     // MARK: - Setup Gesture
@@ -126,26 +132,80 @@ final class DetailLogViewController: UIViewController {
             RecordDetail(timeRange: "18:09 - 18:24", distance: "2.5km", steps: "3,235"),
             RecordDetail(timeRange: "12:13 - 12:30", distance: "100.81km", steps: "1,234"),
             RecordDetail(timeRange: "12:13 - 12:30", distance: "100.81km", steps: "2,237,345"),
+            RecordDetail(timeRange: "12:13 - 12:30", distance: "100.81km", steps: "2,237,345"),
+            RecordDetail(timeRange: "06:12 - 06:18", distance: "1.81km", steps: "345"),
+            RecordDetail(timeRange: "12:13 - 12:30", distance: "1.57km", steps: "1,232"),
+            RecordDetail(timeRange: "13:50 - 14:04", distance: "1.61km", steps: "1,234"),
+            RecordDetail(timeRange: "18:09 - 18:24", distance: "2.5km", steps: "3,235"),
+            RecordDetail(timeRange: "12:13 - 12:30", distance: "100.81km", steps: "1,234"),
+            RecordDetail(timeRange: "12:13 - 12:30", distance: "100.81km", steps: "2,237,345"),
+            RecordDetail(timeRange: "12:13 - 12:30", distance: "100.81km", steps: "2,237,345"),
+            RecordDetail(timeRange: "06:12 - 06:18", distance: "1.81km", steps: "345"),
+            RecordDetail(timeRange: "12:13 - 12:30", distance: "1.57km", steps: "1,232"),
+            RecordDetail(timeRange: "13:50 - 14:04", distance: "1.61km", steps: "1,234"),
+            RecordDetail(timeRange: "18:09 - 18:24", distance: "2.5km", steps: "3,235"),
+            RecordDetail(timeRange: "12:13 - 12:30", distance: "100.81km", steps: "1,234"),
+            RecordDetail(timeRange: "12:13 - 12:30", distance: "100.81km", steps: "2,237,345"),
+            RecordDetail(timeRange: "12:13 - 12:30", distance: "100.81km", steps: "2,237,345"),
+            RecordDetail(timeRange: "06:12 - 06:18", distance: "1.81km", steps: "345"),
+            RecordDetail(timeRange: "12:13 - 12:30", distance: "1.57km", steps: "1,232"),
+            RecordDetail(timeRange: "13:50 - 14:04", distance: "1.61km", steps: "1,234"),
+            RecordDetail(timeRange: "18:09 - 18:24", distance: "2.5km", steps: "3,235"),
+            RecordDetail(timeRange: "12:13 - 12:30", distance: "100.81km", steps: "1,234"),
+            RecordDetail(timeRange: "12:13 - 12:30", distance: "100.81km", steps: "2,237,345"),
             RecordDetail(timeRange: "12:13 - 12:30", distance: "100.81km", steps: "2,237,345")
         ]
         print("DetailLogViewController - 더미데이터 개수: \(dummyRecords.count)")
         self.recordDetails = dummyRecords
         
         detailLogView.recordDetailView.tableView.reloadData()
+        
+        // reloadData 후 테이블뷰 상태 확인 (비동기)
+        DispatchQueue.main.async {
+            let tableView = self.detailLogView.recordDetailView.tableView
+            print("디버그: reloadData 이후 tableView의 contentSize: \(tableView.contentSize), frame: \(tableView.frame), 시각: \(Date())")
+        }
     }
     
     // MARK: - Bind ViewModel
     private func bindViewModel() {
-        //        viewModel.output.something
-        //            .sink { [weak self] value in
-        //                // View 업데이트 로직
-        //            }
-        //            .store(in: &cancellables)
+        viewModel.output
+            .sink { [weak self] output in
+                guard let self = self, let output = output else { return }
+                switch output {
+                case .edit:
+                    print("수정하기 탭됨 → 수정 로직")
+                case .share:
+                    self.handleShare(in: self, shareText: "하트런 기록 공유!")
+                    
+                case .delete:
+                    self.handleDelete(in: self, dateString: "2024년 3월 3일")
+                }
+            }
+            .store(in: &cancellables)
     }
     
-    // MARK: - Actions
-    @objc private func buttonTapped() {
-        print("오른쪽 네비게이션 버튼 탭됨")
+    // MARK: - Action Handlers (함수 분리)
+    private func handleShare(in targetVC: UIViewController, shareText: String) {
+        let shareItems: [Any] = [shareText]
+        let activityVC = UIActivityViewController(activityItems: shareItems, applicationActivities: nil)
+        targetVC.present(activityVC, animated: true)
+    }
+    
+    private func handleDelete(in targetVC: UIViewController, dateString: String) {
+        let alert = UIAlertController(
+            title: "기록 삭제하기",
+            message: "\(dateString) 기록을 정말 삭제하시겠습니까?",
+            preferredStyle: .alert
+        )
+        let confirmAction = UIAlertAction(title: "네", style: .destructive) { _ in
+            // 실제 삭제 로직 처리
+            print("기록 삭제 완료 로직")
+        }
+        let cancelAction = UIAlertAction(title: "아니오", style: .cancel, handler: nil)
+        alert.addAction(confirmAction)
+        alert.addAction(cancelAction)
+        targetVC.present(alert, animated: true)
     }
 }
 
@@ -172,6 +232,7 @@ extension DetailLogViewController: UITableViewDataSource, UITableViewDelegate {
                 return UITableViewCell()
             }
             cell.configureAsHeader()
+            //print("디버그: 헤더 셀 생성됨, 시각: \(Date())")
             return cell
         } else {
             let record = recordDetails[indexPath.row - 1]
@@ -182,6 +243,7 @@ extension DetailLogViewController: UITableViewDataSource, UITableViewDelegate {
                 return UITableViewCell()
             }
             cell.configure(with: record)
+            //print("디버그: 데이터 셀 (인덱스 \(indexPath.row - 1)) 생성됨, 시각: \(Date())")
             return cell
         }
     }

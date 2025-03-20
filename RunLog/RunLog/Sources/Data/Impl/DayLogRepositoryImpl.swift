@@ -1,13 +1,13 @@
+////
+////  DayLogRepositoryImpl.swift
+////  RunLog
+////
+////  Created by 신승재 on 3/18/25.
+////
 //
-//  DayLogRepositoryImpl.swift
-//  RunLog
+//import Foundation
+//import CoreData
 //
-//  Created by 신승재 on 3/18/25.
-//
-
-import Foundation
-import CoreData
-
 //final class DayLogRepositoryImpl: DayLogRepository {
 //    
 //    private let context: NSManagedObjectContext
@@ -24,16 +24,4 @@ import CoreData
 //        }
 //    }
 //
-//    func readDayLog(date: Date) async throws -> DayLog {
-//        <#code#>
-//    }
-//
-//    func updateDayLog(_ dayLog: DayLog) async throws {
-//        <#code#>
-//    }
-//
-//    func deleteDayLog(date: Date) async throws {
-//        <#code#>
-//    }
-//    
-//}
+
