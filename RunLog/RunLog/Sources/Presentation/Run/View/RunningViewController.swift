@@ -15,6 +15,8 @@ final class RunningViewController: UIViewController {
     
     // MARK: - Property
     private let viewModel = RunningViewModel()
+    private let locationManager = LocationManager.shared
+    private let pedometerManager = PedometerManager.shared
     private var cancellables = Set<AnyCancellable>()
     // MARK: - UI
     lazy var mapView = MKMapView().then {
@@ -25,11 +27,14 @@ final class RunningViewController: UIViewController {
         $0.showsUserLocation = true
         $0.showsUserTrackingButton = true
         $0.pitchButtonVisibility = .visible
-//        $0.overrideUserInterfaceStyle = .light  밝은 지도 - 궁금해서 넣어봄
     }
     var cardView = CardView()
     var foldButton = RLButton().then {
-        $0.configureTitle(title: "닫기", titleColor: .Gray000, font: .RLLabel2)
+        $0.configureTitle(
+            title: "닫기",
+            titleColor: .Gray000,
+            font: .RLLabel2
+        )
         $0.setHeight(32)
         $0.configureRadius(8)
         $0.configureBackgroundColor(.Gray700)
@@ -53,16 +58,13 @@ final class RunningViewController: UIViewController {
         $0.setPreferredSymbolConfiguration(sfConfig, forImageIn: .normal)
         $0.isHidden = true
     }
-    
     // MARK: - Init
     init() {
         super.init(nibName: nil, bundle: nil)
     }
-
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -71,26 +73,20 @@ final class RunningViewController: UIViewController {
         bindGesture()
         setupData()
         bindViewModel()
-        
-//        LocationManager.shared.startDummyLocationUpdates()
     }
-    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationController?.setNavigationBarHidden(false, animated: animated)
     }
-    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         self.navigationController?.setNavigationBarHidden(true, animated: false)
     }
-    
     // MARK: - Setup UI
     private func setupUI() {
         // UI 요소 추가
         view.backgroundColor = .systemBackground
         view.addSubviews(mapView, cardView, foldButton, unfoldButton)
-        
         // 맵킷
         mapView.snp.makeConstraints {
             $0.top.bottom.leading.trailing.equalToSuperview()
@@ -112,65 +108,67 @@ final class RunningViewController: UIViewController {
             $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(24)
         }
     }
-    
     // MARK: - Setup Navigation Bar
     private func setupNavigationBar() {
         // 네비게이션바 디테일 설정
     }
-
     // MARK: - Bind Gesture
     private func bindGesture() {
         // 종료 버튼 클릭
         cardView.finishButton.publisher
             .sink { [weak self] in
-//                LocationManager.shared.isRunning = false
-                PedometerManager.shared.stopPedometerUpdate()
-                
-                self?.saveLog() // 결과 확인용 alert띄움
+                guard let self = self else { return }
+                pedometerManager.input.send(.stopPedometer)
+                DispatchQueue.main.async {// 현재 단순 확인 용
+                    self.saveLog() // 결과 확인용 alert띄움
+                }
 //                self?.dismiss(animated: false)
             }
             .store(in: &cancellables)
         // 접기 버튼 클릭
         foldButton.publisher
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] in
-                self?.toggleCardView()
+                guard let self = self else { return }
+                self.toggleCardView()
             }
             .store(in: &cancellables)
         // 펼치기 버튼 클릭
         unfoldButton.publisher
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] in
-                self?.toggleCardView()
+                guard let self = self else { return }
+                self.toggleCardView()
             }
             .store(in: &cancellables)
     }
-    
     // MARK: - Setup Data
     private func setupData() {
         // 맵뷰 초기 데이터 설정
-        let currentLocation = LocationManager.shared.currentLocation
+        let currentLocation = locationManager.currentLocation
         mapView.setUserTrackingMode(.follow, animated: true)
         mapView.centerToLocation(currentLocation)
         // 뷰가 로드되면 운동이 시작된 상태
         viewModel.input.send(.runningStart)
     }
-
     // MARK: - Bind ViewModel
     private func bindViewModel() {
         viewModel.output
             .receive(on: DispatchQueue.main)
             .sink { [weak self] output in
+                guard let self = self else { return }
                 switch output {
                 case .locationUpdate(let location):
-                    self?.mapView.centerToLocation(location, region: self?.mapView.region)
+                    self.mapView.centerToLocation(location, region: self.mapView.region)
                 case .timerUpdate(let time):
-                    self?.cardView.timeLabel.setConfigure(text: time)
+                    self.cardView.timeLabel.setConfigure(text: time)
                 case .distanceUpdate(let distance):
-                    self?.cardView.distanceLabel.setConfigure(text: distance)
+                    self.cardView.distanceLabel.setConfigure(text: distance)
                 case .stepsUpdate(let step):
-                    self?.cardView.stepsLabel.setConfigure(text: step)
+                    self.cardView.stepsLabel.setConfigure(text: step)
                 case .lineDraw(let lineDraw):
 //                    print("라인 그리는 중")
-                    self?.mapView.addOverlay(lineDraw)
+                    self.mapView.addOverlay(lineDraw)
                 }
             }
             .store(in: &cancellables)
@@ -178,17 +176,19 @@ final class RunningViewController: UIViewController {
 }
 
 extension RunningViewController: MKMapViewDelegate {
+    // MARK: - 카드 뷰 접었다 펴기
     private func toggleCardView() {
         self.cardView.isHidden.toggle()
         self.foldButton.isHidden.toggle()
         self.unfoldButton.isHidden.toggle()
     }
-    // 트래킹모드 .none이 되면 시야조정
+    // MARK: - 맵뷰 딜리게이트 함수들
     func mapView(_ mapView: MKMapView, didChange mode: MKUserTrackingMode, animated: Bool) {
         guard let userLocation = mapView.userLocation.location else { return }
 //        if mode == .none {
 //            
 //        }
+        // 지도의 위치로 변경
         mapView.centerToLocation(userLocation, region: self.mapView.region)
     }
     func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
@@ -209,13 +209,13 @@ extension RunningViewController: MKMapViewDelegate {
         let message: String =
         """
         ⏹ 운동 종료 ⏹
-        최종 시간: \(viewModel.record.sectionTime)초
+        최종 시간: \(viewModel.timeRecord)초
         최종 경로 핀 수: \(viewModel.section.route.count)
         최종 걸음 수: \(viewModel.section.steps)
         """
         print(message)
         let alert = UIAlertController(
-            title: "기록 삭제하기",
+            title: nil,
             message: message,
             preferredStyle: .alert
         )
