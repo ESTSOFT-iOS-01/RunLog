@@ -17,7 +17,7 @@ protocol DayLogUseCase {
     func initializeDayLog(
         locationName: String,
         weather: Int,
-        temperature: Int
+        temperature: Double
     ) async throws
     
     /// 특정 날짜의 DayLog를 조회합니다.

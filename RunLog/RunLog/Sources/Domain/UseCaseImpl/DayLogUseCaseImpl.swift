@@ -18,7 +18,7 @@ final class DayLogUseCaseImpl: DayLogUseCase {
     func initializeDayLog(
         locationName: String,
         weather: Int,
-        temperature: Int
+        temperature: Double
     ) async throws {
         print("Impl: ", #function)
         
