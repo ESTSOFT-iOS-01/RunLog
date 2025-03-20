@@ -57,6 +57,7 @@ extension LogViewModel {
     // MARK: - private Functions
     private func loadDatas() {
         Task {
+            // TODO: 실제 연결시 삭제 해야함
             try await dayLogUseCase.initializeDayLog(
                 locationName: "목동",
                 weather: 1,
@@ -65,6 +66,8 @@ extension LogViewModel {
             
             let dayLogs = try await dayLogUseCase.getAllDayLogs()
             let distanceUnit = 5.0
+            
+            // TODO: Appconfig 들어오면 주석 풀기
             //let distanceUnit = try await appConfigUseCase.getUnitDistance()
             
             let groupedDayLogs = Dictionary(grouping: dayLogs) { dayLog in
