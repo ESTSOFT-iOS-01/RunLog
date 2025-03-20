@@ -15,19 +15,16 @@ class DIContainer {
     
     private init() {}
 
-    func register<T>(_ dependency: T) {
-        let key = String(describing: type(of: T.self))
+    func register<T>(_ dependency: T, for type: T.Type) {
+        let key = String(describing: type)
         dependencies[key] = dependency
     }
     
-    func resolve<T>() -> T {
-        let key = String(describing: type(of: T.self))
-        let dependency = dependencies[key]
-        
-        precondition(
-            dependency != nil, "\(key)는 register되지 않았어어요. resolve 부르기전에 register 해주세요"
-        )
-        
+    func resolve<T>(_ type: T.Type) -> T {
+        let key = String(describing: type)
+        guard let dependency = dependencies[key] else {
+            preconditionFailure("\(key)는 register되지 않았어요. resolve 부르기 전에 register 해주세요")
+        }
         return dependency as! T
     }
 }
@@ -35,10 +32,9 @@ class DIContainer {
 
 @propertyWrapper
 class Dependency<T> {
-    
     let wrappedValue: T
     
     init() {
-        self.wrappedValue = DIContainer.shared.resolve()
+        self.wrappedValue = DIContainer.shared.resolve(T.self)
     }
 }
