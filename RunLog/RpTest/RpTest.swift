@@ -11,32 +11,25 @@ import CoreData
 
 final class AppConfigRepositoryTests: XCTestCase {
     
-    var persistentContainer: NSPersistentContainer!
-    var repository: AppConfigRepositoryImpl!
-
+    var repository: AppConfigRepository?
+    
     override func setUpWithError() throws {
         // ✅ In-Memory Store를 사용
-        persistentContainer = NSPersistentContainer(name: "DTOs")
-        let description = NSPersistentStoreDescription()
-        description.type = NSInMemoryStoreType
-        persistentContainer.persistentStoreDescriptions = [description]
-
-        persistentContainer.loadPersistentStores { _, error in
-            if let error = error {
-                fatalError("테스트용 Core Data 로딩 실패: \(error)")
-            }
-        }
-        
-        repository = AppConfigRepositoryImpl(context: persistentContainer.viewContext)
+        let container = TestCoreDataContainer()
+        repository = AppConfigRepositoryImpl(context: container.context)
     }
-
+    
     override func tearDownWithError() throws {
         repository = nil
-        persistentContainer = nil
     }
-
+    
     /// ✅ `createAppConfig` & `readAppConfig` 테스트
     func test_createAndReadAppConfig() async throws {
+        guard let repository = repository else {
+            XCTFail("repository nil")
+            return
+        }
+        
         // Given (테스트용 데이터 생성)
         let testConfig = AppConfig(nickname: "테스트 유저", totalDistance: 100.5, streakDays: 10, totalDays: 20, unitDistance: 1.5)
         
@@ -46,15 +39,16 @@ final class AppConfigRepositoryTests: XCTestCase {
         // Then (저장된 데이터가 일치하는지 확인)
         let savedConfig = try await repository.readAppConfig()
         
-        XCTAssertEqual(savedConfig.nickname, "테스트 유저")
-        XCTAssertEqual(savedConfig.totalDistance, 100.5)
-        XCTAssertEqual(savedConfig.streakDays, 10)
-        XCTAssertEqual(savedConfig.totalDays, 20)
-        XCTAssertEqual(savedConfig.unitDistance, 1.5)
+        XCTAssertEqual(savedConfig, testConfig)
     }
     
     /// ✅ `updateAppConfig` 테스트
     func test_updateAppConfig() async throws {
+        guard let repository = repository else {
+            XCTFail("repository nil")
+            return
+        }
+        
         // Given (초기 데이터 저장)
         let initialConfig = AppConfig(nickname: "초기 설정", totalDistance: 50.0, streakDays: 5, totalDays: 10, unitDistance: 2.0)
         try await repository.createAppConfig(initialConfig)
@@ -71,9 +65,14 @@ final class AppConfigRepositoryTests: XCTestCase {
         XCTAssertEqual(savedConfig.totalDays, 30)
         XCTAssertEqual(savedConfig.unitDistance, 3.5)
     }
-
+    
     /// ✅ `deleteAppConfig` 테스트
     func test_deleteAppConfig() async throws {
+        guard let repository = repository else {
+            XCTFail("repository nil")
+            return
+        }
+        
         // Given (초기 데이터 저장)
         let testConfig = AppConfig(nickname: "삭제할 설정", totalDistance: 75.3, streakDays: 7, totalDays: 14, unitDistance: 2.5)
         try await repository.createAppConfig(testConfig)
@@ -89,4 +88,55 @@ final class AppConfigRepositoryTests: XCTestCase {
             XCTAssertTrue(error is AppConfigError, "❌ 삭제 후 예외(AppConfigError)가 발생해야 합니다.")
         }
     }
+}
+
+
+final class DayLogRepositoryTests: XCTestCase {
+    
+    var repository: DayLogRepository?
+    
+    override func setUpWithError() throws {
+        let container = TestCoreDataContainer()
+        repository = DayLogRepositoryImpl(context: container.context)
+    }
+    
+    override func tearDownWithError() throws {
+        repository = nil
+    }
+    
+    func testRepository() async {
+        guard let repository = repository else {
+            XCTFail("nil")
+            return
+        }
+        
+        // Create & Read
+        let dummyDayLog = DummyData.dummyDayLogs[0]
+        try? await repository.createDayLog(dummyDayLog)
+        let dayLog = try? await repository.readDayLog(date: dummyDayLog.date)
+        
+        XCTAssertEqual(dummyDayLog, dayLog)
+        
+        // ReadAll
+        let dayLogs = try? await repository.readAllDayLogs()
+        XCTAssertEqual(dummyDayLog, dayLogs![0])
+        
+        // Update & Read
+        var updatedDayLog = dummyDayLog
+        updatedDayLog.title = "목동"
+        try? await repository.updateDayLog(updatedDayLog)
+        let fetchDayLog = try? await repository.readDayLog(
+            date: updatedDayLog.date
+        )
+        
+        XCTAssertEqual(fetchDayLog, updatedDayLog)
+        
+        
+        // Delete
+        try? await repository.deleteDayLog(date: dummyDayLog.date)
+        let emptyDayLogs = try? await repository.readAllDayLogs()
+        
+        XCTAssert(emptyDayLogs!.isEmpty)
+    }
+    
 }
