@@ -7,7 +7,7 @@ import Foundation
 extension Date {
     
     // 저장하기 위해 연 월만 남기기
-    var formatted: Date {
+    var toYearMonth: Date {
         let calendar = Calendar.current
         let components = calendar.dateComponents([.year, .month], from: self)
         return calendar.date(from: components)!

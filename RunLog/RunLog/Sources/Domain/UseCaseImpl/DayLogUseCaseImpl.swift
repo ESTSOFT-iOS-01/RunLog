@@ -22,7 +22,7 @@ final class DayLogUseCaseImpl: DayLogUseCase {
     ) async throws {
         print("Impl: ", #function)
         
-        let today = Date().formatted
+        let today = Date().toYearMonth
         let initialTitle = "\(today.formattedString(.weekDay)) 러닝"
         
         let newDayLog = DayLog(
