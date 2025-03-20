@@ -43,6 +43,22 @@ final class AppConfigUsecaseImpl: AppConfigUsecase {
         return config.totalDistance
     }
     
+    func getDistanceIndicators() async throws -> (roadName: String, count : Double) {
+        print("Impl:", #function)
+        
+        let totalDistance = try await appConfigRepository.readAppConfig().totalDistance
+        
+        let eligibleRoads = Road.allRoads.filter { road in
+            road.distance <= totalDistance * 0.5
+        }
+        
+        guard let selectedRoad = eligibleRoads.randomElement() else {
+            return ("마라톤", totalDistance / 42.195)
+        }
+        
+        return (selectedRoad.name, totalDistance / selectedRoad.distance)
+    }
+    
     func updateUnitDistance(_ unitDistance: Double) async throws {
         print("Impl:", #function)
         var config = try await appConfigRepository.readAppConfig()
