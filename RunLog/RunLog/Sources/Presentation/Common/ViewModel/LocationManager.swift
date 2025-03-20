@@ -57,7 +57,8 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
     private var kalmanFilter = KalmanFilter()
     
     // MARK: - Combine Subjects
-    private let locationSubject = PassthroughSubject<CLLocation, Never>()
+//    private let locationSubject = PassthroughSubject<CLLocation, Never>()
+    let locationSubject = PassthroughSubject<CLLocation, Never>() // testcode
     private let distanceSubject = PassthroughSubject<Double, Never>()
     private let locationNameSubject = PassthroughSubject<CLPlacemark, Never>()
     private let weatherUpdateSubject = PassthroughSubject<(String, Double), Never>()

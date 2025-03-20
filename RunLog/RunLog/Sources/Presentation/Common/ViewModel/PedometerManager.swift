@@ -32,7 +32,8 @@ final class PedometerManager {
     static let shared = PedometerManager()
     // MARK: - Propertise
     private let pedometer = CMPedometer()
-    private let pedometerSubject = PassthroughSubject<Int, Never>()
+//    private let pedometerSubject = PassthroughSubject<Int, Never>()
+    let pedometerSubject = PassthroughSubject<Int, Never>() // test코드
     var pedometerPublisher: AnyPublisher<Int, Never> {
         pedometerSubject.eraseToAnyPublisher()
     }
