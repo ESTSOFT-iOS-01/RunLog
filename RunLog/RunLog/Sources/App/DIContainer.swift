@@ -31,3 +31,14 @@ class DIContainer {
         return dependency as! T
     }
 }
+
+
+@propertyWrapper
+class Dependency<T> {
+    
+    let wrappedValue: T
+    
+    init() {
+        self.wrappedValue = DIContainer.shared.resolve()
+    }
+}
