@@ -100,7 +100,9 @@ final class ChangeNicknameViewController: UIViewController {
                 case .nicknameUpdated(let text):
                     self?.nicknameView.nameField.setTextWithUnderline(text)
                 case .saveSuccess:
-                    self?.navigationController?.popViewController(animated: true)
+                    DispatchQueue.main.async {
+                        self?.navigationController?.popViewController(animated: true)
+                    }
                 }
             }
             .store(in: &cancellables)

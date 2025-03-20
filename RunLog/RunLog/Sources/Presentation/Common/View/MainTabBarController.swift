@@ -9,14 +9,14 @@ import UIKit
 
 class MainTabBarController: UITabBarController {
     
-    let dataContainer = CoreDataContainer()
+
     let appConfigRepository : AppConfigRepositoryImpl!
 //    let dayLogRepository : DayLogRepositoryImpl!
     
     // MARK: - Init
-    init(appConfigRepository : AppConfigRepositoryImpl, dayLogRepository: DayLogRepositoryImpl) {
-        self.appConfigRepository = AppConfigRepositoryImpl(context: dataContainer.context)
-//        self.dayLogRepository = DayLogRepositoryImpl(context: dataContainer.context)
+    init(appConfigRepository : AppConfigRepositoryImpl) {
+        self.appConfigRepository = appConfigRepository
+//        self.dayLogRepository = dayLogRepository
         
         super.init(nibName: nil, bundle: nil)
     }

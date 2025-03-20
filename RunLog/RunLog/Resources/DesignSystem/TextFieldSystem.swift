@@ -88,7 +88,9 @@ open class RLTextField: UITextField {
     }
     
     public func setTextWithUnderline(_ value: String) {
-        attributedText = .RLAttributedString(text: value, font: .Headline1)
-        underline.backgroundColor = value.isEmpty ? .Gray200 : .LightGreen
+        DispatchQueue.main.async {
+            self.attributedText = .RLAttributedString(text: value, font: .Headline1)
+            self.underline.backgroundColor = value.isEmpty ? .Gray200 : .LightGreen
+        }
     }
 }

@@ -81,16 +81,18 @@ final class CalUnitView: UIView {
     
     // MARK: - Configure
     func updateDescriptionText(with value: Double) {
-        let unitString = (value * 0.3).formattedString
-        let fullText = "하루에 \(unitString)km 이동하면 이렇게 표시돼요"
-        
-        despLabel.attributedText = fullText.styledText(
-            highlightText: unitString,
-            baseFont: .RLBody1,
-            baseColor: .Gray000,
-            highlightFont: .RLBody1,
-            highlightColor: .LightGreen
-        )
+        DispatchQueue.main.async { [self] in
+            let unitString = (value * 0.3).formattedString
+            let fullText = "하루에 \(unitString)km 이동하면 이렇게 표시돼요"
+            
+            despLabel.attributedText = fullText.styledText(
+                highlightText: unitString,
+                baseFont: .RLBody1,
+                baseColor: .Gray000,
+                highlightFont: .RLBody1,
+                highlightColor: .LightGreen
+            )
+        }
     }
     
 }

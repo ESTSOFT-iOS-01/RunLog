@@ -106,7 +106,9 @@ final class ChangeCalUnitViewController: UIViewController {
             .sink { [weak self] output in
                 switch output {
                 case .saveSuccess:
-                    self?.navigationController?.popViewController(animated: true)
+                    DispatchQueue.main.async {
+                        self?.navigationController?.popViewController(animated: true)
+                    }
                 case .unitUpdated(let value):
                     self?.calUnitView.updateDescriptionText(with: value)
                 }

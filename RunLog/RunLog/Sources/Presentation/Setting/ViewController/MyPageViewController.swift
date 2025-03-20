@@ -84,7 +84,9 @@ final class MyPageViewController: UIViewController {
                 case .profileDataUpdated(let config):
                     self?.mypageView.configure(with: config)
                 case .navigateToViewController(let viewController):
-                    self?.navigationController?.pushViewController(viewController, animated: true)
+                    DispatchQueue.main.async {
+                        self?.navigationController?.pushViewController(viewController, animated: true)
+                    }
                 }
             }
             .store(in: &cancellables)
