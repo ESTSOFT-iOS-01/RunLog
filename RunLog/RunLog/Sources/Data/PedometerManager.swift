@@ -10,16 +10,38 @@ import Combine
 import CoreMotion
 
 final class PedometerManager {
-    // MARK: - Singleton
-    static let shared = PedometerManager()
-    // MARK: - Propertise
-    private let pedometer = CMPedometer()
+    // MARK: - Input & Output
+    enum Input {
+        case startPedometer
+        case stopPedometer
+    }
+    let input = PassthroughSubject<Input, Never>()
+    private var cancellables = Set<AnyCancellable>()
     private let pedometerSubject = PassthroughSubject<Int, Never>()
     var pedometerPublisher: AnyPublisher<Int, Never> {
         pedometerSubject.eraseToAnyPublisher()
     }
+    // MARK: - Singleton
+    static let shared = PedometerManager()
+    // MARK: - Propertise
+    private let pedometer = CMPedometer()
     // MARK: - Init
-    private init() { }
+    private init() {
+        bind()
+    }
+    // MARK: - Bind
+    private func bind() {
+        self.input
+            .sink { [weak self] input in
+                switch input {
+                case .startPedometer:
+                    self?.startPedometerUpdate()
+                case .stopPedometer:
+                    self?.stopPedometerUpdate()
+                }
+            }
+            .store(in: &cancellables)
+    }
     // MARK: - 걸음 수 측정 시작
     func startPedometerUpdate() {
         guard CMPedometer.isStepCountingAvailable() else {
@@ -38,6 +60,5 @@ final class PedometerManager {
     // MARK: - 걸음 수 측정 종료
     func stopPedometerUpdate() {
         pedometer.stopUpdates()
-        print("걸음 수 측정 중지")
     }
 }
