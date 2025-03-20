@@ -10,6 +10,19 @@ import MapKit
 import SnapKit
 import Then
 
+// MARK: - DisplayDayLog Model
+struct DisplayDayLog {
+    let date: Date
+    let locationName: String
+    let weather: String
+    let temperature: Int
+    let title: String
+    let level: String
+    let totalTime: TimeInterval
+    let totalDistance: Double
+    let totalSteps: Int
+}
+
 final class DetailLogView: UIView {
     
     // MARK: - UI Components 선언
@@ -175,7 +188,7 @@ final class DetailLogView: UIView {
         stack.axis = .horizontal
         stack.alignment = .center
         stack.spacing = 16
-        stack.distribution = .equalSpacing
+        stack.distribution = .fillEqually
         return stack
     }()
     
@@ -192,6 +205,7 @@ final class DetailLogView: UIView {
         super.init(frame: frame)
         setupUI()
         setupLayout()
+        
         print("LogView initialized")
     }
     
@@ -274,12 +288,61 @@ final class DetailLogView: UIView {
         }
     }
     
-    // MARK: - Configure
-    private func configure() {
-        // 뷰 설정
+}
+
+// MARK: - Configure Extension
+extension DetailLogView {
+    /// DisplayDayLog 데이터를 기반으로 UI를 업데이트하는 메서드
+    func configure(with log: DisplayDayLog) {
+        // 타이틀 업데이트
+        titleLabel.label.text = log.title
+        
+        // 위치 업데이트
+        locationLabel.label.text = log.locationName
+        
+        // 날씨 업데이트 (예: "맑음 | 20°C")
+        weatherLabel.label.text = "\(log.weather) | \(log.temperature)°C"
+        
+        // 난이도 업데이트
+        conditionLabel.label.text = log.level
+        
+        // 소요시간 업데이트 (예: "1시간 0분")
+        timeValueLabel.label.text = formatTimeInterval(log.totalTime)
+        
+        // 운동거리 업데이트 (예: "5.0km")
+        distanceValueLabel.label.text = "\(log.totalDistance)km"
+        
+        // 걸음수 업데이트 (천 단위 구분 기호 포함)
+        stepsValueLabel.label.text = log.totalSteps.formattedString
     }
     
+    /// TimeInterval (초)를 "X시간 Y분" 형식의 문자열로 변환
+    private func formatTimeInterval(_ interval: TimeInterval) -> String {
+        let hours = Int(interval) / 3600
+        let minutes = (Int(interval) % 3600) / 60
+        return "\(hours)시간 \(minutes)분"
+    }
+    
+    /// 정수를 천단위 구분 기호를 포함한 문자열로 변환
+    private func formatSteps(_ steps: Int) -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        return formatter.string(from: NSNumber(value: steps)) ?? "\(steps)"
+    }
 }
+
+// MARK: - Dummy Data
+let dummyDisplayLog = DisplayDayLog(
+    date: Date(),
+    locationName: "서울",
+    weather: "맑음",
+    temperature: 20,
+    title: "아침 달리기",
+    level: "보통",
+    totalTime: 3600,       // 1시간
+    totalDistance: 5.0,    // 5.0km
+    totalSteps: 7000
+)
 //
 //#if canImport(SwiftUI) && DEBUG
 //import SwiftUI

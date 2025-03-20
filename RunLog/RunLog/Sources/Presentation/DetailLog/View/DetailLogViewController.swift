@@ -54,6 +54,7 @@ final class DetailLogViewController: UIViewController {
         bindGesture()
         setupData()
         bindViewModel()
+        detailLogView.configure(with: dummyDisplayLog)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -75,7 +76,7 @@ final class DetailLogViewController: UIViewController {
     // MARK: - Setup Navigation Bar
     private func setupNavigationBar() {
         // 네비게이션바 디테일 설정
-        title = "0월 0일 (수)"
+        updateNavigationTitle(with: dummyDisplayLog.date)
         navigationController?.setupAppearance() // 스타일 설정
         navigationController?.navigationItem.backButtonTitle = "chevron.left"
         navigationController?
@@ -206,6 +207,13 @@ final class DetailLogViewController: UIViewController {
         alert.addAction(confirmAction)
         alert.addAction(cancelAction)
         targetVC.present(alert, animated: true)
+    }
+    
+    private func updateNavigationTitle(with date: Date) {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "M월 d일 (E)"
+        formatter.locale = Locale(identifier: "ko_KR")
+        self.title = formatter.string(from: date)
     }
 }
 
