@@ -10,23 +10,23 @@ import Combine
 import CoreMotion
 
 final class PedometerManager {
-    // MARK: - Dummy
-    private var dummyStepCount = 0
-    private var timer: Timer?
-    func startDummyPedometerUpdates() {
-        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            guard let self = self else { return }
-            self.dummyStepCount += Int.random(in: 1...3) // ✅ 1~3 걸음씩 증가
-            self.pedometerSubject.send(self.dummyStepCount)
-        }
-    }
-    // MARK: - 더미 걸음 수 업데이트 중지
-    func stopDummyPedometerUpdates() {
-        timer?.invalidate()
-        timer = nil
-        dummyStepCount = 0
-        print("🛑 더미 걸음 수 측정 중지")
-    }
+//    // MARK: - Dummy
+//    private var dummyStepCount = 0
+//    private var timer: Timer?
+//    func startDummyPedometerUpdates() {
+//        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+//            guard let self = self else { return }
+//            self.dummyStepCount += Int.random(in: 1...3) // ✅ 1~3 걸음씩 증가
+//            self.pedometerSubject.send(self.dummyStepCount)
+//        }
+//    }
+//    // MARK: - 더미 걸음 수 업데이트 중지
+//    func stopDummyPedometerUpdates() {
+//        timer?.invalidate()
+//        timer = nil
+//        dummyStepCount = 0
+////        print("🛑 더미 걸음 수 측정 중지")
+//    }
     
     // MARK: - Singleton
     static let shared = PedometerManager()

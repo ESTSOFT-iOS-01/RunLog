@@ -57,18 +57,31 @@ final class RunningViewModel {
     deinit {
         timer?.invalidate()
         timer = nil
-        saveLog()
     }
+    
+    // viewController에도 동일 함수 존재 - 실제 저장할 때는 여기서 작동
     private func saveLog() {
-        print("⏹ 운동 종료 ⏹")
-        print("최종 시간: \(record.sectionTime)초") // - section에 담긴 route의 끝에서 처음을 뺀 시간
-        print("최종 경로 핀 수: \(section.route.count)")
+        let message: String =
+        """
+        ⏹ 운동 종료 ⏹
+        최종 시간: \(record.sectionTime)초
+        최종 경로 핀 수: \(section.route.count)
+        최종 걸음 수: \(section.steps)
+        """
+        print(message)
+        let alert = UIAlertController(
+            title: "기록 삭제하기",
+            message: message,
+            preferredStyle: .alert
+        )
+        let okAction = UIAlertAction(title: "확인", style: .default)
+        alert.addAction(okAction)
+        
 //        print("최종 경로")
 //        for location in section.route {
 //            print("경도: \(location.latitude), 위도: \(location.longitude)")
 //            print("시간: \(location.timestamp.formattedString(.fullTime))")
 //        }
-        print("최종 걸음 수: \(section.steps)")
     }
     // MARK: - Bind (Input -> Output)
     private func bind() {

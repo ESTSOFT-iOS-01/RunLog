@@ -72,7 +72,7 @@ final class RunningViewController: UIViewController {
         setupData()
         bindViewModel()
         
-        LocationManager.shared.startDummyLocationUpdates()
+//        LocationManager.shared.startDummyLocationUpdates()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -124,10 +124,12 @@ final class RunningViewController: UIViewController {
         cardView.finishButton.publisher
             .sink { [weak self] in
                 LocationManager.shared.isRunning = false
-//                PedometerManager.shared.stopPedometerUpdate()
-                PedometerManager.shared.stopDummyPedometerUpdates()
-                LocationManager.shared.stopDummyLocationUpdates()
-                self?.dismiss(animated: false)
+                PedometerManager.shared.stopPedometerUpdate()
+//                PedometerManager.shared.stopDummyPedometerUpdates()
+//                LocationManager.shared.stopDummyLocationUpdates()
+                
+                self?.saveLog() // 결과 확인용 alert띄움
+//                self?.dismiss(animated: false)
             }
             .store(in: &cancellables)
         // 접기 버튼 클릭
@@ -203,5 +205,26 @@ extension RunningViewController: MKMapViewDelegate {
         renderer.alpha = 1.0
         
         return renderer
+    }
+    //종료 시 내용 확용 alert를 띄움
+    private func saveLog() {
+        let message: String =
+        """
+        ⏹ 운동 종료 ⏹
+        최종 시간: \(viewModel.record.sectionTime)초
+        최종 경로 핀 수: \(viewModel.section.route.count)
+        최종 걸음 수: \(viewModel.section.steps)
+        """
+        print(message)
+        let alert = UIAlertController(
+            title: "기록 삭제하기",
+            message: message,
+            preferredStyle: .alert
+        )
+        let okAction = UIAlertAction(title: "확인", style: .default) { _ in
+            self.dismiss(animated: false)
+        }
+        alert.addAction(okAction)
+        self.present(alert,animated: true)
     }
 }

@@ -12,37 +12,39 @@ import WeatherKit
 import CoreLocation
 import Combine
 
-struct DummyWeather {
-    let temperature: Int
-    let condition: WeatherCondition
-    //    let aqi: Int
-}
+//struct DummyWeather {
+//    let temperature: Int
+//    let condition: WeatherCondition
+//    //    let aqi: Int
+//}
 final class LocationManager: NSObject, CLLocationManagerDelegate {
-    // MARK: - Dummy
-    private var dummyIndex = 0
-    private var timer: Timer?
-    func startDummyLocationUpdates() {
-        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            guard let self = self else { return }
-            guard dummyIndex < DummyLocation.route.count else {
-                self.timer?.invalidate()
-                return
-            }
-            let dummyLocation = DummyLocation.route[self.dummyIndex]
-            self.dummyIndex += 1
-            self.locationSubject.send(dummyLocation) // ViewModel로 위치 데이터 전송
-        }
-    }
-    func stopDummyLocationUpdates() {
-        timer?.invalidate()
-        timer = nil
-        dummyIndex = 0
-    }
+//    // MARK: - Dummy
+//    private var dummyIndex = 0
+//    private var timer: Timer?
+//    func startDummyLocationUpdates() {
+//        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+//            guard let self = self else { return }
+//            guard dummyIndex < DummyLocation.route.count else {
+//                self.timer?.invalidate()
+//                return
+//            }
+//            let dummyLocation = DummyLocation.route[self.dummyIndex]
+//            self.dummyIndex += 1
+//            self.locationSubject.send(dummyLocation) // ViewModel로 위치 데이터 전송
+//        }
+//    }
+//    func stopDummyLocationUpdates() {
+//        timer?.invalidate()
+//        timer = nil
+//        dummyIndex = 0
+//    }
     
     // MARK: - Singleton
     static let shared = LocationManager()
     // MARK: - Properties
     var isRunning: Bool = false
+    private var previousLocality: String? // 지난 위치
+    private var currentLocality: String? // 현재 위치
     private var locationManager = CLLocationManager()
     private let weatherService = WeatherService()
     private let openWeatherService = OpenWeatherService()
@@ -76,7 +78,7 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
         setupLocationManager()
     }
     deinit {
-        timer?.invalidate()
+//        timer?.invalidate()
         locationManager.stopUpdatingLocation()
     }
     // MARK: - CLLocationManager 설정
@@ -84,20 +86,21 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         // 배터리를 아낄려면 kCLLocationAccuracyHundredMeters를 이용 - 정확도를 조절
-        locationManager.distanceFilter = 100  //100미터를 이동하면 다시 업데이트
+        locationManager.distanceFilter = 50  //100미터를 이동하면 다시 업데이트
         locationManager.allowsBackgroundLocationUpdates = true
 //        locationManager.pausesLocationUpdatesAutomatically = false // 이동이 없으면 업데이트를 멈출지
         getLocationUsagePermission()
     }
     // MARK: - 이동하면 위치를 받아 ViewModel에 input넣음
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-//        guard let location = locations.last else { return }
-        let location = CLLocation(latitude: 37.5665, longitude: 126.9780)
-//        self.locationSubject.send(location) // 더미 지우고 여기 풀면 현재 위치 기준으로 작성
+        guard let location = locations.last else { return }
+//        let location = CLLocation(latitude: 37.5665, longitude: 126.9780)
+        self.locationSubject.send(location) // 더미 지우고 여기 풀면 현재 위치 기준으로 작성
         // 도시명 패치 - 이걸 위치 따라 지정
         fetchCityName(location: location)
-        // location 정보 10km정도 멀어지면 새로호출 하고 싶다
-        if !isRunning { // 운동중이 아닐때만 날씨랑 대기질 정보를 받아옴
+        
+        // 운동 중이 아니면서 시,군,구 가 바뀌면 날씨를 새로 받아옴
+        if !isRunning && (previousLocality != currentLocality) {
             fetchWeatherData(location: location) // 날씨 정보 패치
             fetchAqiData(location: location) // 대기질 정보 패치
         }
@@ -112,6 +115,8 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
                 print("Geocoding 실패: \(error!.localizedDescription)")
                 return
             }
+            self.previousLocality = self.currentLocality
+            self.currentLocality = placemark.locality
             self.locationNameSubject.send(placemark)
         }
     }

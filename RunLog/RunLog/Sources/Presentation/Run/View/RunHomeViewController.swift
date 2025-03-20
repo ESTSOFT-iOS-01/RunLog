@@ -113,8 +113,8 @@ final class RunHomeViewController: UIViewController {
             .sink {
                 print("운동 시작하기 버튼 클릭")
                 LocationManager.shared.isRunning = true
-//                PedometerManager.shared.startPedometerUpdate()
-                PedometerManager.shared.startDummyPedometerUpdates()
+                PedometerManager.shared.startPedometerUpdate()
+//                PedometerManager.shared.startDummyPedometerUpdates()
                 let vc = RunningViewController()
                 vc.modalPresentationStyle = .fullScreen
                 self.present(vc, animated: false)
@@ -125,7 +125,7 @@ final class RunHomeViewController: UIViewController {
     // MARK: - Setup Data
     private func setupData() {
         // 초기 데이터 로드
-        totalLabelCreate()
+        totalLabelCreate(value: ("올레길", "2.5"))
     }
 
     // MARK: - Bind ViewModel
@@ -147,11 +147,11 @@ final class RunHomeViewController: UIViewController {
 }
 // MARK: - private functions
 extension RunHomeViewController {
-    private func totalLabelCreate() {
+    private func totalLabelCreate(value: (String, String)) {
         // 여기서 사용자의 데이터를 받아오면 될듯
         let nickname = "행복한 쿼카러너화이팅"
-        let road = "올레길"
-        let number = "2.5"
+        let road = value.0
+        let number = value.1
         let string: String = "\(nickname) 님은\n지금까지 \(road) \(number)회\n거리만큼 걸었습니다!"
         totalLabel.attributedText = string.styledText(
             highlightText: "\(road) \(number)회",
