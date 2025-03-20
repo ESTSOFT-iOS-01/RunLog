@@ -8,53 +8,20 @@
 import UIKit
 import Combine
 
-enum SettingMenuType {
-    case changeNickname
-    case changeCalendarUnit
-}
-
-extension SettingMenuType: CaseIterable {
-    var title : String {
-        switch self {
-        case .changeNickname:
-            return "닉네임 변경"
-        case .changeCalendarUnit:
-            return "기록 시각화 단위 변경"
-        }
-    }
-    
-    var viewControllerType: UIViewController.Type {
-        switch self {
-        case .changeNickname:
-            return ChangeNicknameViewController.self
-        case .changeCalendarUnit:
-            return ChangeCalUnitViewController.self
-        }
-    }
-}
-
 final class MyPageViewModel {
     
     // MARK: - Input & Output
     enum Input {
-        case loadData
+        case loadData // 유저 데이터 호출
         case menuItemSelected(Int)
     }
     
     enum Output {
-        case profileDataUpdated(AppConfig)
+        case profileDataUpdated(UserInfoVO) // 유저 데이터 전달
         case navigateToViewController(UIViewController)
     }
     
-    // TODO : repository 구현하면 data read해서 사용.
-    private var appConfig = AppConfig(
-        nickname: "뷰모델테스터",
-        totalDistance: 1234,
-        streakDays: 12,
-        totalDays: 94,
-        unitDistance: 10.1
-    )
-    
+    private let appConfigUseCase : AppConfigUsecaseImpl
     private let menuItems: [SettingMenuType] = SettingMenuType.allCases
     
     private var cancellables = Set<AnyCancellable>()
@@ -65,7 +32,8 @@ final class MyPageViewModel {
     var output: AnyPublisher<Output, Never> { outputSubject.eraseToAnyPublisher() }
     
     // MARK: - Init
-    init() {
+    init(appConfigUseCase: AppConfigUsecaseImpl) {
+        self.appConfigUseCase = appConfigUseCase
         bind()
     }
     
@@ -96,7 +64,18 @@ final class MyPageViewModel {
     
     // MARK: - private Functions
     private func fetchProfileData() {
-        // TODO: - repository 구현하면 data read해서 사용.
-        outputSubject.send(.profileDataUpdated(appConfig))
+        Task {
+            do {
+                var userInfo = UserInfoVO(nickname: "RunLogger", totalDistance: 0.0, streakCount: 0, logCount: 0)
+                userInfo.nickname = try await appConfigUseCase.getNickname()
+                userInfo.totalDistance = try await appConfigUseCase.getTotalDistance()
+                (userInfo.streakCount, userInfo.logCount) = try await appConfigUseCase.getUserIndicators()
+                
+                outputSubject.send(.profileDataUpdated(userInfo))
+            } catch {
+                print("usecase error : \(error)")
+            }
+            
+        }
     }
 }

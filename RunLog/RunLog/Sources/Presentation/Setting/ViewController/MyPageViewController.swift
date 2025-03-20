@@ -13,18 +13,31 @@ import Combine
 final class MyPageViewController: UIViewController {
     
     // MARK: - Properties
-    private let viewModel = MyPageViewModel()
+    private var viewModel: MyPageViewModel!
     private var cancellables = Set<AnyCancellable>()
     
     // MARK: - UI
     private var mypageView = MypageProfileView()
     
+    // MARK: - Init
+    init(viewModel: MyPageViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         setupUI()
         setupNavigationBar()
         setupTableView()
+        
         bindViewModel()
         viewModel.input.send(.loadData)
     }

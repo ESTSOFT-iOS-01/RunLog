@@ -85,7 +85,7 @@ final class MypageProfileView: UIView {
     }
     
     // MARK: - Configure
-    func configure(with config: AppConfig) {
+    func configure(with config: UserInfoVO) {
         nameLabel.attributedText = .RLAttributedString(text: "\(config.nickname) 님", font: .Title, color: .Gray000)
         
         let totalDistanceString = config.totalDistance.toString(withDecimal: 1) + "km"
@@ -99,8 +99,8 @@ final class MypageProfileView: UIView {
             highlightColor: .LightPink
         )
 
-        logCard.configure(property: .logCount, value: config.totalDays)
-        streakCard.configure(property: .streak, value: config.streakDays)
+        logCard.configure(property: .logCount, value: config.logCount)
+        streakCard.configure(property: .streak, value: config.streakCount)
     }
 }
 
