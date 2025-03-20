@@ -40,7 +40,7 @@ final class RunningViewModel {
     enum Output {
         case locationUpdate(CLLocation) // 사용자 위치 데이터
         case timerUpdate(String) // 운동 시간 업데이트
-        case distanceUpdate // 운동 거리 업데이트
+        case distanceUpdate(String) // 운동 거리 업데이트
         case stepsUpdate(String) // 운동 걸음 수 업데이트
         case lineDraw(MKPolyline) // 지도에 라인을 그림
     }
@@ -100,6 +100,15 @@ final class RunningViewModel {
                 self?.section.steps = step
                 let stepString = "\(step)"
                 self?.output.send(.stepsUpdate(stepString))
+            }
+            .store(in: &cancellables)
+        // 사용자 이동 거리 변경 구독
+        locationManager.distancePublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] distance in
+                self?.section.distance += distance
+                let distanceString = "\(distance)km"
+                self?.output.send(.distanceUpdate(distanceString))
             }
             .store(in: &cancellables)
         // input에 따라 처리

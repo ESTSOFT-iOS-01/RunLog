@@ -166,8 +166,8 @@ final class RunningViewController: UIViewController {
                     self?.mapView.centerToLocation(location, region: self?.mapView.region)
                 case .timerUpdate(let time):
                     self?.cardView.timeLabel.setConfigure(text: time)
-                case .distanceUpdate:
-                    print("거리 변경")
+                case .distanceUpdate(let distance):
+                    self?.cardView.distanceLabel.setConfigure(text: distance)
                 case .stepsUpdate(let step):
                     self?.cardView.stepsLabel.setConfigure(text: step)
                 case .lineDraw(let lineDraw):

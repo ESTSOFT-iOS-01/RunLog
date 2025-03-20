@@ -43,8 +43,8 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
     static let shared = LocationManager()
     // MARK: - Properties
     var isRunning: Bool = false
-    private var previousLocality: String? // 지난 위치
-    private var currentLocality: String? // 현재 위치
+    private var previousLocality: String? // 지난(시군구) 위치
+    private var currentLocality: String? // 현재(시군구) 위치
     private var locationManager = CLLocationManager()
     private let weatherService = WeatherService()
     private let openWeatherService = OpenWeatherService()
@@ -53,14 +53,21 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
         // 현재 위치를 반환, 못찾으면 서울을 기본값으로 반환
         return locationManager.location ?? CLLocation(latitude: 37.5665, longitude: 126.9780)
     }
+    private var previousLocation: CLLocation?
+    private var kalmanFilter = KalmanFilter()
+    
     // MARK: - Combine Subjects
     private let locationSubject = PassthroughSubject<CLLocation, Never>()
+    private let distanceSubject = PassthroughSubject<Double, Never>()
     private let locationNameSubject = PassthroughSubject<CLPlacemark, Never>()
     private let weatherUpdateSubject = PassthroughSubject<(String, Double), Never>()
     private let aqiUpdateSubject = PassthroughSubject<Int, Never>()
     // MARK: - Publisher
     var locationPublisher: AnyPublisher<CLLocation, Never> {
         locationSubject.eraseToAnyPublisher()
+    }
+    var distancePublisher: AnyPublisher<Double, Never> {
+        distanceSubject.eraseToAnyPublisher()
     }
     var locationNamePublisher: AnyPublisher<CLPlacemark, Never> {
         locationNameSubject.eraseToAnyPublisher()
@@ -76,9 +83,9 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
     private override init() {
         super.init()
         setupLocationManager()
+        previousLocation = nil
     }
     deinit {
-//        timer?.invalidate()
         locationManager.stopUpdatingLocation()
     }
     // MARK: - CLLocationManager 설정
@@ -94,16 +101,42 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
     // MARK: - 이동하면 위치를 받아 ViewModel에 input넣음
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last else { return }
-//        let location = CLLocation(latitude: 37.5665, longitude: 126.9780)
-        self.locationSubject.send(location) // 더미 지우고 여기 풀면 현재 위치 기준으로 작성
-        // 도시명 패치 - 이걸 위치 따라 지정
-        fetchCityName(location: location)
+        // GPS오차가 큰 경우 무시 - 거리가 10m이상 벌어지면? 인듯
         
-        // 운동 중이 아니면서 시,군,구 가 바뀌면 날씨를 새로 받아옴
-        if !isRunning && (previousLocality != currentLocality) {
+        if previousLocation != nil && (location.horizontalAccuracy < 0 || location.horizontalAccuracy > 10) {
+            print("GPS 신호 불안정 - 위치 무시")
+            return
+        }
+        // Kalman Filter 적용(좌표 보정)
+        let filteredLat = kalmanFilter.update(measurement: location.coordinate.latitude)
+        let filteredLog = kalmanFilter.update(measurement: location.coordinate.longitude)
+        let filteredLocation = CLLocation(
+            latitude: filteredLat,
+            longitude: filteredLog
+        )
+        
+        if let previous = previousLocation {
+            let distance = filteredLocation.distance(from: previous)
+            if distance >= 1 {
+                distanceSubject.send(distance)
+            }
+        }
+        previousLocation = filteredLocation
+        
+        self.locationSubject.send(location)
+        // 도시명 패치
+        fetchCityName(location: location)
+        // 날씨를 받아올지 판단해서 업데이트
+        if  weatherUpdateCheck() {
             fetchWeatherData(location: location) // 날씨 정보 패치
             fetchAqiData(location: location) // 대기질 정보 패치
         }
+    }
+    // MARK: - 날씨랑 대기질 정보를 받아오는 기준점
+    private func weatherUpdateCheck() -> Bool {
+        if previousLocality == nil { return true }
+        if !isRunning && (previousLocality != currentLocality) { return true }
+        return false
     }
     // MARK: - 도시명 가져오기
     private func fetchCityName(location: CLLocation) {
@@ -193,5 +226,26 @@ extension LocationManager {
         if UIApplication.shared.canOpenURL(url) {
             UIApplication.shared.open(url, options: [:], completionHandler: nil)
         }
+    }
+}
+
+// MARK: - KalmanFilter
+final class KalmanFilter {
+    private var x: Double = 0  // 위치 추정값
+    private var p: Double = 1  // 오차 공분산
+    private let q: Double = 0.0001 // 프로세스 노이즈
+    private let r: Double = 0.01 // 측정 노이즈
+    
+    func update(measurement: Double) -> Double {
+        // 1. 예측 단계
+        let xPred = x
+        let pPred = p + q
+        
+        // 2. 업데이트 단계
+        let k = pPred / (pPred + r)
+        x = xPred + k * (measurement - xPred)
+        p = (1 - k) * pPred
+        
+        return x
     }
 }
