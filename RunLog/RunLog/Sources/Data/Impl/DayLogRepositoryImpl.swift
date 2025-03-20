@@ -27,7 +27,7 @@ final class DayLogRepositoryImpl: DayLogRepository {
         }
     }
     
-    func readDayLog(date: Date) async throws -> DayLog {
+    func readDayLog(date: Date) async throws -> DayLog? {
         print("Impl: ", #function)
         
         return try await context.perform {
