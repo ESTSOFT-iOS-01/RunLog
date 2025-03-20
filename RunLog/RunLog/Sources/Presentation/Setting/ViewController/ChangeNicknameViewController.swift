@@ -13,11 +13,22 @@ import Combine
 final class ChangeNicknameViewController: UIViewController {
     
     // MARK: - Properties
-    private let viewModel = ChangeNicknameViewModel()
+    private let viewModel : ChangeNicknameViewModel!
     private var cancellables = Set<AnyCancellable>()
     
     // MARK: - UI
     private lazy var nicknameView = ChangeNicknameView()
+    
+    // MARK: - Init
+    init(viewModel: ChangeNicknameViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -77,6 +88,7 @@ final class ChangeNicknameViewController: UIViewController {
     // MARK: - Setup Data
     private func setupData() {
         // 초기 데이터 로드
+        viewModel.input.send(.loadData)
         nicknameView.nameField.setTextWithUnderline(viewModel.nickname)
     }
 
