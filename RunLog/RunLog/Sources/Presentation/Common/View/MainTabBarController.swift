@@ -8,7 +8,23 @@
 import UIKit
 
 class MainTabBarController: UITabBarController {
-
+    
+    let dataContainer = CoreDataContainer()
+    let appConfigRepository : AppConfigRepositoryImpl!
+//    let dayLogRepository : DayLogRepositoryImpl!
+    
+    // MARK: - Init
+    init(appConfigRepository : AppConfigRepositoryImpl, dayLogRepository: DayLogRepositoryImpl) {
+        self.appConfigRepository = AppConfigRepositoryImpl(context: dataContainer.context)
+//        self.dayLogRepository = DayLogRepositoryImpl(context: dataContainer.context)
+        
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = .systemBackground
@@ -32,7 +48,12 @@ class MainTabBarController: UITabBarController {
             selectedImage: UIImage(systemName: "star.fill")
         )
         
-        let settingView = UINavigationController(rootViewController: MyPageViewController())
+        
+        let usecase = AppConfigUsecaseImpl(appConfigRepository: self.appConfigRepository)
+        let settingVM = MyPageViewModel(appConfigUseCase: usecase)
+        let settingVC = MyPageViewController(viewModel: settingVM)
+        
+        let settingView = UINavigationController(rootViewController: settingVC)
         settingView.title = "Setting"
         settingView.tabBarItem = UITabBarItem(
             title: "Setting",

@@ -34,6 +34,7 @@ final class MyPageViewModel {
     // MARK: - Init
     init(appConfigUseCase: AppConfigUsecaseImpl) {
         self.appConfigUseCase = appConfigUseCase
+        
         bind()
     }
     

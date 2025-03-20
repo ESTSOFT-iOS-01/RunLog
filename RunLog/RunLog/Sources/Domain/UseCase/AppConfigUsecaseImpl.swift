@@ -13,6 +13,15 @@ final class AppConfigUsecaseImpl: AppConfigUsecase {
     
     init(appConfigRepository: AppConfigRepository) {
         self.appConfigRepository = appConfigRepository
+        
+        Task {
+            do {
+                try await self.appConfigRepository.createAppConfig(AppConfig(nickname: "RunLogger", totalDistance: 0, streakDays: 0, totalDays: 0, unitDistance: 10.0))
+            } catch {
+                print("repo error : \(error)")
+            }
+        }
+
     }
     
     func getUnitDistance() async throws -> Double {
