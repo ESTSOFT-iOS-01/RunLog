@@ -35,7 +35,7 @@ final class RecordDetailViewCell: UITableViewCell {
         $0.axis = .horizontal
         $0.alignment = .leading
         $0.distribution = .fill
-        $0.spacing = 16
+        $0.spacing = 0
     }
     
     // MARK: - Init
