@@ -30,6 +30,14 @@ enum RLIcon {
     case oneBeat
     case twoBeats
     case threeBeats
+    
+    case rocket
+    case church
+    case earth
+    case flag
+    case korea
+    case mandarin
+    case medal
 }
 
 extension RLIcon {
@@ -73,7 +81,20 @@ extension RLIcon {
             return "twoBeats"
         case .threeBeats:
             return "threeBeats"
-            
+        case .rocket:
+            return "Rocket"
+        case .church:
+            return "Church"
+        case .earth:
+            return "Earth"
+        case .flag:
+            return "Flag"
+        case .korea:
+            return "Korea"
+        case .mandarin:
+            return "Mandarin"
+        case .medal:
+            return "Medal"
         case .ellipsis:
             return "ellipsis"
         }
