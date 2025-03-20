@@ -13,11 +13,21 @@ import Combine
 final class ChangeCalUnitViewController: UIViewController {
     
     // MARK: - Properties
-    private let viewModel = CalUnitViewModel()
+    private let viewModel : CalUnitViewModel!
     private var cancellables = Set<AnyCancellable>()
     
     // MARK: - UI
     private lazy var calUnitView = CalUnitView()
+    
+    // MARK: - Init
+    init(viewModel: CalUnitViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -81,6 +91,7 @@ final class ChangeCalUnitViewController: UIViewController {
     
     // MARK: - Setup Data
     private func setupData() {
+        viewModel.input.send(.loadData)
         if viewModel.unit != 0 {
             calUnitView.unitField.setTextWithUnderline(String(viewModel.unit))
         }
