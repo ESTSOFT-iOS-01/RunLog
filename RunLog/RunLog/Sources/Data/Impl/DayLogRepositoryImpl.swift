@@ -22,7 +22,7 @@ final class DayLogRepositoryImpl: DayLogRepository {
         
         try await context.perform {
             let data = DataMapper.toDTO(dayLog, context: self.context)
-            //self.context.insert(data)
+            self.context.insert(data)
             try self.context.save()
         }
     }
