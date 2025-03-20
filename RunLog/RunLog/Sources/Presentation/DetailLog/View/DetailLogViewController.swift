@@ -45,6 +45,7 @@ final class DetailLogViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        print("디버그: viewDidLoad 호출됨, 시각: \(Date())")
         let tableView = detailLogView.recordDetailView.tableView
         tableView.dataSource = self
         tableView.delegate = self
@@ -131,12 +132,39 @@ final class DetailLogViewController: UIViewController {
             RecordDetail(timeRange: "18:09 - 18:24", distance: "2.5km", steps: "3,235"),
             RecordDetail(timeRange: "12:13 - 12:30", distance: "100.81km", steps: "1,234"),
             RecordDetail(timeRange: "12:13 - 12:30", distance: "100.81km", steps: "2,237,345"),
+            RecordDetail(timeRange: "12:13 - 12:30", distance: "100.81km", steps: "2,237,345"),
+            RecordDetail(timeRange: "06:12 - 06:18", distance: "1.81km", steps: "345"),
+            RecordDetail(timeRange: "12:13 - 12:30", distance: "1.57km", steps: "1,232"),
+            RecordDetail(timeRange: "13:50 - 14:04", distance: "1.61km", steps: "1,234"),
+            RecordDetail(timeRange: "18:09 - 18:24", distance: "2.5km", steps: "3,235"),
+            RecordDetail(timeRange: "12:13 - 12:30", distance: "100.81km", steps: "1,234"),
+            RecordDetail(timeRange: "12:13 - 12:30", distance: "100.81km", steps: "2,237,345"),
+            RecordDetail(timeRange: "12:13 - 12:30", distance: "100.81km", steps: "2,237,345"),
+            RecordDetail(timeRange: "06:12 - 06:18", distance: "1.81km", steps: "345"),
+            RecordDetail(timeRange: "12:13 - 12:30", distance: "1.57km", steps: "1,232"),
+            RecordDetail(timeRange: "13:50 - 14:04", distance: "1.61km", steps: "1,234"),
+            RecordDetail(timeRange: "18:09 - 18:24", distance: "2.5km", steps: "3,235"),
+            RecordDetail(timeRange: "12:13 - 12:30", distance: "100.81km", steps: "1,234"),
+            RecordDetail(timeRange: "12:13 - 12:30", distance: "100.81km", steps: "2,237,345"),
+            RecordDetail(timeRange: "12:13 - 12:30", distance: "100.81km", steps: "2,237,345"),
+            RecordDetail(timeRange: "06:12 - 06:18", distance: "1.81km", steps: "345"),
+            RecordDetail(timeRange: "12:13 - 12:30", distance: "1.57km", steps: "1,232"),
+            RecordDetail(timeRange: "13:50 - 14:04", distance: "1.61km", steps: "1,234"),
+            RecordDetail(timeRange: "18:09 - 18:24", distance: "2.5km", steps: "3,235"),
+            RecordDetail(timeRange: "12:13 - 12:30", distance: "100.81km", steps: "1,234"),
+            RecordDetail(timeRange: "12:13 - 12:30", distance: "100.81km", steps: "2,237,345"),
             RecordDetail(timeRange: "12:13 - 12:30", distance: "100.81km", steps: "2,237,345")
         ]
         print("DetailLogViewController - 더미데이터 개수: \(dummyRecords.count)")
         self.recordDetails = dummyRecords
         
         detailLogView.recordDetailView.tableView.reloadData()
+        
+        // reloadData 후 테이블뷰 상태 확인 (비동기)
+        DispatchQueue.main.async {
+            let tableView = self.detailLogView.recordDetailView.tableView
+            print("디버그: reloadData 이후 tableView의 contentSize: \(tableView.contentSize), frame: \(tableView.frame), 시각: \(Date())")
+        }
     }
     
     // MARK: - Bind ViewModel
@@ -204,6 +232,7 @@ extension DetailLogViewController: UITableViewDataSource, UITableViewDelegate {
                 return UITableViewCell()
             }
             cell.configureAsHeader()
+            //print("디버그: 헤더 셀 생성됨, 시각: \(Date())")
             return cell
         } else {
             let record = recordDetails[indexPath.row - 1]
@@ -214,6 +243,7 @@ extension DetailLogViewController: UITableViewDataSource, UITableViewDelegate {
                 return UITableViewCell()
             }
             cell.configure(with: record)
+            //print("디버그: 데이터 셀 (인덱스 \(indexPath.row - 1)) 생성됨, 시각: \(Date())")
             return cell
         }
     }
