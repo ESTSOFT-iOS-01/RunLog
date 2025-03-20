@@ -218,8 +218,12 @@ extension DetailLogViewController: UITableViewDataSource, UITableViewDelegate {
             ) as? RecordDetailViewCell else {
                 return UITableViewCell()
             }
-            cell.configure(with: record)
-            //print("디버그: 데이터 셀 (인덱스 \(indexPath.row - 1)) 생성됨, 시각: \(Date())")
+            // 선택된 셀이면 폰트를 RLHeadline1, 아니면 RLHeadline2로 설정
+                        if indexPath.row - 1 == selectedSectionIndex {
+                            cell.configure(with: record, font: .RLHeadline1)
+                        } else {
+                            cell.configure(with: record, font: .RLHeadline2)
+                        }
             return cell
         }
     }
@@ -231,6 +235,9 @@ extension DetailLogViewController: UITableViewDataSource, UITableViewDelegate {
         // 선택된 section 인덱스 업데이트 (헤더 때문에 -1)
         selectedSectionIndex = indexPath.row - 1
         
+        // 테이블뷰 리로드: 선택 상태 변경을 반영하기 위해
+            tableView.reloadData()
+        
         // 맵뷰 오버레이를 제거 후 다시 추가하여 렌더러가 다시 호출되도록 함
         detailLogView.removeAllMapOverlays()
         for polyline in polylineOverlays {
@@ -239,7 +246,7 @@ extension DetailLogViewController: UITableViewDataSource, UITableViewDelegate {
     }
 }
 
-// MARK: - Setup MapView & 폴리라인 그리기
+
 // MARK: - Setup MapView & 폴리라인
 extension DetailLogViewController {
     
