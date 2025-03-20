@@ -24,16 +24,4 @@
 //        }
 //    }
 //
-//    func readDayLog(date: Date) async throws -> DayLog {
-//        <#code#>
-//    }
-//
-//    func updateDayLog(_ dayLog: DayLog) async throws {
-//        <#code#>
-//    }
-//
-//    func deleteDayLog(date: Date) async throws {
-//        <#code#>
-//    }
-//    
-//}
+
