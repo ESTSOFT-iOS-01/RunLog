@@ -80,6 +80,7 @@ open class RLTextField: UITextField {
     // MARK: - Bindings
     private func setupBinding() {
         self.publisher
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] text in
                 self?.attributedText = .RLAttributedString(text: text, font: .Headline1)
                 self?.underline.backgroundColor = text.isEmpty ? .Gray200 : .LightGreen
@@ -88,9 +89,7 @@ open class RLTextField: UITextField {
     }
     
     public func setTextWithUnderline(_ value: String) {
-        DispatchQueue.main.async {
-            self.attributedText = .RLAttributedString(text: value, font: .Headline1)
-            self.underline.backgroundColor = value.isEmpty ? .Gray200 : .LightGreen
-        }
+        self.attributedText = .RLAttributedString(text: value, font: .Headline1)
+        self.underline.backgroundColor = value.isEmpty ? .Gray200 : .LightGreen
     }
 }

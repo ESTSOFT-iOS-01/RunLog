@@ -70,6 +70,7 @@ final class AppConfigUsecaseImpl: AppConfigUsecase {
     
     func updateUnitDistance(_ unitDistance: Double) async throws {
         print("Impl:", #function)
+        
         var config = try await appConfigRepository.readAppConfig()
         config.unitDistance = unitDistance
         
@@ -78,6 +79,7 @@ final class AppConfigUsecaseImpl: AppConfigUsecase {
     
     func updateNickname(_ nickname: String) async throws {
         print("Impl:", #function)
+        
         var config = try await appConfigRepository.readAppConfig()
         config.nickname = nickname
         

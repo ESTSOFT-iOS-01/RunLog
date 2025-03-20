@@ -25,7 +25,6 @@ final class MyPageViewController: UIViewController {
         super.init(nibName: nil, bundle: nil)
     }
     
-    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -38,6 +37,7 @@ final class MyPageViewController: UIViewController {
         setupNavigationBar()
         setupTableView()
         
+        viewModel.bind()
         bindViewModel()
         viewModel.input.send(.loadData)
     }
@@ -79,14 +79,13 @@ final class MyPageViewController: UIViewController {
     // MARK: - Bind ViewModel
     private func bindViewModel() {
         viewModel.output
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] output in
                 switch output {
                 case .profileDataUpdated(let config):
                     self?.mypageView.configure(with: config)
                 case .navigateToViewController(let viewController):
-                    DispatchQueue.main.async {
-                        self?.navigationController?.pushViewController(viewController, animated: true)
-                    }
+                    self?.navigationController?.pushViewController(viewController, animated: true)
                 }
             }
             .store(in: &cancellables)

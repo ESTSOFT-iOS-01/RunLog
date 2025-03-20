@@ -86,13 +86,12 @@ final class MypageProfileView: UIView {
     
     // MARK: - Configure
     func configure(with config: UserInfoVO) {
-        DispatchQueue.main.async { [self] in
-            self.nameLabel.attributedText = .RLAttributedString(text: "\(config.nickname) 님", font: .Title, color: .Gray000)
+            nameLabel.attributedText = .RLAttributedString(text: "\(config.nickname) 님", font: .Title, color: .Gray000)
             
             let totalDistanceString = config.totalDistance.toString(withDecimal: 1) + "km"
             let fullText = "지금까지 총 \(totalDistanceString)를 걸으셨어요!"
             
-            self.despLabel.attributedText = fullText.styledText(
+            despLabel.attributedText = fullText.styledText(
                 highlightText: totalDistanceString,
                 baseFont: .RLHeadline2,
                 baseColor: .Gray000,
@@ -100,9 +99,8 @@ final class MypageProfileView: UIView {
                 highlightColor: .LightPink
             )
 
-            self.logCard.configure(property: .logCount, value: config.logCount)
-            self.streakCard.configure(property: .streak, value: config.streakCount)
-        }
+            logCard.configure(property: .logCount, value: config.logCount)
+            streakCard.configure(property: .streak, value: config.streakCount)
     }
 }
 

@@ -34,9 +34,12 @@ final class ChangeCalUnitViewController: UIViewController {
         super.viewDidLoad()
         setupUI()
         setupNavigationBar()
-        viewModel.input.send(.loadData)
+        
+        viewModel.bind()
         setupTextField()
         setupGesture()
+        
+        viewModel.input.send(.loadData)
         setupData()
         bindViewModel()
     }
@@ -62,7 +65,6 @@ final class ChangeCalUnitViewController: UIViewController {
             $0.top.equalToSuperview().offset(130)
             $0.bottom.equalToSuperview()
         }
-        
     }
     
     // MARK: - Setup Navigation Bar
@@ -79,7 +81,6 @@ final class ChangeCalUnitViewController: UIViewController {
             .store(in: &cancellables)
     }
     
-
     // MARK: - Setup Gesture
     private func setupGesture() {
         // 제스처 추가
@@ -101,12 +102,11 @@ final class ChangeCalUnitViewController: UIViewController {
         viewModel.bindTextField(calUnitView.unitField.publisher)
         
         viewModel.output
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] output in
                 switch output {
                 case .saveSuccess:
-                    DispatchQueue.main.async {
                         self?.navigationController?.popViewController(animated: true)
-                    }
                 case .unitUpdated(let value):
                     self?.calUnitView.unitField.setTextWithUnderline(value.formattedString)
                     self?.calUnitView.updateDescriptionText(with: value)

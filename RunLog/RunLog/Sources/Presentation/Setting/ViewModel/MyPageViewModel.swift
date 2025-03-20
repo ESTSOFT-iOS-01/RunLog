@@ -19,6 +19,8 @@ final class MyPageViewModel {
     enum Output {
         case profileDataUpdated(UserInfoVO) // 유저 데이터 전달
         case navigateToViewController(UIViewController)
+        case settingMenuCount(Int) // 메뉴 아이템 개수
+        case settingMenuItem(SettingMenuType) // 메뉴 아이템
     }
     
     private let appConfigUseCase : AppConfigUsecaseImpl
@@ -27,23 +29,22 @@ final class MyPageViewModel {
     private var cancellables = Set<AnyCancellable>()
     private let inputSubject = PassthroughSubject<Input, Never>()
     private let outputSubject = PassthroughSubject<Output, Never>()
-
+    
     var input: PassthroughSubject<Input, Never> { inputSubject }
     var output: AnyPublisher<Output, Never> { outputSubject.eraseToAnyPublisher() }
-    
+
     // MARK: - Init
     init(appConfigUseCase: AppConfigUsecaseImpl) {
         self.appConfigUseCase = appConfigUseCase
-        
-        bind()
     }
     
-    private func bind() {
+    func bind() {
         inputSubject
             .sink { [weak self] event in
                 switch event {
                 case .loadData:
                     self?.fetchProfileData()
+                    self?.outputSubject.send(.settingMenuCount(self?.menuItems.count ?? 0))
                 case .menuItemSelected(let index):
                     self?.handleMenuSelection(index)
                 }
@@ -64,6 +65,7 @@ final class MyPageViewModel {
         Task {
             do {
                 var userInfo = UserInfoVO(nickname: "RunLogger", totalDistance: 0.0, streakCount: 0, logCount: 0)
+                
                 userInfo.nickname = try await appConfigUseCase.getNickname()
                 userInfo.totalDistance = try await appConfigUseCase.getTotalDistance()
                 (userInfo.streakCount, userInfo.logCount) = try await appConfigUseCase.getUserIndicators()
@@ -72,7 +74,6 @@ final class MyPageViewModel {
             } catch {
                 print("usecase error : \(error)")
             }
-            
         }
     }
     
@@ -93,4 +94,5 @@ final class MyPageViewModel {
             return ChangeNicknameViewController(viewModel: viewModel)
         }
     }
+    
 }
