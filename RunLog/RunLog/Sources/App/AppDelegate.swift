@@ -10,10 +10,10 @@ import UIKit
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
-
-
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        registerDependencies()
+        
         return true
     }
 
@@ -31,6 +31,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
     }
 
-
+    private func registerDependencies() {
+        let coreDataContainer = CoreDataContainer()
+        let appConfigRepository = AppConfigRepositoryImpl(
+            context: coreDataContainer.context
+        )
+        let dayLogRepository = DayLogRepositoryImpl(
+            context: coreDataContainer.context
+        )
+        
+        DIContainer.shared.register(
+            AppConfigUsecaseImpl(appConfigRepository: appConfigRepository)
+        )
+        DIContainer.shared.register(
+            DayLogUseCaseImpl(dayLogRepository: dayLogRepository)
+        )
+        
+    }
 }
 
