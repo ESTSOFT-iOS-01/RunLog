@@ -210,10 +210,7 @@ final class DetailLogViewController: UIViewController {
     }
     
     private func updateNavigationTitle(with date: Date) {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "M월 d일 (E)"
-        formatter.locale = Locale(identifier: "ko_KR")
-        self.title = formatter.string(from: date)
+        self.title = date.formattedString(.monthDay)
     }
 }
 

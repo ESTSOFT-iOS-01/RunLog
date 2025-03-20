@@ -71,7 +71,7 @@ final class MovingTrackSheetView: UIView {
         // 상단 날짜 라벨
         dateLabel.snp.makeConstraints { make in
             make.top.equalTo(safeAreaLayoutGuide).offset(48)
-                make.centerX.equalToSuperview()
+            make.centerX.equalToSuperview()
         }
         
         // 닫기 버튼
@@ -111,30 +111,8 @@ final class MovingTrackSheetView: UIView {
 extension MovingTrackSheetView {
     /// 날짜를 받아서 dateLabel에 반영
     func configure(with date: Date) {
-        // 원하는 형식으로 날짜 포맷팅
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy년 M월 d일 E요일" // 예: "2025년 3월 3일 수요일"
-        formatter.locale = Locale(identifier: "ko_KR")
-        
-        let dateString = formatter.string(from: date)
-        
-        // RLLabel 내부의 UILabel에 접근 (방법1)
+        let dateString = date.formattedString(.detailedFull)
         dateLabel.label.text = dateString
     }
 }
 
-//#if canImport(SwiftUI) && DEBUG
-//import SwiftUI
-//
-//struct MypageProfileView_Preview: PreviewProvider {
-//    static var previews: some View {
-//        UIViewPreview {
-//            MovingTrackSheetView()
-//        }
-//        .previewLayout(.sizeThatFits) // 크기를 적절하게 조절하여 미리보기 가능
-//        .padding()
-//    }
-//}
-//
-//
-//#endif

@@ -18,6 +18,7 @@ enum DateFormatStyle {
     case monthDay     // "0월 0일 (수)"
     case yearMonth     // "2025년 3월"
     case yearMonthShort     // "25년 3월"
+    case detailedFull  // "2025년 3월 3일 수요일"
     
     var format: String {
         switch self {
@@ -29,6 +30,8 @@ enum DateFormatStyle {
             return "yyyy년 M월"
         case .yearMonthShort:
             return "yy년 M월"
+        case .detailedFull:
+            return "yyyy년 M월 d일 E요일"
         }
     }
 }
