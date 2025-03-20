@@ -45,7 +45,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             for: AppConfigUsecase.self
         )
         DIContainer.shared.register(
-            DayLogUseCaseImpl(dayLogRepository: dayLogRepository),
+            DayLogUseCaseImpl(
+                dayLogRepository: dayLogRepository,
+                appConfigRepository: appConfigRepository
+            ),
             for: DayLogUseCase.self
         )
         

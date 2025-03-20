@@ -63,7 +63,6 @@ extension LogViewModel {
                 temperature: 0.5
             )
             
-            
             let dayLogs = try await dayLogUseCase.getAllDayLogs()
             let distanceUnit = 5.0
             //let distanceUnit = try await appConfigUseCase.getUnitDistance()
