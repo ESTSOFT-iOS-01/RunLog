@@ -77,11 +77,16 @@ final class DetailLogViewController: UIViewController {
         title = "0월 0일 (수)"
         navigationController?.setupAppearance() // 스타일 설정
         navigationController?.navigationItem.backButtonTitle = "chevron.left"
-        navigationController?.addRightButton(
-            icon: "ellipsis",
-            target: self,
-            action: #selector(buttonTapped)
-        )
+        navigationController?
+            .addRightMenuButton(menuItems: [
+                ("수정하기", .init()),
+                ("공유하기", .init()),
+                ("삭제하기", .destructive)
+            ])
+            .sink { [weak self] selectedTitle in
+                self?.viewModel.input.send(.menuSelected(selectedTitle))
+            }
+            .store(in: &cancellables)
     }
     
     // MARK: - Setup Gesture
@@ -136,16 +141,43 @@ final class DetailLogViewController: UIViewController {
     
     // MARK: - Bind ViewModel
     private func bindViewModel() {
-        //        viewModel.output.something
-        //            .sink { [weak self] value in
-        //                // View 업데이트 로직
-        //            }
-        //            .store(in: &cancellables)
+        viewModel.output
+            .sink { [weak self] output in
+                guard let self = self, let output = output else { return }
+                switch output {
+                case .edit:
+                    print("수정하기 탭됨 → 수정 로직")
+                case .share:
+                    self.handleShare(in: self, shareText: "하트런 기록 공유!")
+                    
+                case .delete:
+                    self.handleDelete(in: self, dateString: "2024년 3월 3일")
+                }
+            }
+            .store(in: &cancellables)
     }
     
-    // MARK: - Actions
-    @objc private func buttonTapped() {
-        print("오른쪽 네비게이션 버튼 탭됨")
+    // MARK: - Action Handlers (함수 분리)
+    private func handleShare(in targetVC: UIViewController, shareText: String) {
+        let shareItems: [Any] = [shareText]
+        let activityVC = UIActivityViewController(activityItems: shareItems, applicationActivities: nil)
+        targetVC.present(activityVC, animated: true)
+    }
+    
+    private func handleDelete(in targetVC: UIViewController, dateString: String) {
+        let alert = UIAlertController(
+            title: "기록 삭제하기",
+            message: "\(dateString) 기록을 정말 삭제하시겠습니까?",
+            preferredStyle: .alert
+        )
+        let confirmAction = UIAlertAction(title: "네", style: .destructive) { _ in
+            // 실제 삭제 로직 처리
+            print("기록 삭제 완료 로직")
+        }
+        let cancelAction = UIAlertAction(title: "아니오", style: .cancel, handler: nil)
+        alert.addAction(confirmAction)
+        alert.addAction(cancelAction)
+        targetVC.present(alert, animated: true)
     }
 }
 

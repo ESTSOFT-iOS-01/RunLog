@@ -9,6 +9,7 @@ import Foundation
 
 // MARK: - 아이콘
 enum RLIcon {
+    case ellipsis
     case walk
     case rightArrow
     case leftArrow
@@ -24,7 +25,7 @@ enum RLIcon {
     
     case selectedCircle
     case unslectedCircle
-  
+    
     case noneBeat
     case oneBeat
     case twoBeats
@@ -58,12 +59,12 @@ extension RLIcon {
             return "mappin.and.ellipse"
         case .dumbell:
             return "dumbbell"
-
+            
         case .selectedCircle:
             return "inset.filled.circle"
         case .unslectedCircle:
             return "circle"
-
+            
         case .noneBeat:
             return "noneBeat"
         case .oneBeat:
@@ -72,6 +73,9 @@ extension RLIcon {
             return "twoBeats"
         case .threeBeats:
             return "threeBeats"
+            
+        case .ellipsis:
+            return "ellipsis"
         }
     }
 }
