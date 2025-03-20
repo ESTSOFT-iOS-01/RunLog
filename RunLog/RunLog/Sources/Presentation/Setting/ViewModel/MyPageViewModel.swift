@@ -45,11 +45,7 @@ final class MyPageViewModel {
                 case .loadData:
                     self?.fetchProfileData()
                 case .menuItemSelected(let index):
-                    let selectedItem = self?.menuItems[index]
-                    if let viewControllerType = selectedItem?.viewControllerType {
-                        let viewController = viewControllerType.init()
-                        self?.outputSubject.send(.navigateToViewController(viewController))
-                    }
+                    self?.handleMenuSelection(index)
                 }
             }
             .store(in: &cancellables)
@@ -77,6 +73,24 @@ final class MyPageViewModel {
                 print("usecase error : \(error)")
             }
             
+        }
+    }
+    
+    private func handleMenuSelection(_ index: Int) {
+        let selectedItem = menuItems[index]
+        
+        let viewController = createViewController(for: selectedItem)
+        outputSubject.send(.navigateToViewController(viewController))
+    }
+    
+    private func createViewController(for selectedItem: SettingMenuType) -> UIViewController {
+        switch selectedItem {
+        case .changeCalendarUnit:
+            let viewModel = CalUnitViewModel(appConfigUseCase: appConfigUseCase)
+            return ChangeCalUnitViewController(viewModel: viewModel)
+        case .changeNickname:
+            let viewModel = ChangeNicknameViewModel(appConfigUseCase: appConfigUseCase)
+            return ChangeNicknameViewController(viewModel: viewModel)
         }
     }
 }
