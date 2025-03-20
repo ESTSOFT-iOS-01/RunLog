@@ -85,13 +85,6 @@ final class RunningViewModel {
     }
     // MARK: - Bind (Input -> Output)
     private func bind() {
-        // 사용자 위치 변경 구독
-        locationManager.locationPublisher
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] location in
-                self?.lindDraw(location: location)
-            }
-            .store(in: &cancellables)
         // 사용자 걸음 수 변경 구독
         pedometerManager.pedometerPublisher
             .receive(on: DispatchQueue.main)
@@ -102,28 +95,39 @@ final class RunningViewModel {
                 self?.output.send(.stepsUpdate(stepString))
             }
             .store(in: &cancellables)
-        // 사용자 이동 거리 변경 구독
-        locationManager.distancePublisher
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] distance in
-                self?.section.distance += distance
-                let distanceString = "\(distance)km"
-                self?.output.send(.distanceUpdate(distanceString))
-            }
-            .store(in: &cancellables)
-        // input에 따라 처리
-        self.input
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] input in
-                guard let self = self else { return }
-                switch input {
-                case .runningStart:
-                    timerUpdate()
-                case .distanceUpdate(let distance):
-                    print(distance)
-                }
-            }
-            .store(in: &cancellables)
+        
+        
+        
+//        // 사용자 위치 변경 구독
+//        locationManager.locationPublisher
+//            .receive(on: DispatchQueue.main)
+//            .sink { [weak self] location in
+//                self?.lindDraw(location: location)
+//            }
+//            .store(in: &cancellables)
+
+//        // 사용자 이동 거리 변경 구독
+//        locationManager.distancePublisher
+//            .receive(on: DispatchQueue.main)
+//            .sink { [weak self] distance in
+//                self?.section.distance += distance
+//                let distanceString = "\(distance)km"
+//                self?.output.send(.distanceUpdate(distanceString))
+//            }
+//            .store(in: &cancellables)
+//        // input에 따라 처리
+//        self.input
+//            .receive(on: DispatchQueue.main)
+//            .sink { [weak self] input in
+//                guard let self = self else { return }
+//                switch input {
+//                case .runningStart:
+//                    timerUpdate()
+//                case .distanceUpdate(let distance):
+//                    print(distance)
+//                }
+//            }
+//            .store(in: &cancellables)
         
     }
     // 운동 시작하면 초당 운동시간 업데이트

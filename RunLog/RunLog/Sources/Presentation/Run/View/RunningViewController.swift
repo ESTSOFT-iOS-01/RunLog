@@ -123,10 +123,8 @@ final class RunningViewController: UIViewController {
         // 종료 버튼 클릭
         cardView.finishButton.publisher
             .sink { [weak self] in
-                LocationManager.shared.isRunning = false
+//                LocationManager.shared.isRunning = false
                 PedometerManager.shared.stopPedometerUpdate()
-//                PedometerManager.shared.stopDummyPedometerUpdates()
-//                LocationManager.shared.stopDummyLocationUpdates()
                 
                 self?.saveLog() // 결과 확인용 alert띄움
 //                self?.dismiss(animated: false)

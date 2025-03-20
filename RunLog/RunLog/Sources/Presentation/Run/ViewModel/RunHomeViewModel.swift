@@ -19,37 +19,37 @@ final class RunHomeViewModel {
     }
     let output = PassthroughSubject<Output, Never>()
     private var cancellables = Set<AnyCancellable>()
-    private let locationManager = LocationManager.shared
     // MARK: - Properties
-    private var condition: WeatherCondition?
-    private var temperature: Int?
-    private var airQuality: Int?
-    
+    private let locationManager = LocationManager.shared
     // MARK: - Init
     init() {
         bind()
     }
     // MARK: - Bind (Input -> Output)
     private func bind() {
-        // 사용자 위치 변경 구독
+        // 사용자 위치 변경 구독 -> location에 맞는 지도 이동
         locationManager.locationPublisher
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] locaiton in
-                self?.output.send(.locationUpdate(locaiton))
+            .sink { [weak self] location in
+                self?.output.send(.locationUpdate(location))
             }
             .store(in: &cancellables)
         // 도시명 변경 구독
         locationManager.locationNamePublisher
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] placemark in
+            .sink { [weak self] value in
+                let location = value.0
+                let placemark = value.1
                 let city = self?.placemarksToString(placemark) ?? "알 수 없음"
+                // 여기서 기존의 지역과 다르면 locationNameUpdate를 부르고 날씨 변경도 부름
+                OpenWeatherService.shared.input.send(.requestUpdate(location))
                 self?.output.send(.locationNameUpdate(city))
             }
             .store(in: &cancellables)
         // 날씨 및 대기질 변경 구독
         Publishers.Zip(
-            locationManager.weatherUpdatePublisher,
-            locationManager.aqiUpdatePublisher
+            OpenWeatherService.shared.weatherUpdatePublisher,
+            OpenWeatherService.shared.aqiUpdatePublisher
         )
         .receive(on: DispatchQueue.main)
         .sink { completion in
@@ -59,8 +59,21 @@ final class RunHomeViewModel {
             self?.output.send(.weatherUpdate(formattedString))
         }
         .store(in: &cancellables)
-        
     }
+    
+    
+    
+    
+    
+   
+    
+    
+//    private var condition: WeatherCondition?
+//    private var temperature: Int?
+//    private var airQuality: Int?
+//    
+   
+    
 }
 // MARK: - 정보 한글화
 extension RunHomeViewModel {
