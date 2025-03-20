@@ -34,6 +34,7 @@ final class ChangeCalUnitViewController: UIViewController {
         super.viewDidLoad()
         setupUI()
         setupNavigationBar()
+        viewModel.input.send(.loadData)
         setupTextField()
         setupGesture()
         setupData()
@@ -91,10 +92,7 @@ final class ChangeCalUnitViewController: UIViewController {
     
     // MARK: - Setup Data
     private func setupData() {
-        viewModel.input.send(.loadData)
-        if viewModel.unit != 0 {
-            calUnitView.unitField.setTextWithUnderline(String(viewModel.unit))
-        }
+        calUnitView.unitField.setTextWithUnderline(String(viewModel.unit))
         calUnitView.updateDescriptionText(with: viewModel.unit)
     }
 
@@ -110,6 +108,7 @@ final class ChangeCalUnitViewController: UIViewController {
                         self?.navigationController?.popViewController(animated: true)
                     }
                 case .unitUpdated(let value):
+                    self?.calUnitView.unitField.setTextWithUnderline(value.formattedString)
                     self?.calUnitView.updateDescriptionText(with: value)
                 }
             }
