@@ -118,11 +118,13 @@ final class RunningViewController: UIViewController {
         cardView.finishButton.publisher
             .sink { [weak self] in
                 guard let self = self else { return }
+                // 걸음 측정 종료
                 pedometerManager.input.send(.stopPedometer)
+                viewModel.input.send(.runningStop)
                 DispatchQueue.main.async {// 현재 단순 확인 용
                     self.saveLog() // 결과 확인용 alert띄움
                 }
-//                self?.dismiss(animated: false)
+//                self.dismiss(animated: false)
             }
             .store(in: &cancellables)
         // 접기 버튼 클릭
@@ -206,14 +208,22 @@ extension RunningViewController: MKMapViewDelegate {
     }
     //종료 시 내용 확용 alert를 띄움
     private func saveLog() {
+        guard let startTime = viewModel.section.route.first?.timestamp,
+              let endTime = viewModel.section.route.last?.timestamp
+        else {
+            print("루트가 없음")
+            return
+        }
+        let totalTime = endTime.timeIntervalSince(startTime)
         let message: String =
         """
         ⏹ 운동 종료 ⏹
-        최종 시간: \(viewModel.timeRecord)초
+        시작 시간: \(startTime.formattedString(.fullTime))초
+        종료 시간: \(endTime.formattedString(.fullTime))초
+        총 운동 시간: \(totalTime)초
         최종 경로 핀 수: \(viewModel.section.route.count)
         최종 걸음 수: \(viewModel.section.steps)
         """
-        print(message)
         let alert = UIAlertController(
             title: nil,
             message: message,

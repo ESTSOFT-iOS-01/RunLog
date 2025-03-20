@@ -21,7 +21,7 @@ final class RunningViewModel {
     // MARK: - Input & Output
     enum Input {
         case runningStart // 운동 시작 -> 시간 업데이트 필요
-        // Q) 아마 거리랑 걸음 수도 location처럼 처리를 해야할 듯
+        case runningStop // 운동 종료 -> 결과 저장
     }
     enum Output {
         case locationUpdate(CLLocation) // 사용자 위치 데이터
@@ -43,32 +43,26 @@ final class RunningViewModel {
     // MARK: - Init
     init() {
         bind()
-        previousLocation = locationManager.currentLocation
     }
-    // MARK: - DeInit
-    deinit {
-        timer?.invalidate()
-        timer = nil
-    }
-    // viewController에도 동일 함수 존재 - 실제 저장할 때는 여기서 작동
+    // viewController에도 동일 함수 존재 - 실제 저장할 때는 여기서 작동(Controller는 실기기에서 확인용 alert띄우기용)
     private func saveLog() {
+        guard let startTime = section.route.first?.timestamp,
+              let endTime = section.route.last?.timestamp
+        else {
+            print("루트가 없음")
+            return
+        }
+        let totalTime = endTime.timeIntervalSince(startTime)
         let message: String =
         """
         ⏹ 운동 종료 ⏹
-        시작 시간: \(section.route.first?.timestamp)초
-        종료 시간: \(section.route.last?.timestamp)초
-        총 운동 시간: \(timeRecord)초
+        시작 시간: \(startTime.formattedString(.fullTime))초
+        종료 시간: \(endTime.formattedString(.fullTime))초
+        총 운동 시간: \(totalTime)초
         최종 경로 핀 수: \(section.route.count)
         최종 걸음 수: \(section.steps)
         """
         print(message)
-        let alert = UIAlertController(
-            title: nil,
-            message: message,
-            preferredStyle: .alert
-        )
-        let okAction = UIAlertAction(title: "확인", style: .default)
-        alert.addAction(okAction)
 //        print("최종 경로")
 //        for location in section.route {
 //            print("경도: \(location.latitude), 위도: \(location.longitude)")
@@ -115,7 +109,30 @@ final class RunningViewModel {
                 guard let self = self else { return }
                 switch input {
                 case .runningStart:
-                    timerUpdate()
+                    // 시작 위치를 경로에 저장
+                    let currentLocation = locationManager.currentLocation
+                    let point: Point = Point(
+                        latitude: currentLocation.coordinate.latitude,
+                        longitude: currentLocation.coordinate.longitude,
+                        timestamp: Date())
+                    previousLocation = currentLocation
+                    self.section.route.append(point)
+                    // 타이머 시작
+                    self.timerUpdate()
+                case .runningStop:
+                    // 타이머 종료
+                    timer?.invalidate()
+                    timer = nil
+                    // 마지막 위치를 경로에 저장
+                    let currentLocation = locationManager.currentLocation
+                    let point: Point = Point(
+                        latitude: currentLocation.coordinate.latitude,
+                        longitude: currentLocation.coordinate.longitude,
+                        timestamp: Date())
+                    previousLocation = currentLocation
+                    self.section.route.append(point)
+                    // 내용 저장
+                    self.saveLog()
                 }
             }
             .store(in: &cancellables)

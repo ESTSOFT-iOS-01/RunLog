@@ -43,9 +43,7 @@ final class RunHomeViewModel {
                 let location = value.0
                 let placemark = value.1
                 let city = self.placemarksToString(placemark)
-                print(city)
-                
-                // +) 여기서 기존의 지역과 다르면 locationNameUpdate를 부르고 날씨 변경도 부름
+                // +) 이전과 다른 위치면 정보 업데이트인데 여긴 도시가 달라지면으로 바꿔야할듯
                 if previousLocation != location {
                     print("날씨정보 업데이트")
                     self.openWeatherService.input.send(.requestUpdate(location))
