@@ -16,8 +16,7 @@ final class RunningViewModel {
         steps: 0,
         route: []
     )
-    // 운동시간(실제 저장 될때는 private 추가)
-    var timeRecord: TimeInterval = 0
+    private var timeRecord: TimeInterval = 0
     // MARK: - Input & Output
     enum Input {
         case runningStart // 운동 시작 -> 시간 업데이트 필요

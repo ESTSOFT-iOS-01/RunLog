@@ -31,7 +31,7 @@ enum DateFormatStyle {
         case .yearMonthShort:
             return "yy년 M월"
         case .fullTime:
-            return "HH:MM:ss:SSS"
+            return "HH:mm:ss:SSS"
         }
     }
 }
