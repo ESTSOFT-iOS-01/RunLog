@@ -19,6 +19,11 @@ final class DetailLogViewController: UIViewController {
     
     private var recordDetails: [RecordDetail] = []
     
+    /// 각 section에 해당하는 폴리라인 배열
+    private var polylineOverlays: [MKPolyline] = []
+    /// 선택된 section의 인덱스 (nil이면 선택된 section 없음)
+    private var selectedSectionIndex: Int? = nil
+    
     // MARK: - UI
     /// 전체 화면을 구성하는 뷰 (스크롤뷰 포함)
     private let detailLogView = DetailLogView()
@@ -218,6 +223,20 @@ extension DetailLogViewController: UITableViewDataSource, UITableViewDelegate {
             return cell
         }
     }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        // 헤더 셀은 무시 (indexPath.row == 0)
+        guard indexPath.row > 0 else { return }
+        
+        // 선택된 section 인덱스 업데이트 (헤더 때문에 -1)
+        selectedSectionIndex = indexPath.row - 1
+        
+        // 맵뷰 오버레이를 제거 후 다시 추가하여 렌더러가 다시 호출되도록 함
+        detailLogView.removeAllMapOverlays()
+        for polyline in polylineOverlays {
+            detailLogView.addMapOverlay(polyline)
+        }
+    }
 }
 
 // MARK: - Setup MapView & 폴리라인 그리기
@@ -238,28 +257,30 @@ extension DetailLogViewController {
     
     /// dummyDayLog의 모든 Section을 순회하여 폴리라인을 그리고, 적절히 확대
     private func drawPolyline(from dayLog: DayLog) {
-        // 기존에 폴리라인 그리기 코드 ...
-        var coordinates: [CLLocationCoordinate2D] = []
-        for section in dayLog.sections {
-            for point in section.route {
-                let coord = CLLocationCoordinate2D(latitude: point.latitude, longitude: point.longitude)
-                coordinates.append(coord)
-            }
+        // 기존 오버레이 제거
+        detailLogView.removeAllMapOverlays()
+        polylineOverlays.removeAll()
+        
+        // 각 section 별로 폴리라인 생성
+        for (index, section) in dayLog.sections.enumerated() {
+            let coordinates = section.route.map { CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude) }
+            let polyline = MKPolyline(coordinates: coordinates, count: coordinates.count)
+            polyline.title = "\(index)"  // section 인덱스를 문자열로 저장
+            polylineOverlays.append(polyline)
+            detailLogView.addMapOverlay(polyline)
         }
         
-        let polyline = MKPolyline(coordinates: coordinates, count: coordinates.count)
-        detailLogView.addMapOverlay(polyline)
-        
-        // 첫 경로의 첫지점과 마지막 경로의 끝지점을 기준으로 줌 지정
+        // 전체 영역이 보이도록 확대
         zoomToAllPoints(dayLog: dayLog)
     }
+    
     
     /// 모든 경로 점들을 순회하여 바운딩 박스(최소·최대 위도/경도) 구하기
     private func zoomToAllPoints(dayLog: DayLog) {
         // 1) 모든 Point 추출
         let allPoints = dayLog.sections.flatMap { $0.route }
         guard !allPoints.isEmpty else { return }
-
+        
         // 2) min/max lat, lon 구하기
         var minLat = Double.greatestFiniteMagnitude
         var maxLat = -Double.greatestFiniteMagnitude
@@ -300,25 +321,31 @@ extension DetailLogViewController {
         
         detailLogView.setMapRegion(region, animated: true)
     }
-
-
+    
+    
 }
 
 
 
 // MARK: - MKMapViewDelegate
 extension DetailLogViewController: MKMapViewDelegate {
-    /// 폴리라인을 어떤 스타일로 그릴지 결정
     func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
         guard let polyline = overlay as? MKPolyline else {
             return MKOverlayRenderer()
         }
+        
         let renderer = MKPolylineRenderer(polyline: polyline)
-        renderer.strokeColor = .systemBlue
-        renderer.lineWidth = 5
+        if let title = polyline.title, let index = Int(title), index == selectedSectionIndex {
+            renderer.strokeColor = .red  // 선택된 section이면 빨간색으로 표시
+            renderer.lineWidth = 6
+        } else {
+            renderer.strokeColor = .systemBlue
+            renderer.lineWidth = 5
+        }
         return renderer
     }
 }
+
 
 
 // MARK: 더미데이터

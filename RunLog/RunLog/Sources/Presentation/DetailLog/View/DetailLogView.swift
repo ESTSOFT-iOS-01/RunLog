@@ -338,6 +338,9 @@ extension DetailLogView {
         mapView.setRegion(region, animated: animated)
     }
     
+    func removeAllMapOverlays() {
+        mapView.removeOverlays(mapView.overlays)
+    }
 }
 
 // MARK: - DisplayDayLog Model
