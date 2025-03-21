@@ -12,7 +12,7 @@ import MapKit
 final class RunningViewModel {
     // MARK: - 운동 시작 부터 종료 전까지의 정보
     // +) save 기능 넣으면 private으로 변경
-    private var section: Section = Section(
+    var section: Section = Section(
         distance: 0,
         steps: 0,
         route: []
@@ -62,11 +62,11 @@ final class RunningViewModel {
         최종 걸음 수: \(section.steps)
         """
         print(message)
-//        print("최종 경로")
-//        for location in section.route {
-//            print("경도: \(location.latitude), 위도: \(location.longitude)")
-//            print("시간: \(location.timestamp.formattedString(.fullTime))")
-//        }
+        print("최종 경로")
+        for location in section.route {
+            print("경도: \(location.latitude), 위도: \(location.longitude)")
+            print("시간: \(location.timestamp.formattedString(.fullTime))")
+        }
     }
     // MARK: - Bind (Input -> Output)
     private func bind() {
