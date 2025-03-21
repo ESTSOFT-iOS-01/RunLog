@@ -57,7 +57,7 @@ final class AppConfigUsecaseImpl: AppConfigUsecase {
         
         let totalDistance = try await appConfigRepository.readAppConfig().totalDistance
         
-        let eligibleRoads = Road.allRoads.filter { road in
+        let eligibleRoads = Constants.allRoads.filter { road in
             road.distance <= totalDistance * 0.5
         }
         
