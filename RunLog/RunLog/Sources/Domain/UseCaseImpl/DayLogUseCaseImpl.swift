@@ -28,11 +28,6 @@ final class DayLogUseCaseImpl: DayLogUseCase {
         print("Impl: ", #function)
         
         let today = Date().toYearMonthDay
-        let yesterday = Calendar.current.date(
-            byAdding: .day,
-            value: -1,
-            to: today
-        )!
         
         let initialTitle = "\(today.formattedString(.weekDay)) 러닝"
         
@@ -156,7 +151,7 @@ final class DayLogUseCaseImpl: DayLogUseCase {
         // 오늘 운동했니?
         do {
             // yes -> 업데이트 X
-            let todayDayLog = try await dayLogRepository.readDayLog(date: today)
+            try await dayLogRepository.readDayLog(date: today)
         } catch CoreDataError.modelNotFound {
             // no -> 어제 운동했니?
             let hasYesterdayDayLog = try await hasYesterdayDayLog()
@@ -182,7 +177,7 @@ extension DayLogUseCaseImpl {
         )!
         
         do {
-            let yesterdayLogDay = try await dayLogRepository.readDayLog(date: yesterday)
+            try await dayLogRepository.readDayLog(date: yesterday)
             return true
         } catch CoreDataError.modelNotFound {
             return false

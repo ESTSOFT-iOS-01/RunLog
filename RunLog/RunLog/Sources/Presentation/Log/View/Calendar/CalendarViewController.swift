@@ -206,7 +206,7 @@ extension CalendarViewController: UICollectionViewDelegate, UICollectionViewData
         _ collectionView: UICollectionView,
         didSelectItemAt indexPath: IndexPath
     ) {
-        guard currentMonthDays[indexPath.row].heartBeatCount >= 0 else { return }
+        guard currentMonthDays[indexPath.row].heartBeatCount > 0 else { return }
 
         let key = viewModel.output.sortedKeys.value[currentKeyIndex]
         let calendar = Calendar.current
