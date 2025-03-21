@@ -176,32 +176,28 @@ final class MovingTrackSheetViewController: UIViewController {
         let currentCoord = allCoordinates[currentCoordIndex]
         let nextCoord = allCoordinates[currentCoordIndex + 1]
         
-        // 진행 방향 계산
-        let rawHeading = calculateHeading(from: currentCoord, to: nextCoord)
-        let targetHeading = rawHeading.truncatingRemainder(dividingBy: 360)
+        // 두 좌표 사이의 거리를 계산 (미터 단위)
+        let distance = CLLocation(latitude: currentCoord.latitude, longitude: currentCoord.longitude)
+                        .distance(from: CLLocation(latitude: nextCoord.latitude, longitude: nextCoord.longitude))
         
-        let currentHeading = sheetView.mapView.camera.heading
-        let deltaHeading = abs(targetHeading - currentHeading)
+        let distanceThreshold: CLLocationDistance = 50  // 예: 50미터 임계값
         
-        // 임계값: 예를 들어 30도 이상이면 회전이 급격하다고 판단
-        let rotationThreshold: CLLocationDirection = 60
-        
-        if deltaHeading > rotationThreshold {
-            // 회전 각도가 크면, 진행 좌표는 그대로 유지하고 회전만 부드럽게 적용
-            let smoothedHeading = smoothHeading(currentHeading: currentHeading, targetHeading: targetHeading, maxChange: 20)  // 최대 회전 각도
-            // 더 긴 애니메이션 지속시간으로 회전만 적용 (초)
-            UIView.animate(withDuration: 0.23) {
-                self.setCameraToCoordinate(currentCoord, heading: smoothedHeading)
-            }
-            // 좌표 인덱스는 업데이트하지 않아, 회전이 충분히 이루어지면 다음 좌표로 넘어감
+        var targetHeading: CLLocationDirection
+        if distance > distanceThreshold {
+            // 큰 간격이면 회전을 최소화하거나 현재 heading 유지
+            targetHeading = sheetView.mapView.camera.heading
         } else {
-            // 변화가 작으면, 정상적으로 다음 좌표로 진행
-            UIView.animate(withDuration: 0.2) {
-                self.setCameraToCoordinate(nextCoord, heading: targetHeading)
-            }
-            currentCoordIndex += 1
+            let rawHeading = calculateHeading(from: currentCoord, to: nextCoord)
+            // 필요한 경우 오프셋 추가 (예: 뒤에서 보는 시점이라면 +180)
+            targetHeading = rawHeading.truncatingRemainder(dividingBy: 360)
         }
         
+        // (보간 로직은 필요에 따라 적용)
+        UIView.animate(withDuration: 0.24) {
+            self.setCameraToCoordinate(nextCoord, heading: targetHeading)
+        }
+        
+        currentCoordIndex += 1
         updateProgressOverlay()
     }
     

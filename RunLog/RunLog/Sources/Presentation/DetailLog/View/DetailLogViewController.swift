@@ -40,6 +40,7 @@ final class DetailLogViewController: UIViewController {
     
     // MARK: - Lifecycle
     override func loadView() {
+        detailLogView.frame = UIScreen.main.bounds
         self.view = detailLogView
     }
     

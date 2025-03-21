@@ -227,7 +227,7 @@ final class DetailLogView: UIView {
         
         contentView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
-            make.width.equalToSuperview()
+            make.width.equalTo(self.safeAreaLayoutGuide.snp.width)
         }
         
         mapView.snp.makeConstraints { make in
