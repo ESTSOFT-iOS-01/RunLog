@@ -101,7 +101,7 @@ final class DetailLogView: UIView {
     
     /// 구분선
     private let separatorView = UIView().then {
-        $0.backgroundColor = .Gray000  // 원하는 색상
+        $0.backgroundColor = .Gray300  // 원하는 색상
     }
     
     private let timeTitleLabel = RLLabel(
@@ -286,7 +286,7 @@ final class DetailLogView: UIView {
         // “기록 상세” 테이블뷰
         recordDetailView.snp.makeConstraints { make in
             make.top.equalTo(recordTitleLabel.snp.bottom).offset(16)
-            make.leading.trailing.equalToSuperview().inset(24)
+            make.leading.trailing.equalToSuperview().inset(16)
             make.bottom.equalToSuperview().offset(-20)
         }
     }

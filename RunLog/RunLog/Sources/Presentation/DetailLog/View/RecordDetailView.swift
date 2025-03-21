@@ -53,6 +53,8 @@ final class RecordDetailView: UIView {
             make.edges.equalToSuperview()
             make.height.equalTo(300) // 초기 높이 (나중에 KVO로 업데이트됨)
         }
+        tableView.separatorInset = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 8)
+
     }
     
     // MARK: - Configure

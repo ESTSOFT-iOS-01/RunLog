@@ -356,7 +356,7 @@ extension DetailLogViewController: MKMapViewDelegate {
 
 
 
-// MARK: 더미데이터
+// MARK: - 더미데이터
 // 더 세분화한 더미 데이터 (예시)
 let dummyDayLog = DayLog(
     date: Calendar.current.date(from: DateComponents(year: 2025, month: 3, day: 17)) ?? Date(),
@@ -532,7 +532,39 @@ let dummyDayLog = DayLog(
                 Point(latitude: 37.54715, longitude: 127.0803, timestamp: Date().addingTimeInterval(660)),
                 Point(latitude: 37.5470, longitude: 127.0800, timestamp: Date().addingTimeInterval(690))
             ]
-        )
+        ),
+        Section(
+                    distance: 0.125,
+                    steps: 100,
+                    route: [
+                        Point(latitude: 37.5600, longitude: 127.0000, timestamp: Date().addingTimeInterval(700)),
+                        Point(latitude: 37.5600, longitude: 127.0010, timestamp: Date().addingTimeInterval(730))
+                    ]
+                ),
+                Section(
+                    distance: 0.125,
+                    steps: 100,
+                    route: [
+                        Point(latitude: 37.5600, longitude: 127.0010, timestamp: Date().addingTimeInterval(730)),
+                        Point(latitude: 37.5610, longitude: 127.0010, timestamp: Date().addingTimeInterval(760))
+                    ]
+                ),
+                Section(
+                    distance: 0.125,
+                    steps: 100,
+                    route: [
+                        Point(latitude: 37.5610, longitude: 127.0010, timestamp: Date().addingTimeInterval(760)),
+                        Point(latitude: 37.5610, longitude: 127.0000, timestamp: Date().addingTimeInterval(790))
+                    ]
+                ),
+                Section(
+                    distance: 0.125,
+                    steps: 100,
+                    route: [
+                        Point(latitude: 37.5610, longitude: 127.0000, timestamp: Date().addingTimeInterval(790)),
+                        Point(latitude: 37.5600, longitude: 127.0000, timestamp: Date().addingTimeInterval(820))
+                    ]
+                )
     ]
 )
 

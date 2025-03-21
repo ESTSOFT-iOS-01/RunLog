@@ -30,9 +30,9 @@ final class MovingTrackSheetViewController: UIViewController {
     /// 카메라 이동을 위한 타이머
     private var cameraTimer: Timer?
     
-    // 진행 경로 오버레이 (전체 경로 오버레이와는 별도로, 현재 진행된 섹션만 표시)
-    private var progressOverlay: MKPolyline?
-    
+    /// 진행 경로를 누적하는 배열 (현재 섹션 내)
+      private var accumulatedProgressCoordinates: [CLLocationCoordinate2D] = []
+      
     // MARK: - Init
     init(viewModel: MovingTrackSheetViewModel) {
         self.viewModel = viewModel
@@ -122,9 +122,7 @@ final class MovingTrackSheetViewController: UIViewController {
         mapView.delegate = self
     }
     
-    // MARK: - 섹션별 경로 관련 메서드
-        
-        /// 각 섹션의 route를 그대로 sectionsCoordinates에 저장
+    /// 각 섹션의 route를 그대로 sectionsCoordinates에 저장
         private func prepareSectionsCoordinates() {
             // 여기서는 dummyDayLog를 사용. 실제로는 viewModel.dayLog.sections를 활용.
             sectionsCoordinates = dummyDayLog.sections.map { section in
@@ -160,8 +158,13 @@ final class MovingTrackSheetViewController: UIViewController {
             cameraTimer = nil
             currentCoordIndexInSection = 0
             
-            // 초기 카메라 설정: 현재 섹션 첫 좌표, 현재 카메라 heading 유지
-            setCameraToCoordinate(sectionCoords[0], heading: sheetView.mapView.camera.heading)
+            // 누적 좌표 배열 초기화 및 첫 좌표 추가
+            accumulatedProgressCoordinates = []
+            if let firstCoord = sectionCoords.first {
+                accumulatedProgressCoordinates.append(firstCoord)
+                // 초기 카메라 설정: 현재 섹션 첫 좌표, 현재 카메라 heading 유지
+                setCameraToCoordinate(firstCoord, heading: sheetView.mapView.camera.heading)
+            }
             
             cameraTimer = Timer.scheduledTimer(timeInterval: 0.2,
                                                target: self,
@@ -170,7 +173,7 @@ final class MovingTrackSheetViewController: UIViewController {
                                                repeats: true)
         }
         
-        /// 섹션 내에서 카메라를 업데이트
+        /// 섹션 내에서 카메라를 업데이트하고 진행 구간을 개별 세그먼트로 추가
         @objc private func updateCameraForSection() {
             let sectionCoords = sectionsCoordinates[currentSectionIndex]
             guard currentCoordIndexInSection < sectionCoords.count - 1 else {
@@ -184,15 +187,23 @@ final class MovingTrackSheetViewController: UIViewController {
             
             // 경로 진행 방향에 따른 heading 계산
             let rawHeading = calculateHeading(from: currentCoord, to: nextCoord)
-            // (필요 시 오프셋 적용: 예, 뒤에서 보는 시점이면 +180)
             let targetHeading = rawHeading.truncatingRemainder(dividingBy: 360)
             
             UIView.animate(withDuration: 0.2) {
                 self.setCameraToCoordinate(nextCoord, heading: targetHeading)
             }
-            currentCoordIndexInSection += 1
             
-            updateProgressOverlayForCurrentSection()
+            // 누적 좌표 배열에 새로운 좌표 추가
+            accumulatedProgressCoordinates.append(nextCoord)
+            // 바로 직전 좌표와 연결하는 세그먼트 오버레이 추가 (기존 오버레이는 제거하지 않음)
+            if accumulatedProgressCoordinates.count >= 2 {
+                let lastTwoCoords = Array(accumulatedProgressCoordinates.suffix(2))
+                let segmentPolyline = MKPolyline(coordinates: lastTwoCoords, count: lastTwoCoords.count)
+                segmentPolyline.title = "진행 경로"
+                sheetView.addMapOverlay(segmentPolyline)
+            }
+            
+            currentCoordIndexInSection += 1
         }
         
         /// 현재 섹션이 끝났다면 다음 섹션으로 전환 (있을 경우)
@@ -200,13 +211,14 @@ final class MovingTrackSheetViewController: UIViewController {
             if currentSectionIndex < sectionsCoordinates.count - 1 {
                 currentSectionIndex += 1
                 currentCoordIndexInSection = 0
-                // 카메라를 다음 섹션의 첫 좌표로 바로 전환
+                
+                // 새로운 섹션으로 넘어갈 때 누적 좌표 배열 초기화
+                accumulatedProgressCoordinates = []
                 let nextSectionCoords = sectionsCoordinates[currentSectionIndex]
                 if let firstCoord = nextSectionCoords.first {
+                    accumulatedProgressCoordinates.append(firstCoord)
                     setCameraToCoordinate(firstCoord, heading: sheetView.mapView.camera.heading)
                 }
-                // 새로운 섹션의 진행 오버레이는 초기화 (필요 시)
-                updateProgressOverlayForCurrentSection(reset: true)
             } else {
                 // 모든 섹션 완료 시 타이머 종료
                 cameraTimer?.invalidate()
@@ -239,31 +251,6 @@ final class MovingTrackSheetViewController: UIViewController {
             if degrees < 0 { degrees += 360 }
             return degrees
         }
-        
-        /// 진행 경로 오버레이 업데이트 (현재 섹션만 표시)
-        private func updateProgressOverlayForCurrentSection(reset: Bool = false) {
-            let mapView = sheetView.mapView
-            
-            // 기존 진행 오버레이 제거
-            if let progressOverlay = progressOverlay {
-                mapView.removeOverlay(progressOverlay)
-            }
-            
-            // 만약 reset이면 현재 섹션의 진행 경로 초기화
-            let sectionCoords = sectionsCoordinates[currentSectionIndex]
-            let progressCoords: [CLLocationCoordinate2D]
-            if reset {
-                progressCoords = []
-            } else {
-                progressCoords = Array(sectionCoords.prefix(currentCoordIndexInSection + 1))
-            }
-            
-            guard progressCoords.count >= 2 else { return }
-            let overlay = MKPolyline(coordinates: progressCoords, count: progressCoords.count)
-            overlay.title = "진행 경로"
-            progressOverlay = overlay
-            sheetView.addMapOverlay(overlay)
-        }
     }
 
     // MARK: - MKMapViewDelegate
@@ -281,3 +268,4 @@ final class MovingTrackSheetViewController: UIViewController {
             return renderer
         }
     }
+
