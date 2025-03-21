@@ -11,6 +11,7 @@
 		16F688C52D82972900C2163F /* Then in Frameworks */ = {isa = PBXBuildFile; productRef = 16F688C42D82972900C2163F /* Then */; };
 		16F688C82D82974E00C2163F /* CombineMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 16F688C72D82974E00C2163F /* CombineMoya */; };
 		16F688CA2D82974E00C2163F /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = 16F688C92D82974E00C2163F /* Moya */; };
+		5EB036452D8A57120030DA8F /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 5EB036442D8A57120030DA8F /* Secrets.xcconfig */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -26,6 +27,7 @@
 /* Begin PBXFileReference section */
 		16811EF62D8A9E520013461D /* RpTest.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RpTest.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		16F686B72D827D6C00C2163F /* RunLog.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RunLog.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5EB036442D8A57120030DA8F /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -85,6 +87,7 @@
 		16F686AE2D827D6C00C2163F = {
 			isa = PBXGroup;
 			children = (
+				5EB036442D8A57120030DA8F /* Secrets.xcconfig */,
 				16F686B92D827D6C00C2163F /* RunLog */,
 				16811EF72D8A9E520013461D /* RpTest */,
 				16F686B82D827D6C00C2163F /* Products */,
@@ -213,6 +216,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		16F686B52D827D6C00C2163F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5EB036452D8A57120030DA8F /* Secrets.xcconfig in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -281,6 +292,7 @@
 		};
 		16F686CB2D827D6F00C2163F /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5EB036442D8A57120030DA8F /* Secrets.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -292,6 +304,7 @@
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "운동 거리 기록 및 시각화 정보 제공을 위한 위치 권한을 항상 혹은 앱 활성 시에만 허용하시겠습니까?";
 				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "운동 거리 기록 및 시각화 정보 제공을 위한 위치 권한을 항상 허용하시겠습니까?";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "운동 거리 기록 및 시각화 정보 제공을 위한 위치 권한을 앱 활성 시에만 허용하시겠습니까?";
+				INFOPLIST_KEY_NSMotionUsageDescription = "이 앱은 걸음 수를 측정하여 운동 데이터를 제공합니다.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -317,6 +330,7 @@
 		};
 		16F686CC2D827D6F00C2163F /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5EB036442D8A57120030DA8F /* Secrets.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -328,6 +342,7 @@
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "운동 거리 기록 및 시각화 정보 제공을 위한 위치 권한을 항상 혹은 앱 활성 시에만 허용하시겠습니까?";
 				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "운동 거리 기록 및 시각화 정보 제공을 위한 위치 권한을 항상 허용하시겠습니까?";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "운동 거리 기록 및 시각화 정보 제공을 위한 위치 권한을 앱 활성 시에만 허용하시겠습니까?";
+				INFOPLIST_KEY_NSMotionUsageDescription = "이 앱은 걸음 수를 측정하여 운동 데이터를 제공합니다.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";

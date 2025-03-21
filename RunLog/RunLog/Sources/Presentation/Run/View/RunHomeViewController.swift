@@ -18,29 +18,30 @@ final class RunHomeViewController: UIViewController {
     private var cancellables = Set<AnyCancellable>()
     
     // MARK: - UI
-    lazy var mapView = MKMapView().then {
+    private lazy var mapView = MKMapView().then {
         $0.showsUserLocation = true
     }
-    var totalLabel = UILabel().then {
+    private var totalLabel = UILabel().then {
         $0.numberOfLines = 3
     }
-    var weatherLabel = RLLabel().then {
+    private var weatherLabel = RLLabel().then {
         $0.setImage(image: UIImage(systemName: RLIcon.weather.name))
     }
-    var blurView = MapBlurView()
-    var locationLabel = UILabel()
-    var startButton = RLButton(title: "운동 시작하기", titleColor: .Gray900).then {
+    private var blurView = MapBlurView()
+    private var locationLabel = UILabel()
+    private var startButton = RLButton(
+        title: "운동 시작하기",
+        titleColor: .Gray900
+    ).then {
         $0.clipsToBounds = true
     }
     // MARK: - Init
     init() {
         super.init(nibName: nil, bundle: nil)
     }
-
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -51,18 +52,15 @@ final class RunHomeViewController: UIViewController {
         setupData()
         bindViewModel()
     }
-    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationController?.setNavigationBarHidden(false, animated: animated)
         self.mapView.centerToLocation(LocationManager.shared.currentLocation)
     }
-    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         self.navigationController?.setNavigationBarHidden(true, animated: false)
     }
-    
     // MARK: - Setup UI
     private func setupUI() {
         // UI 요소 추가
@@ -94,7 +92,6 @@ final class RunHomeViewController: UIViewController {
             $0.centerX.equalToSuperview()
         }
     }
-    
     // MARK: - Setup Navigation Bar
     private func setupNavigationBar() {
         // 네비게이션바 디테일 설정
@@ -110,21 +107,21 @@ final class RunHomeViewController: UIViewController {
     private func bindGesture() {
         // 제스처 추가
         startButton.publisher
+            .receive(on: DispatchQueue.main)
             .sink {
-                print("운동 시작하기 버튼 클릭")
+                // +) 코디네이터를 쓰면 해당 부분들이 전부 거기로 넘어갈듯
+                PedometerManager.shared.input.send(.startPedometer)
                 let vc = RunningViewController()
                 vc.modalPresentationStyle = .fullScreen
                 self.present(vc, animated: false)
             }
             .store(in: &cancellables)
     }
-    
     // MARK: - Setup Data
     private func setupData() {
         // 초기 데이터 로드
-        totalLabelCreate()
+        totalLabelCreate(value: ("올레길", "2.5"))
     }
-
     // MARK: - Bind ViewModel
     private func bindViewModel() {
         viewModel.output
@@ -144,11 +141,11 @@ final class RunHomeViewController: UIViewController {
 }
 // MARK: - private functions
 extension RunHomeViewController {
-    private func totalLabelCreate() {
+    private func totalLabelCreate(value: (String, String)) {
         // 여기서 사용자의 데이터를 받아오면 될듯
         let nickname = "행복한 쿼카러너화이팅"
-        let road = "올레길"
-        let number = "2.5"
+        let road = value.0
+        let number = value.1
         let string: String = "\(nickname) 님은\n지금까지 \(road) \(number)회\n거리만큼 걸었습니다!"
         totalLabel.attributedText = string.styledText(
             highlightText: "\(road) \(number)회",
