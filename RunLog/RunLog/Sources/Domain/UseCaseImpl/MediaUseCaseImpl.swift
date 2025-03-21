@@ -6,3 +6,7 @@
 //
 
 import Foundation
+
+final class MediaUseCaseImpl: MediaUseCase {
+    
+}

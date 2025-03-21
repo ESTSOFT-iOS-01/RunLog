@@ -76,8 +76,8 @@ final class DayLogUseCaseImpl: DayLogUseCase {
         var targetDayLog = try await dayLogRepository.readDayLog(date: date)
         
         // 2. section에서 시작, 끝 타임 스템프 가져오기
-        let startTime = section.route[0].timestamp
-        let endTime = section.route[-1].timestamp
+        let startTime = section.route.first?.timestamp ?? Date()
+        let endTime = section.route.last?.timestamp ?? Date()
         
         // 3. timeinterval로 계산
         targetDayLog.totalTime += endTime.timeIntervalSince(startTime)

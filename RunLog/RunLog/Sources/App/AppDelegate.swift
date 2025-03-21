@@ -52,6 +52,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             for: DayLogUseCase.self
         )
         
+        DIContainer.shared.register(
+            MediaUseCaseImpl(),
+            for: MediaUseCase.self
+        )
+        
     }
 }
 
