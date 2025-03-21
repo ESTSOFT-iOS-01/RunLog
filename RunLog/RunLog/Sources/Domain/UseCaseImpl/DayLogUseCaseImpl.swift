@@ -10,9 +10,14 @@ import Foundation
 final class DayLogUseCaseImpl: DayLogUseCase {
     
     private let dayLogRepository: DayLogRepository
+    private let appConfigRepository: AppConfigRepository
     
-    init(dayLogRepository: DayLogRepository) {
+    init(
+        dayLogRepository: DayLogRepository,
+        appConfigRepository: AppConfigRepository
+    ) {
         self.dayLogRepository = dayLogRepository
+        self.appConfigRepository = appConfigRepository
     }
     
     func initializeDayLog(
@@ -23,6 +28,12 @@ final class DayLogUseCaseImpl: DayLogUseCase {
         print("Impl: ", #function)
         
         let today = Date().toYearMonth
+        let yesterday = Calendar.current.date(
+            byAdding: .day,
+            value: -1,
+            to: today
+        )!
+        
         let initialTitle = "\(today.formattedString(.weekDay)) 러닝"
         
         let newDayLog = DayLog(
@@ -40,6 +51,18 @@ final class DayLogUseCaseImpl: DayLogUseCase {
         )
         
         try await dayLogRepository.createDayLog(newDayLog)
+        
+        var appconfig = try await appConfigRepository.readAppConfig()
+        
+        
+        let hasYesterdayDayLog = try await hasYesterdayDayLog()
+        if hasYesterdayDayLog {
+            appconfig.streakDays += 1
+        } else {
+            appconfig.streakDays = 1
+        }
+        
+        try await appConfigRepository.updateAppConfig(appconfig)
     }
 
     func getDayLogByDate(_ date: Date) async throws -> DayLog? {
@@ -65,10 +88,32 @@ final class DayLogUseCaseImpl: DayLogUseCase {
     func addSectionByDate(_ date: Date, section: Section) async throws {
         print("Impl: ", #function)
         
+        // 1. update 할 DayLog 가져오기
         var targetDayLog = try await dayLogRepository.readDayLog(date: date)
+        
+        // 2. section에서 시작, 끝 타임 스템프 가져오기
+        let startTime = section.route.first?.timestamp ?? Date()
+        let endTime = section.route.last?.timestamp ?? Date()
+        
+        // 3. timeinterval로 계산
+        targetDayLog.totalTime += endTime.timeIntervalSince(startTime)
+        
+        // 4. 총 걸음수, 총 거리, 섹션 추가
+        targetDayLog.totalSteps += section.steps
+        targetDayLog.totalDistance += section.distance
         targetDayLog.sections.append(section)
         
+        // 5. 업데이트
         try await dayLogRepository.updateDayLog(targetDayLog)
+        
+        // 6. 업데이트할 appconfig 가져오기
+        var appconfig = try await appConfigRepository.readAppConfig()
+        
+        // 7. 총 거리수 추가
+        appconfig.totalDistance += section.distance
+        
+        // 8. appconfig 업데이트
+        try await appConfigRepository.updateAppConfig(appconfig)
     }
 
     func getTitleByDate(_ date: Date) async throws -> String {
@@ -101,5 +146,46 @@ final class DayLogUseCaseImpl: DayLogUseCase {
         targetDayLog.level = level
         
         try await dayLogRepository.updateDayLog(targetDayLog)
+    }
+    
+    func updateStreakIfNeeded() async throws {
+        let today = Date().toYearMonth
+        
+        // case: 오늘 운동을 했는지 안했는지 모르겟는데 마이페이지로 들어온 상황
+        // streak = 6
+        // 오늘 운동했니?
+        do {
+            // yes -> 업데이트 X
+            let todayDayLog = try await dayLogRepository.readDayLog(date: today)
+        } catch CoreDataError.modelNotFound {
+            // no -> 어제 운동했니?
+            let hasYesterdayDayLog = try await hasYesterdayDayLog()
+            //      yes -> 업데이트 X
+            //      no -> streak 0으로 초기화
+            if !hasYesterdayDayLog {
+                var appconfig = try await appConfigRepository.readAppConfig()
+                appconfig.streakDays = 0
+                try await appConfigRepository.updateAppConfig(appconfig)
+            }
+        }
+        
+    }
+}
+
+
+extension DayLogUseCaseImpl {
+    private func hasYesterdayDayLog() async throws -> Bool {
+        let yesterday = Calendar.current.date(
+            byAdding: .day,
+            value: -1,
+            to: Date().toYearMonth
+        )!
+        
+        do {
+            let yesterdayLogDay = try await dayLogRepository.readDayLog(date: yesterday)
+            return true
+        } catch CoreDataError.modelNotFound {
+            return false
+        }
     }
 }

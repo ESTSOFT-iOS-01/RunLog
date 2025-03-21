@@ -60,6 +60,8 @@ protocol DayLogUseCase {
     ///   - date: 수정할 날짜
     ///   - level: 새로 수정할 난이도 값
     func updateLevelByDate(_ date: Date, level: Int) async throws
+    
+    func updateStreakIfNeeded() async throws
 }
 
 
