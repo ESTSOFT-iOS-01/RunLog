@@ -13,25 +13,37 @@ import Combine
 final class ChangeCalUnitViewController: UIViewController {
     
     // MARK: - Properties
-    private let viewModel = CalUnitViewModel()
+    private let viewModel: CalUnitViewModel!
     private var cancellables = Set<AnyCancellable>()
     
     // MARK: - UI
     private lazy var calUnitView = CalUnitView()
+    
+    // MARK: - Init
+    init(viewModel: CalUnitViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
         setupNavigationBar()
-        setupTextField()
         setupGesture()
-        setupData()
+        setupTextField()
+        
+        viewModel.bind()
         bindViewModel()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        setupData()
         self.navigationController?.setNavigationBarHidden(false, animated: animated)
     }
     
@@ -51,7 +63,6 @@ final class ChangeCalUnitViewController: UIViewController {
             $0.top.equalToSuperview().offset(130)
             $0.bottom.equalToSuperview()
         }
-        
     }
     
     // MARK: - Setup Navigation Bar
@@ -68,7 +79,6 @@ final class ChangeCalUnitViewController: UIViewController {
             .store(in: &cancellables)
     }
     
-
     // MARK: - Setup Gesture
     private func setupGesture() {
         // 제스처 추가
@@ -81,23 +91,28 @@ final class ChangeCalUnitViewController: UIViewController {
     
     // MARK: - Setup Data
     private func setupData() {
-        if viewModel.unit != 0 {
-            calUnitView.unitField.setTextWithUnderline(String(viewModel.unit))
-        }
-        calUnitView.updateDescriptionText(with: viewModel.unit)
+        viewModel.input.send(.loadData)
     }
 
     // MARK: - Bind ViewModel
     private func bindViewModel() {
         viewModel.bindTextField(calUnitView.unitField.publisher)
         
-        viewModel.output
-            .sink { [weak self] output in
-                switch output {
-                case .saveSuccess:
+        viewModel.output.unitUpdated
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] value in
+                self?.calUnitView.unitField.setTextWithUnderline(value)
+                self?.calUnitView.updateDescriptionText(with: value)
+            }
+            .store(in: &cancellables)
+        
+        viewModel.output.saveSuccess
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] success in
+                if success {
                     self?.navigationController?.popViewController(animated: true)
-                case .unitUpdated(let value):
-                    self?.calUnitView.updateDescriptionText(with: value)
+                } else {
+                    // 저장 실패 시 처리
                 }
             }
             .store(in: &cancellables)
