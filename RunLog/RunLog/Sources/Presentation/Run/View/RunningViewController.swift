@@ -28,8 +28,8 @@ final class RunningViewController: UIViewController {
         $0.showsUserTrackingButton = true
         $0.pitchButtonVisibility = .visible
     }
-    var cardView = CardView()
-    var foldButton = RLButton().then {
+    private var cardView = CardView()
+    private var foldButton = RLButton().then {
         $0.configureTitle(
             title: "닫기",
             titleColor: .Gray000,
@@ -49,7 +49,7 @@ final class RunningViewController: UIViewController {
         )
         $0.configuration = config
     }
-    var unfoldButton = UIButton().then {
+    private var unfoldButton = UIButton().then {
         $0.backgroundColor = .LightGreen
         $0.layer.cornerRadius = 40
         $0.setImage(UIImage(systemName: RLIcon.unfold.name), for: .normal)
@@ -65,7 +65,16 @@ final class RunningViewController: UIViewController {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    // MARK: - Lifecycle
+//    // MARK: - 더미 테스트용: 테스트 끝나면지우기
+//    override func viewDidAppear(_ animated: Bool) {
+//        super.viewDidAppear(animated)
+//        // 2초 후 특정 함수 실행
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+////            DummyLocation.distanceCheck()
+////            DummyLocation.lineCheck()
+//        }
+//    }
+    // MARK: - Life Cycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
@@ -121,6 +130,7 @@ final class RunningViewController: UIViewController {
                 // 걸음 측정 종료
                 pedometerManager.input.send(.stopPedometer)
                 viewModel.input.send(.runningStop)
+                // +) 세이브 구현 시 saveLog는 지움 -> ViewModel에서 데이터 저장
                 DispatchQueue.main.async {// 현재 단순 확인 용
                     self.saveLog() // 결과 확인용 alert띄움
                 }
@@ -150,7 +160,7 @@ final class RunningViewController: UIViewController {
         let currentLocation = locationManager.currentLocation
         mapView.setUserTrackingMode(.follow, animated: true)
         mapView.centerToLocation(currentLocation)
-        // 뷰가 로드되면 운동이 시작된 상태
+        
         viewModel.input.send(.runningStart)
     }
     // MARK: - Bind ViewModel
@@ -187,11 +197,10 @@ extension RunningViewController: MKMapViewDelegate {
     // MARK: - 맵뷰 딜리게이트 함수들
     func mapView(_ mapView: MKMapView, didChange mode: MKUserTrackingMode, animated: Bool) {
         guard let userLocation = mapView.userLocation.location else { return }
-//        if mode == .none {
-//            
-//        }
-        // 지도의 위치로 변경
-        mapView.centerToLocation(userLocation, region: self.mapView.region)
+        if mode == .none {
+            // 지도의 위치로 변경
+            mapView.centerToLocation(userLocation, region: self.mapView.region)
+        }
     }
     func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
         guard let polyLine = overlay as? MKPolyline
@@ -206,7 +215,10 @@ extension RunningViewController: MKMapViewDelegate {
         
         return renderer
     }
-    //종료 시 내용 확용 alert를 띄움
+}
+// MARK: - 외부에서 테스트 할때는 log 확인을 못하니 alert로 띄워서 확인
+// 데이터 저장 부분이 다 되면 지워도 됨
+extension RunningViewController {
     private func saveLog() {
         guard let startTime = viewModel.section.route.first?.timestamp,
               let endTime = viewModel.section.route.last?.timestamp
@@ -216,14 +228,14 @@ extension RunningViewController: MKMapViewDelegate {
         }
         let totalTime = endTime.timeIntervalSince(startTime)
         let message: String =
-        """
-        ⏹ 운동 종료 ⏹
-        시작 시간: \(startTime.formattedString(.fullTime))초
-        종료 시간: \(endTime.formattedString(.fullTime))초
-        총 운동 시간: \(totalTime)초
-        최종 경로 핀 수: \(viewModel.section.route.count)
-        최종 걸음 수: \(viewModel.section.steps)
-        """
+            """
+            ⏹ 운동 종료 ⏹
+            시작 시간: \(startTime.formattedString(.fullTime))초
+            종료 시간: \(endTime.formattedString(.fullTime))초
+            총 운동 시간: \(totalTime)초
+            최종 경로 핀 수: \(viewModel.section.route.count)
+            최종 걸음 수: \(viewModel.section.steps)
+            """
         let alert = UIAlertController(
             title: nil,
             message: message,
