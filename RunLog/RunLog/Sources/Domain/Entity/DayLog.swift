@@ -7,11 +7,11 @@
 
 import Foundation
 
-struct DayLog {
+struct DayLog: Equatable {
     let date: Date
     let locationName: String
     let weather: Int
-    let temperature: Int
+    let temperature: Double
     
     var trackImage: Data
     var title: String
