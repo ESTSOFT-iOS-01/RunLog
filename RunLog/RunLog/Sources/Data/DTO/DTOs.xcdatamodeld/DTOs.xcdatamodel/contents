@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23605" systemVersion="24D60" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithSwiftData="YES" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23231" systemVersion="24A348" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithSwiftData="YES" userDefinedModelVersionIdentifier="">
     <entity name="AppConfigDTO" representedClassName="AppConfigDTO" syncable="YES" codeGenerationType="class">
         <attribute name="nickname" attributeType="String" defaultValueString="RunLogger"/>
         <attribute name="streakDays" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
@@ -11,7 +11,7 @@
         <attribute name="date" attributeType="Date" defaultDateTimeInterval="763978080" usesScalarValueType="NO"/>
         <attribute name="level" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="locationName" attributeType="String"/>
-        <attribute name="temperature" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="temperature" attributeType="Double" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="title" attributeType="String"/>
         <attribute name="totalDistance" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="totalSteps" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>

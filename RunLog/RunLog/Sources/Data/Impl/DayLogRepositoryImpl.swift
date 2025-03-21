@@ -1,10 +1,10 @@
-////
-////  DayLogRepositoryImpl.swift
-////  RunLog
-////
-////  Created by 신승재 on 3/18/25.
-////
 //
+//  DayLogRepositoryImpl.swift
+//  RunLog
+//
+//  Created by 신승재 on 3/18/25.
+//
+
 
 import Foundation
 import CoreData
@@ -22,7 +22,7 @@ final class DayLogRepositoryImpl: DayLogRepository {
         
         try await context.perform {
             let data = DataMapper.toDTO(dayLog, context: self.context)
-            //self.context.insert(data)
+            self.context.insert(data)
             try self.context.save()
         }
     }

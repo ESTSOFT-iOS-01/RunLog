@@ -50,6 +50,7 @@ final class MovingTrackSheetView: UIView {
         super.init(frame: frame)
         setupUI()
         setupLayout()
+        configure(with: dummyDisplayLog.date)
     }
     
     required init?(coder: NSCoder) {
@@ -70,7 +71,7 @@ final class MovingTrackSheetView: UIView {
         // 상단 날짜 라벨
         dateLabel.snp.makeConstraints { make in
             make.top.equalTo(safeAreaLayoutGuide).offset(48)
-                make.centerX.equalToSuperview()
+            make.centerX.equalToSuperview()
         }
         
         // 닫기 버튼
@@ -107,18 +108,11 @@ final class MovingTrackSheetView: UIView {
     }
 }
 
-//#if canImport(SwiftUI) && DEBUG
-//import SwiftUI
-//
-//struct MypageProfileView_Preview: PreviewProvider {
-//    static var previews: some View {
-//        UIViewPreview {
-//            MovingTrackSheetView()
-//        }
-//        .previewLayout(.sizeThatFits) // 크기를 적절하게 조절하여 미리보기 가능
-//        .padding()
-//    }
-//}
-//
-//
-//#endif
+extension MovingTrackSheetView {
+    /// 날짜를 받아서 dateLabel에 반영
+    func configure(with date: Date) {
+        let dateString = date.formattedString(.detailedFull)
+        dateLabel.label.text = dateString
+    }
+}
+
