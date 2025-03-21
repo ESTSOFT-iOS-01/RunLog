@@ -41,16 +41,6 @@ final class CalendarViewController: UIViewController {
         bindViewModel()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        self.navigationController?.setNavigationBarHidden(false, animated: animated)
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        self.navigationController?.setNavigationBarHidden(true, animated: false)
-    }
-    
     
     // MARK: - Setup UI
     private func setupUI() {
@@ -210,5 +200,27 @@ extension CalendarViewController: UICollectionViewDelegate, UICollectionViewData
         let dayInfo = currentMonthDays[indexPath.row]
         cell.configure(day: dayInfo.day, heartBeatCount: dayInfo.heartBeatCount)
         return cell
+    }
+    
+    func collectionView(
+        _ collectionView: UICollectionView,
+        didSelectItemAt indexPath: IndexPath
+    ) {
+        guard currentMonthDays[indexPath.row].heartBeatCount >= 0 else { return }
+
+        let key = viewModel.output.sortedKeys.value[currentKeyIndex]
+        let calendar = Calendar.current
+
+        // 1. key에서 year, month 꺼내기
+        let components = calendar.dateComponents([.year, .month], from: key)
+
+        // 2. day 붙이기
+        var finalComponents = components
+        finalComponents.day = currentMonthDays[indexPath.row].day
+
+        // 3. 최종 Date 만들기
+        if let date = calendar.date(from: finalComponents) {
+            viewModel.send(.cellTapped(date: date))
+        }
     }
 }

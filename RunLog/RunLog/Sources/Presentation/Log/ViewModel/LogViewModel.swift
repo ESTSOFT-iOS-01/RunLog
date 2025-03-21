@@ -13,6 +13,7 @@ final class LogViewModel {
     // MARK: - 사용자의 Input 정의
     enum Input {
         case viewWillAppear
+        case cellTapped(date: Date)
     }
     
     
@@ -21,6 +22,7 @@ final class LogViewModel {
         let groupedDayLogs = CurrentValueSubject<[Date: [DayLog]], Never>([:])
         let sortedKeys = CurrentValueSubject<[Date], Never>([])
         let distanceUnit = CurrentValueSubject<Double, Never>(0.0)
+        let navigationEvent = PassthroughSubject<Date, Never>()
     }
     
     private(set) var output: Output = .init()
@@ -42,6 +44,8 @@ final class LogViewModel {
                 switch event {
                 case .viewWillAppear:
                     self?.loadDatas()
+                case .cellTapped(let date):
+                    self?.output.navigationEvent.send(date)
                 }
             }
             .store(in: &cancellables)
