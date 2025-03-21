@@ -16,11 +16,9 @@ final class MyPageViewModel {
         case menuItemSelected(Int)
     }
     
-    enum Output {
-        case profileDataUpdated(UserInfoVO) // 유저 데이터 전달
-        case navigateToViewController(UIViewController)
-        case settingMenuCount(Int) // 메뉴 아이템 개수
-        case settingMenuItem(SettingMenuType) // 메뉴 아이템
+    struct Output {
+        let profileDataUpdated = CurrentValueSubject<UserInfoVO, Never>(UserInfoVO(nickname: "RunLogger", totalDistance: 0.0, streakCount: 0, logCount: 0))
+        let navigateToViewController = CurrentValueSubject<UIViewController?, Never>(nil)
     }
     
     private let appConfigUseCase : AppConfigUsecaseImpl
@@ -28,10 +26,9 @@ final class MyPageViewModel {
     
     private var cancellables = Set<AnyCancellable>()
     private let inputSubject = PassthroughSubject<Input, Never>()
-    private let outputSubject = PassthroughSubject<Output, Never>()
     
     var input: PassthroughSubject<Input, Never> { inputSubject }
-    var output: AnyPublisher<Output, Never> { outputSubject.eraseToAnyPublisher() }
+    private(set) var output: Output = Output()
 
     // MARK: - Init
     init(appConfigUseCase: AppConfigUsecaseImpl) {
@@ -40,24 +37,16 @@ final class MyPageViewModel {
     
     func bind() {
         inputSubject
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] event in
                 switch event {
                 case .loadData:
                     self?.fetchProfileData()
-                    self?.outputSubject.send(.settingMenuCount(self?.menuItems.count ?? 0))
                 case .menuItemSelected(let index):
                     self?.handleMenuSelection(index)
                 }
             }
             .store(in: &cancellables)
-    }
-    
-    func numberOfMenuItems() -> Int {
-        return menuItems.count
-    }
-
-    func menuItem(at index: Int) -> SettingMenuType {
-        return menuItems[index]
     }
     
     // MARK: - private Functions
@@ -70,7 +59,7 @@ final class MyPageViewModel {
                 userInfo.totalDistance = try await appConfigUseCase.getTotalDistance()
                 (userInfo.streakCount, userInfo.logCount) = try await appConfigUseCase.getUserIndicators()
                 
-                outputSubject.send(.profileDataUpdated(userInfo))
+                output.profileDataUpdated.send(userInfo)
             } catch {
                 print("usecase error : \(error)")
             }
@@ -81,7 +70,7 @@ final class MyPageViewModel {
         let selectedItem = menuItems[index]
         
         let viewController = createViewController(for: selectedItem)
-        outputSubject.send(.navigateToViewController(viewController))
+        output.navigateToViewController.send(viewController)
     }
     
     private func createViewController(for selectedItem: SettingMenuType) -> UIViewController {

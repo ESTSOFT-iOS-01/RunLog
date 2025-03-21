@@ -78,14 +78,18 @@ final class MyPageViewController: UIViewController {
 
     // MARK: - Bind ViewModel
     private func bindViewModel() {
-        viewModel.output
+        viewModel.output.profileDataUpdated
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] output in
-                switch output {
-                case .profileDataUpdated(let config):
-                    self?.mypageView.configure(with: config)
-                case .navigateToViewController(let viewController):
-                    self?.navigationController?.pushViewController(viewController, animated: true)
+            .sink { [weak self] config in
+                self?.mypageView.configure(with: config)
+            }
+            .store(in: &cancellables)
+        
+        viewModel.output.navigateToViewController
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] viewController in
+                if let vc = viewController {
+                    self?.navigationController?.pushViewController(vc, animated: true)
                 }
             }
             .store(in: &cancellables)
@@ -103,7 +107,9 @@ extension MyPageViewController: UITableViewDelegate {
         
         header.textLabel?.frame.origin.x = 4
         header.textLabel?.textAlignment = .left
-        header.textLabel?.attributedText = .RLAttributedString(text: header.textLabel?.text ?? "설정", font: .Label1, color: .Gray100)
+        header.textLabel?.attributedText = .RLAttributedString(text: header.textLabel?.text ?? "설정",
+                                                               font: .Label1,
+                                                               color: .Gray100)
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -114,7 +120,7 @@ extension MyPageViewController: UITableViewDelegate {
 
 extension MyPageViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.numberOfMenuItems()
+        return SettingMenuType.allCases.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -122,8 +128,7 @@ extension MyPageViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         
-        let menuType = viewModel.menuItem(at: indexPath.row)
-        cell.configure(title: menuType.title)
+        cell.configure(title: SettingMenuType.allCases[indexPath.row].title)
         return cell
     }
     
