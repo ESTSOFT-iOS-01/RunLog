@@ -34,7 +34,7 @@ final class MovingTrackSheetView: UIView {
         $0.tintColor = .white
     }
     
-    private let mapView = MKMapView().then {
+    let mapView = MKMapView().then {
         // 추가 delegate 설정 및 커스터마이징 가능
         $0.layer.cornerRadius = 16
         $0.clipsToBounds = true
@@ -116,3 +116,14 @@ extension MovingTrackSheetView {
     }
 }
 
+extension MovingTrackSheetView {
+    // 메서드: MapOverlay 추가
+    func addMapOverlay(_ overlay: MKOverlay) {
+        mapView.addOverlay(overlay)
+    }
+    
+    // 메서드: 맵 영역 설정
+    func setMapRegion(_ region: MKCoordinateRegion, animated: Bool) {
+        mapView.setRegion(region, animated: animated)
+    }
+}

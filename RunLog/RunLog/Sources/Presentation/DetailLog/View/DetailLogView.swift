@@ -179,9 +179,9 @@ final class DetailLogView: UIView {
     private lazy var statsStack: UIStackView = {
         let stack = UIStackView(arrangedSubviews: [timeStack, distanceStack, stepsStack])
         stack.axis = .horizontal
-        stack.alignment = .center
-        stack.spacing = 16
-        stack.distribution = .fillEqually
+        stack.alignment = .leading
+        stack.spacing = 0
+        stack.distribution = .fill
         return stack
     }()
     
@@ -265,6 +265,16 @@ final class DetailLogView: UIView {
         statsStack.snp.makeConstraints { make in
             make.top.equalTo(separatorView.snp.bottom).offset(8)
             make.leading.trailing.equalToSuperview().inset(24)
+        }
+        
+        timeStack.snp.makeConstraints { make in
+            make.width.equalTo(statsStack.snp.width).multipliedBy(0.334)
+        }
+        distanceStack.snp.makeConstraints { make in
+            make.width.equalTo(statsStack.snp.width).multipliedBy(0.333)
+        }
+        stepsStack.snp.makeConstraints { make in
+            make.width.equalTo(statsStack.snp.width).multipliedBy(0.333)
         }
         
         // 기록상세

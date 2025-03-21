@@ -356,6 +356,7 @@ extension DetailLogViewController: MKMapViewDelegate {
 
 
 // MARK: 더미데이터
+// 더 세분화한 더미 데이터 (예시)
 let dummyDayLog = DayLog(
     date: Calendar.current.date(from: DateComponents(year: 2025, month: 3, day: 17)) ?? Date(),
     locationName: "광진구",
@@ -368,91 +369,172 @@ let dummyDayLog = DayLog(
     totalDistance: 5.0,     // 5km
     totalSteps: 7000,
     sections: [
-        // --- 나가는 구간 5개 ---
+        // 나가는 구간 (각 구간을 2개로 세분화)
         Section(
-            distance: 0.5,
-            steps: 300,
+            distance: 0.25,
+            steps: 150,
             route: [
                 Point(latitude: 37.5470, longitude: 127.0800, timestamp: Date()),
+                Point(latitude: 37.54715, longitude: 127.0802, timestamp: Date().addingTimeInterval(30))
+            ]
+        ),
+        Section(
+            distance: 0.25,
+            steps: 150,
+            route: [
+                Point(latitude: 37.54715, longitude: 127.0802, timestamp: Date().addingTimeInterval(30)),
                 Point(latitude: 37.5473, longitude: 127.0804, timestamp: Date().addingTimeInterval(60))
             ]
         ),
         Section(
-            distance: 0.5,
-            steps: 310,
+            distance: 0.25,
+            steps: 155,
             route: [
                 Point(latitude: 37.5473, longitude: 127.0804, timestamp: Date().addingTimeInterval(70)),
+                Point(latitude: 37.5474, longitude: 127.0807, timestamp: Date().addingTimeInterval(100))
+            ]
+        ),
+        Section(
+            distance: 0.25,
+            steps: 155,
+            route: [
+                Point(latitude: 37.5474, longitude: 127.0807, timestamp: Date().addingTimeInterval(100)),
                 Point(latitude: 37.5475, longitude: 127.0810, timestamp: Date().addingTimeInterval(130))
             ]
         ),
         Section(
-            distance: 0.5,
-            steps: 320,
+            distance: 0.25,
+            steps: 160,
             route: [
                 Point(latitude: 37.5475, longitude: 127.0810, timestamp: Date().addingTimeInterval(140)),
+                Point(latitude: 37.54775, longitude: 127.08125, timestamp: Date().addingTimeInterval(170))
+            ]
+        ),
+        Section(
+            distance: 0.25,
+            steps: 160,
+            route: [
+                Point(latitude: 37.54775, longitude: 127.08125, timestamp: Date().addingTimeInterval(170)),
                 Point(latitude: 37.5480, longitude: 127.0815, timestamp: Date().addingTimeInterval(200))
             ]
         ),
         Section(
-            distance: 0.5,
-            steps: 330,
+            distance: 0.25,
+            steps: 165,
             route: [
                 Point(latitude: 37.5480, longitude: 127.0815, timestamp: Date().addingTimeInterval(210)),
+                Point(latitude: 37.54815, longitude: 127.08185, timestamp: Date().addingTimeInterval(240))
+            ]
+        ),
+        Section(
+            distance: 0.25,
+            steps: 165,
+            route: [
+                Point(latitude: 37.54815, longitude: 127.08185, timestamp: Date().addingTimeInterval(240)),
                 Point(latitude: 37.5483, longitude: 127.0822, timestamp: Date().addingTimeInterval(270))
             ]
         ),
         Section(
-            distance: 0.5,
-            steps: 340,
+            distance: 0.25,
+            steps: 170,
             route: [
                 Point(latitude: 37.5483, longitude: 127.0822, timestamp: Date().addingTimeInterval(280)),
+                Point(latitude: 37.54845, longitude: 127.08245, timestamp: Date().addingTimeInterval(310))
+            ]
+        ),
+        Section(
+            distance: 0.25,
+            steps: 170,
+            route: [
+                Point(latitude: 37.54845, longitude: 127.08245, timestamp: Date().addingTimeInterval(310)),
                 Point(latitude: 37.5486, longitude: 127.0827, timestamp: Date().addingTimeInterval(340))
             ]
         ),
         
-        // --- 돌아오는 구간 5개 ---
+        // 돌아오는 구간 (각 구간을 2개로 세분화)
         Section(
-            distance: 0.5,
-            steps: 350,
+            distance: 0.25,
+            steps: 175,
             route: [
                 Point(latitude: 37.5486, longitude: 127.0827, timestamp: Date().addingTimeInterval(350)),
+                Point(latitude: 37.54845, longitude: 127.0825, timestamp: Date().addingTimeInterval(380))
+            ]
+        ),
+        Section(
+            distance: 0.25,
+            steps: 175,
+            route: [
+                Point(latitude: 37.54845, longitude: 127.0825, timestamp: Date().addingTimeInterval(380)),
                 Point(latitude: 37.5483, longitude: 127.0820, timestamp: Date().addingTimeInterval(410))
             ]
         ),
         Section(
-            distance: 0.5,
-            steps: 360,
+            distance: 0.25,
+            steps: 180,
             route: [
                 Point(latitude: 37.5483, longitude: 127.0820, timestamp: Date().addingTimeInterval(420)),
+                Point(latitude: 37.54815, longitude: 127.08165, timestamp: Date().addingTimeInterval(450))
+            ]
+        ),
+        Section(
+            distance: 0.25,
+            steps: 180,
+            route: [
+                Point(latitude: 37.54815, longitude: 127.08165, timestamp: Date().addingTimeInterval(450)),
                 Point(latitude: 37.5480, longitude: 127.0813, timestamp: Date().addingTimeInterval(480))
             ]
         ),
         Section(
-            distance: 0.5,
-            steps: 370,
+            distance: 0.25,
+            steps: 185,
             route: [
                 Point(latitude: 37.5480, longitude: 127.0813, timestamp: Date().addingTimeInterval(490)),
+                Point(latitude: 37.5478, longitude: 127.08115, timestamp: Date().addingTimeInterval(520))
+            ]
+        ),
+        Section(
+            distance: 0.25,
+            steps: 185,
+            route: [
+                Point(latitude: 37.5478, longitude: 127.08115, timestamp: Date().addingTimeInterval(520)),
                 Point(latitude: 37.5476, longitude: 127.0810, timestamp: Date().addingTimeInterval(550))
             ]
         ),
         Section(
-            distance: 0.5,
-            steps: 380,
+            distance: 0.25,
+            steps: 190,
             route: [
                 Point(latitude: 37.5476, longitude: 127.0810, timestamp: Date().addingTimeInterval(560)),
+                Point(latitude: 37.54745, longitude: 127.0808, timestamp: Date().addingTimeInterval(590))
+            ]
+        ),
+        Section(
+            distance: 0.25,
+            steps: 190,
+            route: [
+                Point(latitude: 37.54745, longitude: 127.0808, timestamp: Date().addingTimeInterval(590)),
                 Point(latitude: 37.5473, longitude: 127.0806, timestamp: Date().addingTimeInterval(620))
             ]
         ),
         Section(
-            distance: 0.5,
-            steps: 390,
+            distance: 0.25,
+            steps: 195,
             route: [
                 Point(latitude: 37.5473, longitude: 127.0806, timestamp: Date().addingTimeInterval(630)),
+                Point(latitude: 37.54715, longitude: 127.0803, timestamp: Date().addingTimeInterval(660))
+            ]
+        ),
+        Section(
+            distance: 0.25,
+            steps: 195,
+            route: [
+                Point(latitude: 37.54715, longitude: 127.0803, timestamp: Date().addingTimeInterval(660)),
                 Point(latitude: 37.5470, longitude: 127.0800, timestamp: Date().addingTimeInterval(690))
             ]
         )
     ]
 )
+
 
 // dummyDayLog를 기반으로 DisplayDayLog 생성
 let dummyDisplayLog = DisplayDayLog(from: dummyDayLog)

@@ -7,8 +7,24 @@
 
 import UIKit
 import Combine
+import MapKit
 
 final class DetailLogViewModel {
+    
+    // MARK: - Properties
+        let dayLog: DayLog  // 외부에서 주입되는 DayLog 데이터
+        
+        // 전체 경로 좌표를 계산하는 computed property
+        var allCoordinates: [CLLocationCoordinate2D] {
+            var coordinates: [CLLocationCoordinate2D] = []
+            for section in dayLog.sections {
+                for point in section.route {
+                    let coord = CLLocationCoordinate2D(latitude: point.latitude, longitude: point.longitude)
+                    coordinates.append(coord)
+                }
+            }
+            return coordinates
+        }
     
     // MARK: - Input & Output
     enum Input {
@@ -26,9 +42,10 @@ final class DetailLogViewModel {
     private var cancellables = Set<AnyCancellable>()
     
     // MARK: - Init
-    init() {
-        bind()
-    }
+    init(dayLog: DayLog) {
+            self.dayLog = dayLog
+            bind()
+        }
     
     // MARK: - Bind (Input -> Output)
     private func bind() {
