@@ -37,7 +37,6 @@ final class RunningViewModel {
     private let locationManager = LocationManager.shared
     private let pedometerManager = PedometerManager.shared
     private let distanceManager = DistanceManager.shared
-    private var previousLocation: CLLocation?
     private var timer: Timer?
     
     // MARK: - Init
@@ -75,22 +74,25 @@ final class RunningViewModel {
         locationManager.locationPublisher
             .sink { [weak self] location in
                 guard let self = self else { return }
-                // 1. 이전 위치 저장
-                self.previousLocation = location
-                // 2. 경로 저장
-                let point: Point = Point(
+                if let last = self.section.route.last {
+                    let previous = CLLocation(
+                        latitude: last.latitude,
+                        longitude: last.longitude
+                    )
+                    // 이전 위치가 있으면 이동 거리를 요청
+                    self.distanceManager.input.send(.requestDistance(location, previous))
+                    // 이전 위치가 있으면 라인을 그림
+                    self.lindDraw(location: location, previous: previous)
+                }
+                // 현재 위치를 저장
+                let current: Point = Point(
                     latitude: location.coordinate.latitude,
                     longitude: location.coordinate.longitude,
                     timestamp: Date())
-                self.section.route.append(point)
-                if let previous = self.previousLocation {
-                    // 3. 이동에 따른 거리 계산요청
-                    self.distanceManager.input.send(.requestDistance(location, previous))
-                    // 4. 경로 그리기
-                    self.lindDraw(location: location, previous: previous)
-                }
-                // 5.위치 이동
+                self.section.route.append(current)
+                // 이전 위치와 상관없이 현위치로 이동
                 self.output.send(.locationUpdate(location))
+                
             }
             .store(in: &cancellables)
         // 사용자 걸음 수 변경 구독
@@ -115,7 +117,6 @@ final class RunningViewModel {
                         latitude: currentLocation.coordinate.latitude,
                         longitude: currentLocation.coordinate.longitude,
                         timestamp: Date())
-                    previousLocation = currentLocation
                     self.section.route.append(point)
                     // 타이머 시작
                     self.timerUpdate()
@@ -129,7 +130,6 @@ final class RunningViewModel {
                         latitude: currentLocation.coordinate.latitude,
                         longitude: currentLocation.coordinate.longitude,
                         timestamp: Date())
-                    previousLocation = currentLocation
                     self.section.route.append(point)
                     // 내용 저장
                     self.saveLog()
