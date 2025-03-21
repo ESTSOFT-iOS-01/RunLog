@@ -96,8 +96,8 @@ final class CalendarViewController: UIViewController {
         viewModel.output.sortedKeys
             .receive(on: DispatchQueue.main)
             .sink { [weak self] keys in
-                guard let self = self, !keys.isEmpty else { return }
-                
+                //guard let self = self, !keys.isEmpty else { return }
+                guard let self = self else { return }
                 let month = viewModel.output.sortedKeys.value.first ?? Date()
                 self.currentMonthDays = generateDaysFor(date: month)
                 calendarView.calendarTitleLabel.text = month.formattedString(

@@ -57,18 +57,11 @@ extension LogViewModel {
     // MARK: - private Functions
     private func loadDatas() {
         Task {
-            // TODO: 실제 연결시 삭제 해야함
-            try await dayLogUseCase.initializeDayLog(
-                locationName: "목동",
-                weather: 1,
-                temperature: 0.5
-            )
             
             let dayLogs = try await dayLogUseCase.getAllDayLogs()
-            let distanceUnit = 5.0
-            
             // TODO: Appconfig 들어오면 주석 풀기
-            //let distanceUnit = try await appConfigUseCase.getUnitDistance()
+            // let distanceUnit = try await appConfigUseCase.getUnitDistance()
+            let distanceUnit = 5.0
             
             let groupedDayLogs = Dictionary(grouping: dayLogs) { dayLog in
                 let calendar = Calendar.current
@@ -81,4 +74,23 @@ extension LogViewModel {
             output.sortedKeys.send(groupedDayLogs.keys.sorted(by: >))
         }
     }
+}
+
+
+enum DummyData {
+    static let dummyDayLogs: [DayLog] = [
+        DayLog(
+            date: Calendar.current.date(from: DateComponents(year: 2025, month: 6, day: 4)) ?? Date(),
+            locationName: "서울",
+            weather: 1,
+            temperature: 5,
+            trackImage: Data(),
+            title: "아침 산책",
+            level: 2,
+            totalTime: 1800,
+            totalDistance: 0.0,
+            totalSteps: 3000,
+            sections: []
+        )
+    ]
 }
