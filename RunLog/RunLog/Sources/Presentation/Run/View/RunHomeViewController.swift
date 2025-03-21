@@ -49,13 +49,14 @@ final class RunHomeViewController: UIViewController {
         setupNavigationBar()
         setupTabBar()
         bindGesture()
-        setupData()
+        // bind
+        viewModel.bind()
         bindViewModel()
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationController?.setNavigationBarHidden(false, animated: animated)
-        self.mapView.centerToLocation(LocationManager.shared.currentLocation)
+        setupData()
     }
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
@@ -120,6 +121,7 @@ final class RunHomeViewController: UIViewController {
     // MARK: - Setup Data
     private func setupData() {
         // 초기 데이터 로드
+        self.mapView.centerToLocation(LocationManager.shared.currentLocation)
         totalLabelCreate(value: ("올레길", "2.5"))
     }
     // MARK: - Bind ViewModel

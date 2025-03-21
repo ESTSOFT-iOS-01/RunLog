@@ -80,12 +80,15 @@ final class RunningViewController: UIViewController {
         setupUI()
         setupNavigationBar()
         bindGesture()
-        setupData()
+        
+        // bind
+        viewModel.bind()
         bindViewModel()
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationController?.setNavigationBarHidden(false, animated: animated)
+        setupData()
     }
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)

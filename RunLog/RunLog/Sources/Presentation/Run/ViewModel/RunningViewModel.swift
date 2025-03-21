@@ -40,9 +40,7 @@ final class RunningViewModel {
     private var timer: Timer?
     
     // MARK: - Init
-    init() {
-        bind()
-    }
+    init() { }
     // viewController에도 동일 함수 존재 - 실제 저장할 때는 여기서 작동(Controller는 실기기에서 확인용 alert띄우기용)
     private func saveLog() {
         guard let startTime = section.route.first?.timestamp,
@@ -67,9 +65,17 @@ final class RunningViewModel {
             print("경도: \(location.latitude), 위도: \(location.longitude)")
             print("시간: \(location.timestamp.formattedString(.fullTime))")
         }
+        
+        
+        
+        
+        
+        
+        
+        
     }
     // MARK: - Bind (Input -> Output)
-    private func bind() {
+    func bind() {
         // 사용자 위치 변경 구독
         locationManager.locationPublisher
             .sink { [weak self] location in
@@ -141,6 +147,8 @@ final class RunningViewModel {
         self.section.route.append(point)
         // 타이머 시작
         self.timerUpdate()
+        
+        
     }
     // 운동 종료
     private func runnungStop() {
@@ -154,7 +162,7 @@ final class RunningViewModel {
             longitude: currentLocation.coordinate.longitude,
             timestamp: Date())
         self.section.route.append(point)
-        // 내용 저장
+        // +) 내용 저장
         self.saveLog()
     }
     // 운동 종료

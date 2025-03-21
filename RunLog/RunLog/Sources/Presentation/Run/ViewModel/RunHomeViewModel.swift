@@ -23,11 +23,9 @@ final class RunHomeViewModel {
     private let openWeatherService = OpenWeatherService.shared
     private var previousCity: String? // 이전 도시명
     // MARK: - Init
-    init() {
-        bind()
-    }
+    init() { }
     // MARK: - Bind (Input -> Output)
-    private func bind() {
+    func bind() {
         // 사용자 위치 변경 구독 -> location에 맞는 지도 이동
         locationManager.locationPublisher
             .sink { [weak self] location in
