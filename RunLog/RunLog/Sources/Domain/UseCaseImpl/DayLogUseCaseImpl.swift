@@ -54,15 +54,11 @@ final class DayLogUseCaseImpl: DayLogUseCase {
         
         var appconfig = try await appConfigRepository.readAppConfig()
         
-        // case 1: 일반적인 상황
-        // 사용자가 오늘 들어온 상황, streak은 6을 가리키고있다.
-        // 어제 들어왓나?
-        do {
-            // yes -> streak에 1더하기
-            let yesterdayLogDay = try await dayLogRepository.readDayLog(date: yesterday)
+        
+        let hasYesterdayDayLog = try await hasYesterdayDayLog()
+        if hasYesterdayDayLog {
             appconfig.streakDays += 1
-        } catch CoreDataError.modelNotFound {
-            // no -> streak을 1로 초기화
+        } else {
             appconfig.streakDays = 1
         }
         
@@ -150,5 +146,47 @@ final class DayLogUseCaseImpl: DayLogUseCase {
         targetDayLog.level = level
         
         try await dayLogRepository.updateDayLog(targetDayLog)
+    }
+    
+    func updateStreakIfNeeded() async throws {
+        let today = Date().toYearMonth
+        
+        // case: 오늘 운동을 했는지 안했는지 모르겟는데 마이페이지로 들어온 상황
+        // streak = 6
+        // 오늘 운동했니?
+        do {
+            // yes -> 업데이트 X
+            let todayDayLog = try await dayLogRepository.readDayLog(date: today)
+        } catch CoreDataError.modelNotFound {
+            // no -> 어제 운동했니?
+            let hasYesterdayDayLog = try await hasYesterdayDayLog()
+            //      yes -> 업데이트 X
+            //      no -> streak 0으로 초기화
+            if !hasYesterdayDayLog {
+                var appconfig = try await appConfigRepository.readAppConfig()
+                appconfig.streakDays = 0
+                try await appConfigRepository.updateAppConfig(appconfig)
+            }
+        }
+        
+    }
+}
+
+
+extension DayLogUseCaseImpl {
+    private func hasYesterdayDayLog() async throws -> Bool {
+        let today = Date().toYearMonth
+        let yesterday = Calendar.current.date(
+            byAdding: .day,
+            value: -1,
+            to: today
+        )!
+        
+        do {
+            let yesterdayLogDay = try await dayLogRepository.readDayLog(date: yesterday)
+            return true
+        } catch CoreDataError.modelNotFound {
+            return false
+        }
     }
 }
