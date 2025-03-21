@@ -101,7 +101,7 @@ final class DetailLogViewController: UIViewController {
                 guard let self = self else { return }
                 
                 let sheetVC = MovingTrackSheetViewController(viewModel: MovingTrackSheetViewModel())
-                
+                sheetVC.modalPresentationStyle = .pageSheet
                 if let sheet = sheetVC.sheetPresentationController {
                     let customDetent = UISheetPresentationController.Detent.custom(identifier: .init("myCustomDetent")) { _ in
                         820
@@ -118,7 +118,7 @@ final class DetailLogViewController: UIViewController {
                     sheet.preferredCornerRadius = 16
                 }
                 
-                sheetVC.modalPresentationStyle = .pageSheet
+                
                 self.present(sheetVC, animated: true)
             }
             .store(in: &cancellables)

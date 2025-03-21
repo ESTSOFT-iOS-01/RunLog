@@ -21,14 +21,16 @@ final class MovingTrackSheetViewController: UIViewController {
     private var cancellables = Set<AnyCancellable>()
     
     // MARK: - Moving Track 관련 프로퍼티
-    /// 모든 섹션의 좌표를 합친 배열
-    private var allCoordinates: [CLLocationCoordinate2D] = []
+    /// 각 섹션별 좌표 배열
+    private var sectionsCoordinates: [[CLLocationCoordinate2D]] = []
+    /// 현재 섹션 인덱스
+    private var currentSectionIndex = 0
+    /// 현재 섹션 내 좌표 인덱스
+    private var currentCoordIndexInSection = 0
     /// 카메라 이동을 위한 타이머
     private var cameraTimer: Timer?
-    /// 현재 카메라가 이동 중인 좌표 인덱스
-    private var currentCoordIndex = 0
     
-    // 진행 경로를 나타내는 오버레이
+    // 진행 경로 오버레이 (전체 경로 오버레이와는 별도로, 현재 진행된 섹션만 표시)
     private var progressOverlay: MKPolyline?
     
     // MARK: - Init
@@ -42,9 +44,7 @@ final class MovingTrackSheetViewController: UIViewController {
     }
     
     // MARK: - Lifecycle
-    override func loadView() {
-        view = sheetView
-    }
+    override func loadView() { view = sheetView }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -54,14 +54,12 @@ final class MovingTrackSheetViewController: UIViewController {
         bindViewModel()
         setupMapView()
         
-        // 1) 전체 경로 계산
-        prepareAllCoordinates()
-        
-        // 2) 전체 경로 폴리라인 그리기
-        drawEntireRoute()
-        
-        // 3) 카메라 애니메이션 시작
-        startCameraAnimation()
+        // 1) 섹션별 경로 계산
+        prepareSectionsCoordinates()
+        // 2) 전체 경로 오버레이 (각 섹션 별 오버레이를 모두 그리기)
+        drawAllSectionOverlays()
+        // 3) 첫 섹션의 카메라 애니메이션 시작
+        startCameraAnimationForCurrentSection()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -124,163 +122,162 @@ final class MovingTrackSheetViewController: UIViewController {
         mapView.delegate = self
     }
     
-    // MARK: - 전체 경로 관련 메서드
-    /// 모든 section의 route를 합쳐 allCoordinates에 저장
-    private func prepareAllCoordinates() {
-        // 여기서는 dummyDayLog를 사용
-        // 실제로는 viewModel을 통해 데이터를 전달받을 예정.
-        allCoordinates = dummyDayLog.sections.flatMap { section in
-            section.route.map {
-                CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
+    // MARK: - 섹션별 경로 관련 메서드
+        
+        /// 각 섹션의 route를 그대로 sectionsCoordinates에 저장
+        private func prepareSectionsCoordinates() {
+            // 여기서는 dummyDayLog를 사용. 실제로는 viewModel.dayLog.sections를 활용.
+            sectionsCoordinates = dummyDayLog.sections.map { section in
+                section.route.map {
+                    CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
+                }
             }
         }
-    }
-    
-    /// 전체 경로를 단일 폴리라인으로 그려 mapView에 추가
-    private func drawEntireRoute() {
-        guard !allCoordinates.isEmpty else { return }
-        let entirePolyline = MKPolyline(coordinates: allCoordinates, count: allCoordinates.count)
-        entirePolyline.title = "전체 경로"
-        sheetView.addMapOverlay(entirePolyline)
-    }
-    
-    // MARK: - 3D 카메라 애니메이션 (startCameraAnimation, updateCamera 등)
-    
-    /// 무빙트랙 애니메이션 시작
-    private func startCameraAnimation() {
-        guard allCoordinates.count > 1 else { return }
         
-        // 기존 타이머 종료
-        cameraTimer?.invalidate()
-        cameraTimer = nil
-        currentCoordIndex = 0
+        /// 각 섹션별로 오버레이를 그려 전체 경로를 표현 (섹션 간 구분)
+        private func drawAllSectionOverlays() {
+            let mapView = sheetView.mapView
+            // 기존 오버레이 제거
+            mapView.removeOverlays(mapView.overlays)
+            // 각 섹션마다 오버레이 추가
+            for (index, sectionCoords) in sectionsCoordinates.enumerated() {
+                guard sectionCoords.count >= 2 else { continue }
+                let polyline = MKPolyline(coordinates: sectionCoords, count: sectionCoords.count)
+                polyline.title = "전체 경로-\(index)"  // 섹션별로 구분
+                sheetView.addMapOverlay(polyline)
+            }
+        }
         
-        // 초기 카메라 설정
-        setCameraToCoordinate(allCoordinates[0], heading: sheetView.mapView.camera.heading)
+        // MARK: - 3D 카메라 애니메이션 (섹션별)
         
-        // 0.2초 간격으로 updateCamera() 호출
-        cameraTimer = Timer.scheduledTimer(timeInterval: 0.2,
-                                           target: self,
-                                           selector: #selector(updateCamera),
-                                           userInfo: nil,
-                                           repeats: true)
-    }
-    
-    @objc private func updateCamera() {
-        guard currentCoordIndex < allCoordinates.count - 1 else {
+        /// 현재 섹션의 애니메이션 시작
+        private func startCameraAnimationForCurrentSection() {
+            guard currentSectionIndex < sectionsCoordinates.count else { return }
+            let sectionCoords = sectionsCoordinates[currentSectionIndex]
+            guard sectionCoords.count > 1 else { return }
+            
             cameraTimer?.invalidate()
             cameraTimer = nil
-            return
+            currentCoordIndexInSection = 0
+            
+            // 초기 카메라 설정: 현재 섹션 첫 좌표, 현재 카메라 heading 유지
+            setCameraToCoordinate(sectionCoords[0], heading: sheetView.mapView.camera.heading)
+            
+            cameraTimer = Timer.scheduledTimer(timeInterval: 0.2,
+                                               target: self,
+                                               selector: #selector(updateCameraForSection),
+                                               userInfo: nil,
+                                               repeats: true)
         }
         
-        let currentCoord = allCoordinates[currentCoordIndex]
-        let nextCoord = allCoordinates[currentCoordIndex + 1]
-        
-        // 두 좌표 사이의 거리를 계산 (미터 단위)
-        let distance = CLLocation(latitude: currentCoord.latitude, longitude: currentCoord.longitude)
-                        .distance(from: CLLocation(latitude: nextCoord.latitude, longitude: nextCoord.longitude))
-        
-        let distanceThreshold: CLLocationDistance = 50  // 예: 50미터 임계값
-        
-        var targetHeading: CLLocationDirection
-        if distance > distanceThreshold {
-            // 큰 간격이면 회전을 최소화하거나 현재 heading 유지
-            targetHeading = sheetView.mapView.camera.heading
-        } else {
+        /// 섹션 내에서 카메라를 업데이트
+        @objc private func updateCameraForSection() {
+            let sectionCoords = sectionsCoordinates[currentSectionIndex]
+            guard currentCoordIndexInSection < sectionCoords.count - 1 else {
+                // 현재 섹션의 끝에 도달하면 다음 섹션으로 전환
+                moveToNextSectionIfAvailable()
+                return
+            }
+            
+            let currentCoord = sectionCoords[currentCoordIndexInSection]
+            let nextCoord = sectionCoords[currentCoordIndexInSection + 1]
+            
+            // 경로 진행 방향에 따른 heading 계산
             let rawHeading = calculateHeading(from: currentCoord, to: nextCoord)
-            // 필요한 경우 오프셋 추가 (예: 뒤에서 보는 시점이라면 +180)
-            targetHeading = rawHeading.truncatingRemainder(dividingBy: 360)
+            // (필요 시 오프셋 적용: 예, 뒤에서 보는 시점이면 +180)
+            let targetHeading = rawHeading.truncatingRemainder(dividingBy: 360)
+            
+            UIView.animate(withDuration: 0.2) {
+                self.setCameraToCoordinate(nextCoord, heading: targetHeading)
+            }
+            currentCoordIndexInSection += 1
+            
+            updateProgressOverlayForCurrentSection()
         }
         
-        // (보간 로직은 필요에 따라 적용)
-        UIView.animate(withDuration: 0.24) {
-            self.setCameraToCoordinate(nextCoord, heading: targetHeading)
+        /// 현재 섹션이 끝났다면 다음 섹션으로 전환 (있을 경우)
+        private func moveToNextSectionIfAvailable() {
+            if currentSectionIndex < sectionsCoordinates.count - 1 {
+                currentSectionIndex += 1
+                currentCoordIndexInSection = 0
+                // 카메라를 다음 섹션의 첫 좌표로 바로 전환
+                let nextSectionCoords = sectionsCoordinates[currentSectionIndex]
+                if let firstCoord = nextSectionCoords.first {
+                    setCameraToCoordinate(firstCoord, heading: sheetView.mapView.camera.heading)
+                }
+                // 새로운 섹션의 진행 오버레이는 초기화 (필요 시)
+                updateProgressOverlayForCurrentSection(reset: true)
+            } else {
+                // 모든 섹션 완료 시 타이머 종료
+                cameraTimer?.invalidate()
+                cameraTimer = nil
+            }
         }
         
-        currentCoordIndex += 1
-        updateProgressOverlay()
-    }
-    
-    /// 카메라 설정 함수
-    private func setCameraToCoordinate(_ coordinate: CLLocationCoordinate2D, heading: CLLocationDirection) {
-        let camera = MKMapCamera(
-            lookingAtCenter: coordinate,
-            fromDistance: 90,
-            pitch: 65,
-            heading: heading
-        )
-        sheetView.mapView.camera = camera
-    }
-    
-    /// 두 좌표 간 heading(방위각) 계산
-    private func calculateHeading(from: CLLocationCoordinate2D, to: CLLocationCoordinate2D) -> CLLocationDirection {
-        let fromLat = from.latitude.deg2rad
-        let fromLon = from.longitude.deg2rad
-        let toLat = to.latitude.deg2rad
-        let toLon = to.longitude.deg2rad
-        
-        let y = sin(toLon - fromLon) * cos(toLat)
-        let x = cos(fromLat) * sin(toLat) - sin(fromLat) * cos(toLat) * cos(toLon - fromLon)
-        let radians = atan2(y, x)
-        var degrees = radians.rad2deg
-        
-        if degrees < 0 { degrees += 360 }
-        return degrees
-    }
-    
-    /// 보간 함수 (한 번에 최대 maxChange도만 회전)
-    private func smoothHeading(currentHeading: CLLocationDirection,
-                               targetHeading: CLLocationDirection,
-                               maxChange: Double) -> CLLocationDirection {
-        var delta = targetHeading - currentHeading
-        if delta > 180 { delta -= 360 }
-        if delta < -180 { delta += 360 }
-        
-        if abs(delta) > maxChange {
-            delta = (delta > 0) ? maxChange : -maxChange
+        /// 카메라 설정 함수
+        private func setCameraToCoordinate(_ coordinate: CLLocationCoordinate2D, heading: CLLocationDirection) {
+            let camera = MKMapCamera(
+                lookingAtCenter: coordinate,
+                fromDistance: 90,
+                pitch: 65,
+                heading: heading
+            )
+            sheetView.mapView.camera = camera
         }
         
-        var newHeading = currentHeading + delta
-        if newHeading < 0 { newHeading += 360 }
-        else if newHeading >= 360 { newHeading -= 360 }
-        return newHeading
-    }
-    
-    // MARK: - 진행 경로 오버레이 업데이트
-    private func updateProgressOverlay() {
-        // 기존 진행 경로 오버레이 제거
-        if let progressOverlay = progressOverlay {
-            sheetView.mapView.removeOverlay(progressOverlay)
+        /// 두 좌표 간 heading(방위각) 계산
+        private func calculateHeading(from: CLLocationCoordinate2D, to: CLLocationCoordinate2D) -> CLLocationDirection {
+            let fromLat = from.latitude.deg2rad
+            let fromLon = from.longitude.deg2rad
+            let toLat = to.latitude.deg2rad
+            let toLon = to.longitude.deg2rad
+            
+            let y = sin(toLon - fromLon) * cos(toLat)
+            let x = cos(fromLat) * sin(toLat) - sin(fromLat) * cos(toLat) * cos(toLon - fromLon)
+            let radians = atan2(y, x)
+            var degrees = radians.rad2deg
+            if degrees < 0 { degrees += 360 }
+            return degrees
         }
         
-        // 현재 진행된 좌표(시작부터 currentCoordIndex까지)
-        let progressCoordinates = Array(allCoordinates.prefix(currentCoordIndex + 1))
-        guard progressCoordinates.count >= 2 else { return }
-        
-        let newOverlay = MKPolyline(coordinates: progressCoordinates, count: progressCoordinates.count)
-        newOverlay.title = "진행 경로"
-        progressOverlay = newOverlay
-        sheetView.addMapOverlay(newOverlay)
+        /// 진행 경로 오버레이 업데이트 (현재 섹션만 표시)
+        private func updateProgressOverlayForCurrentSection(reset: Bool = false) {
+            let mapView = sheetView.mapView
+            
+            // 기존 진행 오버레이 제거
+            if let progressOverlay = progressOverlay {
+                mapView.removeOverlay(progressOverlay)
+            }
+            
+            // 만약 reset이면 현재 섹션의 진행 경로 초기화
+            let sectionCoords = sectionsCoordinates[currentSectionIndex]
+            let progressCoords: [CLLocationCoordinate2D]
+            if reset {
+                progressCoords = []
+            } else {
+                progressCoords = Array(sectionCoords.prefix(currentCoordIndexInSection + 1))
+            }
+            
+            guard progressCoords.count >= 2 else { return }
+            let overlay = MKPolyline(coordinates: progressCoords, count: progressCoords.count)
+            overlay.title = "진행 경로"
+            progressOverlay = overlay
+            sheetView.addMapOverlay(overlay)
+        }
     }
-}
 
-// MARK: - MKMapViewDelegate
-extension MovingTrackSheetViewController: MKMapViewDelegate {
-    func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
-        guard let polyline = overlay as? MKPolyline else { return MKOverlayRenderer() }
-        let renderer = MKPolylineRenderer(polyline: polyline)
-        if polyline.title == "전체 경로" {
-            renderer.strokeColor = .systemBlue
-            renderer.lineWidth = 5
-        } else if polyline.title == "진행 경로" {
-            renderer.strokeColor = .systemRed
-            renderer.lineWidth = 6
-        } else {
-            // 기본 스타일 지정 (예: 회색)
-            renderer.strokeColor = .gray
-            renderer.lineWidth = 4
+    // MARK: - MKMapViewDelegate
+    extension MovingTrackSheetViewController: MKMapViewDelegate {
+        func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+            guard let polyline = overlay as? MKPolyline, let title = polyline.title else { return MKOverlayRenderer() }
+            let renderer = MKPolylineRenderer(polyline: polyline)
+            if title == "진행 경로" {
+                renderer.strokeColor = .systemRed
+                renderer.lineWidth = 6
+            } else {
+                renderer.strokeColor = .systemBlue
+                renderer.lineWidth = 5
+            }
+            return renderer
         }
-        return renderer
     }
-}
-
