@@ -81,9 +81,9 @@ final class LogViewController: UIViewController {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] date in
                 
-                let detailVC = DetailLogViewController(
-                    viewModel: DetailLogViewModel(date: date)
-                )
+                let detailVM = DetailLogViewModel(date: date)
+                let detailVC = DetailLogViewController(viewModel: detailVM)
+                detailVC.title = date.formattedString(.monthDay)
                 self?.navigationController?.pushViewController(detailVC, animated: true)
             }
             .store(in: &cancellables)
