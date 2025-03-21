@@ -27,7 +27,7 @@ final class DayLogUseCaseImpl: DayLogUseCase {
     ) async throws {
         print("Impl: ", #function)
         
-        let today = Date().toYearMonth
+        let today = Date().toYearMonthDay
         let yesterday = Calendar.current.date(
             byAdding: .day,
             value: -1,
@@ -149,7 +149,7 @@ final class DayLogUseCaseImpl: DayLogUseCase {
     }
     
     func updateStreakIfNeeded() async throws {
-        let today = Date().toYearMonth
+        let today = Date().toYearMonthDay
         
         // case: 오늘 운동을 했는지 안했는지 모르겟는데 마이페이지로 들어온 상황
         // streak = 6
@@ -178,7 +178,7 @@ extension DayLogUseCaseImpl {
         let yesterday = Calendar.current.date(
             byAdding: .day,
             value: -1,
-            to: Date().toYearMonth
+            to: Date().toYearMonthDay
         )!
         
         do {

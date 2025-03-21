@@ -7,15 +7,20 @@ import Foundation
 extension Date {
     
     // 저장하기 위해 연 월만 남기기
-    var toYearMonth: Date {
-        let calendar = Calendar.current
-        let components = calendar.dateComponents([.year, .month], from: self)
+    var toYearMonthDay: Date {
+        var calendar = Calendar.current
+        calendar.timeZone = TimeZone(identifier: "Asia/Seoul")!
+        let components = calendar.dateComponents(
+            [.year, .month, .day],
+            from: self
+        )
         return calendar.date(from: components)!
     }
     
     func formattedString(_ style: DateFormatStyle) -> String {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "ko_KR")
+        formatter.timeZone = TimeZone(identifier: "Asia/Seoul")!
         formatter.dateFormat = style.format
         return formatter.string(from: self)
     }
