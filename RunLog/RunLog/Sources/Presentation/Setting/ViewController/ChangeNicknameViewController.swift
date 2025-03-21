@@ -13,7 +13,7 @@ import Combine
 final class ChangeNicknameViewController: UIViewController {
     
     // MARK: - Properties
-    private let viewModel : ChangeNicknameViewModel!
+    private let viewModel: ChangeNicknameViewModel!
     private var cancellables = Set<AnyCancellable>()
     
     // MARK: - UI

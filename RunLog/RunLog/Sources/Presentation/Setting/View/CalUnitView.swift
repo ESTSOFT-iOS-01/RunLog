@@ -82,21 +82,19 @@ final class CalUnitView: UIView {
     
     // MARK: - Configure
     func updateDescriptionText(with value: String) {
-        DispatchQueue.main.async { [self] in
-            let visibleUnitDouble = (Double(value) ?? 10.0) * 0.3
-            let threeDecimalUnitDouble = Double(visibleUnitDouble.toString(withDecimal: 3)) ?? 3.3
-            let unitString = threeDecimalUnitDouble.formattedString
-            
-            let fullText = "하루에 \(unitString)km 이동하면 이렇게 표시돼요"
-            
-            despLabel.attributedText = fullText.styledText(
-                highlightText: unitString,
-                baseFont: .RLBody1,
-                baseColor: .Gray000,
-                highlightFont: .RLBody1,
-                highlightColor: .LightGreen
-            )
-        }
+        let visibleUnitDouble = (Double(value) ?? 10.0) * 0.3
+        let threeDecimalUnitDouble = Double(visibleUnitDouble.toString(withDecimal: 3)) ?? 3.3
+        let unitString = threeDecimalUnitDouble.formattedString
+        
+        let fullText = "하루에 \(unitString)km 이동하면 이렇게 표시돼요"
+        
+        despLabel.attributedText = fullText.styledText(
+            highlightText: unitString,
+            baseFont: .RLBody1,
+            baseColor: .Gray000,
+            highlightFont: .RLBody1,
+            highlightColor: .LightGreen
+        )
     }
     
 }
