@@ -28,6 +28,12 @@ final class DayLogUseCaseImpl: DayLogUseCase {
         print("Impl: ", #function)
         
         let today = Date().toYearMonth
+        let yesterday = Calendar.current.date(
+            byAdding: .day,
+            value: -1,
+            to: today
+        )!
+        
         let initialTitle = "\(today.formattedString(.weekDay)) 러닝"
         
         let newDayLog = DayLog(
@@ -46,7 +52,21 @@ final class DayLogUseCaseImpl: DayLogUseCase {
         
         try await dayLogRepository.createDayLog(newDayLog)
         
-        // TODO: Streak 어떻게 처리할지 고민
+        var appconfig = try await appConfigRepository.readAppConfig()
+        
+        // case 1: 일반적인 상황
+        // 사용자가 오늘 들어온 상황, streak은 6을 가리키고있다.
+        // 어제 들어왓나?
+        do {
+            // yes -> streak에 1더하기
+            let yesterdayLogDay = try await dayLogRepository.readDayLog(date: yesterday)
+            appconfig.streakDays += 1
+        } catch CoreDataError.modelNotFound {
+            // no -> streak을 1로 초기화
+            appconfig.streakDays = 1
+        }
+        
+        try await appConfigRepository.updateAppConfig(appconfig)
     }
 
     func getDayLogByDate(_ date: Date) async throws -> DayLog? {
