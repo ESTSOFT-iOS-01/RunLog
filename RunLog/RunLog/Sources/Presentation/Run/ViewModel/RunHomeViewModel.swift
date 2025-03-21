@@ -30,14 +30,13 @@ final class RunHomeViewModel {
     private func bind() {
         // 사용자 위치 변경 구독 -> location에 맞는 지도 이동
         locationManager.locationPublisher
-            .receive(on: DispatchQueue.main)
             .sink { [weak self] location in
-                self?.output.send(.locationUpdate(location))
+                guard let self = self else { return }
+                self.output.send(.locationUpdate(location))
             }
             .store(in: &cancellables)
         // 도시명 변경 구독
         locationManager.locationNamePublisher
-            .receive(on: DispatchQueue.main)
             .sink { [weak self] value in
                 guard let self = self else { return }
                 let location = value.0
@@ -57,12 +56,13 @@ final class RunHomeViewModel {
             openWeatherService.weatherUpdatePublisher,
             openWeatherService.aqiUpdatePublisher
         )
-        .receive(on: DispatchQueue.main)
-        .sink { completion in
-            print(completion)
-        } receiveValue: { [weak self] weather, aqi in
-            let formattedString = "\(weather.0) | \(weather.1.toString(withDecimal: 1))°C 대기질 \(self?.aqiToString(aqi) ?? "알 수 없음")"
-            self?.output.send(.weatherUpdate(formattedString))
+        .sink { [weak self] weather, aqi in
+            guard let self = self else { return }
+            let condition = weather.0
+            let temperature = weather.1.toString(withDecimal: 1)
+            let aqi = self.aqiToString(aqi)
+            let formattedString = "\(condition) | \(temperature)°C 대기질 \(aqi)"
+            self.output.send(.weatherUpdate(formattedString))
         }
         .store(in: &cancellables)
     }

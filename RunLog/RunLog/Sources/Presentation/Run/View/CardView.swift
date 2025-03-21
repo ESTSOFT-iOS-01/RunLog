@@ -67,7 +67,7 @@ final class CardView: UIView {
     private func configure() {
         // 뷰 설정
         timeLabel.setConfigure(text: "00 : 00")
-        distanceLabel.setConfigure(text: "0.00 m")
+        distanceLabel.setConfigure(text: "0.00km")
         stepsLabel.setConfigure(text: "0")
     }
 }

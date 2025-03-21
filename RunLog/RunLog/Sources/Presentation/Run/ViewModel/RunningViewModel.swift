@@ -11,7 +11,8 @@ import MapKit
 
 final class RunningViewModel {
     // MARK: - 운동 시작 부터 종료 전까지의 정보
-    var section: Section = Section(
+    // +) save 기능 넣으면 private으로 변경
+    private var section: Section = Section(
         distance: 0,
         steps: 0,
         route: []
@@ -143,12 +144,7 @@ final class RunningViewModel {
                 case .responseDistance(let distance):
                     self.section.distance += distance
                     // 거리에 따라 단위 변경
-                    var distanceString: String = ""
-                    if self.section.distance >= 1000 {
-                        distanceString = "\((self.section.distance / 1000).toString(withDecimal: 2)) km"
-                    } else {
-                        distanceString = "\(self.section.distance.toString(withDecimal: 2)) m"
-                    }
+                    let distanceString = "\((self.section.distance / 1000).toString(withDecimal: 2))km"
                     self.output.send(.distanceUpdate(distanceString))
                 }
             }
