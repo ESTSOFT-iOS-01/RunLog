@@ -23,10 +23,14 @@ final class DetailLogViewModel {
     
     let input = PassthroughSubject<Input, Never>()
     let output = CurrentValueSubject<Output?, Never>(nil)
+    
+    private let date: Date
     private var cancellables = Set<AnyCancellable>()
     
     // MARK: - Init
-    init() {
+    init(date: Date) {
+        self.date = date
+        print(date)
         bind()
     }
     

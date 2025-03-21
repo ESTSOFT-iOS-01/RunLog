@@ -13,6 +13,15 @@ final class AppConfigUsecaseImpl: AppConfigUsecase {
     
     init(appConfigRepository: AppConfigRepository) {
         self.appConfigRepository = appConfigRepository
+        
+        Task {
+            do {
+                try await self.appConfigRepository.createAppConfig(AppConfig(nickname: "RunLogger", totalDistance: 0, streakDays: 0, totalDays: 0, unitDistance: 10.0))
+            } catch {
+                print("repo error : \(error)")
+            }
+        }
+
     }
     
     func getUnitDistance() async throws -> Double {
@@ -48,7 +57,7 @@ final class AppConfigUsecaseImpl: AppConfigUsecase {
         
         let totalDistance = try await appConfigRepository.readAppConfig().totalDistance
         
-        let eligibleRoads = Road.allRoads.filter { road in
+        let eligibleRoads = Constants.allRoads.filter { road in
             road.distance <= totalDistance * 0.5
         }
         
@@ -61,6 +70,7 @@ final class AppConfigUsecaseImpl: AppConfigUsecase {
     
     func updateUnitDistance(_ unitDistance: Double) async throws {
         print("Impl:", #function)
+        
         var config = try await appConfigRepository.readAppConfig()
         config.unitDistance = unitDistance
         
@@ -69,6 +79,7 @@ final class AppConfigUsecaseImpl: AppConfigUsecase {
     
     func updateNickname(_ nickname: String) async throws {
         print("Impl:", #function)
+        
         var config = try await appConfigRepository.readAppConfig()
         config.nickname = nickname
         

@@ -17,6 +17,7 @@ protocol AppConfigRepository {
 
 /// 에러 
 enum AppConfigError: Error {
+    case duplicatedObject
     case notFound
     case dataConversionFailed
     case saveFailed
@@ -32,6 +33,8 @@ enum AppConfigError: Error {
             return "데이터 저장에 실패했습니다."
         case .deleteFailed:
             return "데이터 삭제에 실패했습니다."
+        case .duplicatedObject:
+            return "한 개 이상의 AppConfig 데이터가 이미 존재합니다."
         }
     }
 }

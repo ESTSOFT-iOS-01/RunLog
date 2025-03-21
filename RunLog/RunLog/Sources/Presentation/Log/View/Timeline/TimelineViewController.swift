@@ -35,16 +35,6 @@ final class TimelineViewController: UIViewController {
         bindViewModel()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        self.navigationController?.setNavigationBarHidden(false, animated: animated)
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        self.navigationController?.setNavigationBarHidden(true, animated: false)
-    }
-    
     
     // MARK: - Setup UI
     private func setupUI() {
@@ -64,6 +54,7 @@ final class TimelineViewController: UIViewController {
     // MARK: - Bind ViewModel
     private func bindViewModel() {
         viewModel.output.groupedDayLogs
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.timelineView.tableView.reloadData()
             }
@@ -131,5 +122,14 @@ extension TimelineViewController: UITableViewDelegate, UITableViewDataSource {
         forRowAt indexPath: IndexPath
     ) {
         cell.backgroundColor = .clear
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let key = viewModel.output.sortedKeys.value[indexPath.section]
+        if let dayLogs = viewModel.output.groupedDayLogs.value[key] {
+            let dayLog = dayLogs[indexPath.row]
+            viewModel.send(.cellTapped(date: dayLog.date))
+        }
+        
     }
 }

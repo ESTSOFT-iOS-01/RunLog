@@ -8,7 +8,17 @@
 import UIKit
 
 class MainTabBarController: UITabBarController {
-
+    
+    
+    // MARK: - Init
+    init() {
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = .systemBackground
@@ -32,7 +42,9 @@ class MainTabBarController: UITabBarController {
             selectedImage: UIImage(systemName: "star.fill")
         )
         
-        let settingView = UINavigationController(rootViewController: MyPageViewController())
+        
+        let settingVC = MyPageViewController(viewModel: MyPageViewModel())
+        let settingView = UINavigationController(rootViewController: settingVC)
         settingView.title = "Setting"
         settingView.tabBarItem = UITabBarItem(
             title: "Setting",

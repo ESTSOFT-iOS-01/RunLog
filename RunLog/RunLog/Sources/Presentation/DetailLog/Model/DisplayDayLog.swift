@@ -12,7 +12,7 @@ struct DisplayDayLog {
     let date: Date
     let locationName: String
     let weather: String
-    let temperature: Int
+    let temperature: Double
     let title: String
     let level: String
     let totalTime: TimeInterval
