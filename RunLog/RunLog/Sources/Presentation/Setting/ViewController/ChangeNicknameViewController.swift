@@ -25,7 +25,6 @@ final class ChangeNicknameViewController: UIViewController {
         super.init(nibName: nil, bundle: nil)
     }
     
-    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -37,6 +36,8 @@ final class ChangeNicknameViewController: UIViewController {
         setupNavigationBar()
         setupGesture()
         setupTextField()
+        
+        viewModel.bind()
         bindViewModel()
         setupData()
     }
@@ -89,20 +90,24 @@ final class ChangeNicknameViewController: UIViewController {
     private func setupData() {
         // 초기 데이터 로드
         viewModel.input.send(.loadData)
-        nicknameView.nameField.setTextWithUnderline(viewModel.nickname)
     }
 
     // MARK: - Bind ViewModel
     private func bindViewModel() {
-        viewModel.output
-            .sink { [weak self] output in
-                switch output {
-                case .nicknameUpdated(let text):
-                    self?.nicknameView.nameField.setTextWithUnderline(text)
-                case .saveSuccess:
-                    DispatchQueue.main.async {
-                        self?.navigationController?.popViewController(animated: true)
-                    }
+        viewModel.output.nicknameUpdated
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] text in
+                self?.nicknameView.nameField.setTextWithUnderline(text)
+            }
+            .store(in: &cancellables)
+        
+        viewModel.output.saveSuccess
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] success in
+                if success {
+                    self?.navigationController?.popViewController(animated: true)
+                } else {
+                    // 저장 실패 시 처리
                 }
             }
             .store(in: &cancellables)
