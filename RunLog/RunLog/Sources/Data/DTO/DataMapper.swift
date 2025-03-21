@@ -17,7 +17,7 @@ final class DataMapper {
         dto.date = entity.date
         dto.locationName = entity.locationName
         dto.weather = Int16(entity.weather)
-        dto.temperature = Int32(entity.temperature)
+        dto.temperature = entity.temperature
         dto.trackImage = entity.trackImage
         dto.title = entity.title
         dto.level = Int16(entity.level)
@@ -79,7 +79,7 @@ extension DataMapper {
             date: date,
             locationName: locationName,
             weather: Int(dto.weather),
-            temperature: Int(dto.temperature),
+            temperature: dto.temperature,
             trackImage: trackImage,
             title: title,
             level: Int(dto.level),

@@ -24,7 +24,6 @@ final class RecordDetailView: UIView {
         $0.rowHeight = UITableView.automaticDimension
         $0.estimatedRowHeight = 32
     }
-    
     // KVO 관찰자 (contentSize 변경)
     private var contentSizeObservation: NSKeyValueObservation?
     
@@ -34,7 +33,6 @@ final class RecordDetailView: UIView {
         setupUI()
         setupLayout()
         configure()
-       
     }
     
     required init?(coder: NSCoder) {
@@ -86,7 +84,6 @@ final class RecordDetailView: UIView {
     deinit {
         contentSizeObservation?.invalidate()
     }
-    
     
 }
 

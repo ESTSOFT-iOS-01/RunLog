@@ -17,4 +17,17 @@ extension Double {
         let seconds = Int(self) % 60
         return String(format: "%02d : %02d", minutes, seconds)
     }
+    
+    // 소숫점 뒤에 0을 없애주는 애들
+    var formattedString: String {
+        let formattedString = String(self)
+        if let dotIndex = formattedString.firstIndex(of: ".") {
+            let afterDot = formattedString[dotIndex...]
+            // 소수점 뒤가 0으로만 이루어져 있으면 소수점 제거
+            if afterDot.trimmingCharacters(in: CharacterSet(charactersIn: "0")) == "." {
+                return String(formattedString.prefix(upTo: dotIndex))
+            }
+        }
+        return String(format: "%.12f", self).replacingOccurrences(of: "\\.?0*$", with: "", options: .regularExpression)
+    }
 }

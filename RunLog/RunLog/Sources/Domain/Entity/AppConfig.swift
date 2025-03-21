@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct AppConfig {
+struct AppConfig: Equatable {
     var nickname: String
     var totalDistance: Double
     var streakDays: Int
