@@ -80,9 +80,10 @@ final class CalUnitView: UIView {
     }
     
     // MARK: - Configure
-    func updateDescriptionText(with value: Double) {
+    func updateDescriptionText(with value: String) {
         DispatchQueue.main.async { [self] in
-            let unitString = (value * 0.3).formattedString
+            let unitDouble = Double(value) ?? 10.0
+            let unitString = (unitDouble * 0.3).formattedString
             let fullText = "하루에 \(unitString)km 이동하면 이렇게 표시돼요"
             
             despLabel.attributedText = fullText.styledText(

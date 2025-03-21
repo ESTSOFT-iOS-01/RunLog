@@ -34,14 +34,12 @@ final class ChangeCalUnitViewController: UIViewController {
         super.viewDidLoad()
         setupUI()
         setupNavigationBar()
+        setupGesture()
+        setupTextField()
         
         viewModel.bind()
-        setupTextField()
-        setupGesture()
-        
-        viewModel.input.send(.loadData)
-        setupData()
         bindViewModel()
+        setupData()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -93,23 +91,28 @@ final class ChangeCalUnitViewController: UIViewController {
     
     // MARK: - Setup Data
     private func setupData() {
-        calUnitView.unitField.setTextWithUnderline(String(viewModel.unit))
-        calUnitView.updateDescriptionText(with: viewModel.unit)
+        viewModel.input.send(.loadData)
     }
 
     // MARK: - Bind ViewModel
     private func bindViewModel() {
         viewModel.bindTextField(calUnitView.unitField.publisher)
         
-        viewModel.output
+        viewModel.output.unitUpdated
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] output in
-                switch output {
-                case .saveSuccess:
-                        self?.navigationController?.popViewController(animated: true)
-                case .unitUpdated(let value):
-                    self?.calUnitView.unitField.setTextWithUnderline(value.formattedString)
-                    self?.calUnitView.updateDescriptionText(with: value)
+            .sink { [weak self] value in
+                self?.calUnitView.unitField.setTextWithUnderline(value)
+                self?.calUnitView.updateDescriptionText(with: value)
+            }
+            .store(in: &cancellables)
+        
+        viewModel.output.saveSuccess
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] success in
+                if success {
+                    self?.navigationController?.popViewController(animated: true)
+                } else {
+                    // 저장 실패 시 처리
                 }
             }
             .store(in: &cancellables)
