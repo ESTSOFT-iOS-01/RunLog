@@ -31,10 +31,9 @@ final class DistanceManager {
     private func bind() {
         self.input
             .sink { [weak self] input in
-                guard let self = self else { return }
                 switch input {
                 case .requestDistance(let location, let previous):
-                    self.calculateDistance(
+                    self?.calculateDistance(
                         location: location,
                         previous: previous
                     )

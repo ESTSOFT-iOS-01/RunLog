@@ -15,7 +15,7 @@ enum OpenWeatherEndpoint {
 extension OpenWeatherEndpoint: TargetType {
     // MARK: - 기본 도메인
     public var baseURL: URL {
-        guard let url = URL(string: API.openWeatherURL.rawValue) else {
+        guard let url = URL(string: API.openWeatherURL) else {
             fatalError("잘못된 URL")
         }
         return url

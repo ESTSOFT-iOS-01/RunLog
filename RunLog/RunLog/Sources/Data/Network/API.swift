@@ -7,9 +7,6 @@
 
 import Foundation
 
-//final class API {
-//    static let openWeatherURL: String = "https://api.openweathermap.org/data/2.5"
-//}
-enum API: String {
-    case openWeatherURL = "https://api.openweathermap.org/data/2.5"
+enum API {
+    static let openWeatherURL = "https://api.openweathermap.org/data/2.5"
 }
