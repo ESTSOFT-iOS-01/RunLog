@@ -175,11 +175,10 @@ final class DayLogUseCaseImpl: DayLogUseCase {
 
 extension DayLogUseCaseImpl {
     private func hasYesterdayDayLog() async throws -> Bool {
-        let today = Date().toYearMonth
         let yesterday = Calendar.current.date(
             byAdding: .day,
             value: -1,
-            to: today
+            to: Date().toYearMonth
         )!
         
         do {
