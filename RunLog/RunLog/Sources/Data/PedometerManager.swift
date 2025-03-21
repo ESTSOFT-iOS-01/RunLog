@@ -10,40 +10,58 @@ import Combine
 import CoreMotion
 
 final class PedometerManager {
-    // MARK: - Input & Output
-    enum Input {
-        case startPedometer
-        case stopPedometer
-    }
-    let input = PassthroughSubject<Input, Never>()
-    private var cancellables = Set<AnyCancellable>()
-    private let pedometerSubject = PassthroughSubject<Int, Never>()
-    var pedometerPublisher: AnyPublisher<Int, Never> {
-        pedometerSubject.eraseToAnyPublisher()
-    }
+    
     // MARK: - Singleton
     static let shared = PedometerManager()
-    // MARK: - Propertise
-    private let pedometer = CMPedometer()
-    // MARK: - Init
     private init() {
         bind()
     }
-    // MARK: - Bind
+    
+    
+    // MARK: - Input
+    enum Input {
+        case requestPedometerStart
+        case requestPedometerStop
+    }
+    let input = PassthroughSubject<Input, Never>()
+    
+    // MARK: - Output
+    enum Output {
+        case responseSteps(Int)
+    }
+    let output = PassthroughSubject<Output, Never>()
+    
+    // MARK: - Properties
+    private var cancellables = Set<AnyCancellable>()
+    private let pedometer = CMPedometer()
+    
+    
+    // MARK: - Binding
     private func bind() {
         self.input
             .sink { [weak self] input in
+                guard let self = self else { return }
                 switch input {
-                case .startPedometer:
-                    self?.startPedometerUpdate()
-                case .stopPedometer:
-                    self?.stopPedometerUpdate()
+                case .requestPedometerStart:
+                    self.pedometerUpdateStart()
+                case .requestPedometerStop:
+                    self.pedometerUpdateStop()
                 }
             }
             .store(in: &cancellables)
     }
+    
     // MARK: - 걸음 수 측정 시작
-    func startPedometerUpdate() {
+    private func pedometerUpdateStart() {
+//        // Syr) 테스트용 Start
+//        for i in 0...200 {
+//            DispatchQueue.main.asyncAfter(deadline: .now() + Double(i)) {
+//                let num = Int.random(in: 1...5)
+//                self.output.send(.responseSteps(num))
+//            }
+//        }
+//        // Syr) 테스트용 End
+        // Syr) 실측정용 Start
         guard CMPedometer.isStepCountingAvailable() else {
             print("측정 불가 기기")
             return
@@ -54,11 +72,13 @@ final class PedometerManager {
                   error == nil
             else { return }
             let stepCount = data.numberOfSteps.intValue
-            self.pedometerSubject.send(stepCount)
+            self.output.send(.responseSteps(stepCount))
         }
+        // Syr) 실측정용 Start
     }
+    
     // MARK: - 걸음 수 측정 종료
-    func stopPedometerUpdate() {
+    private func pedometerUpdateStop() {
         pedometer.stopUpdates()
     }
 }

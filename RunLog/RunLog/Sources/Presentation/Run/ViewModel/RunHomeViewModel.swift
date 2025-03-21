@@ -10,99 +10,81 @@ import Combine
 import MapKit
 
 final class RunHomeViewModel {
+    
+    // MARK: - Init
+    init() { }
+    
+    
     // MARK: - Input & Output
+    enum Input {
+        case requestRunningStart // 운동시작 요청
+        case requestCurrentLocation
+        case requestCurrentWeahter
+    }
+    let input = PassthroughSubject<Input, Never>()
+    
+    // MARK: - Output
     enum Output {
+        case responseRunningStart // 운동시작
         case locationUpdate(CLLocation) // 사용자 위치 데이터
         case locationNameUpdate(String) // 가공된 위치 데이터
         case weatherUpdate(String)  // 가공된 날씨 데이터
     }
     let output = PassthroughSubject<Output, Never>()
-    private var cancellables = Set<AnyCancellable>()
+    
     // MARK: - Properties
-    var cityName: String? // 이전 도시명
-    private let locationManager = LocationManager.shared
-    private let openWeatherService = OpenWeatherService.shared
-    // MARK: - Init
-    init() { }
-    // MARK: - Bind (Input -> Output)
+    private var cancellables = Set<AnyCancellable>()
+    private var provider = RunningDataProvider.shared
+    
+    
+    // MARK: - Binding
     func bind() {
-        // 사용자 위치 변경 구독 -> location에 맞는 지도 이동
-        locationManager.locationPublisher
-            .sink { [weak self] location in
+        self.input
+            .sink { [weak self] input in
                 guard let self = self else { return }
-                self.output.send(.locationUpdate(location))
-            }
-            .store(in: &cancellables)
-        // 도시명 변경 구독
-        locationManager.locationNamePublisher
-            .sink { [weak self] value in
-                guard let self = self else { return }
-                let location = value.0
-                let placemark = value.1
-                let newCity = self.placemarksToString(placemark)
-                if cityName != newCity {
-                    print("날씨정보 업데이트")
-                    self.openWeatherService.input.send(.requestUpdate(location))
-                    let nameUpdatedString = "\(newCity)에서"
-                    self.output.send(.locationNameUpdate(nameUpdatedString))
+                switch input {
+                case .requestRunningStart:
+                    self.provider.input.send(.requestRunningStart)
+                case .requestCurrentLocation:
+                    self.provider.input.send(.requestCurrentLocation)
+                case .requestCurrentWeahter:
+                    self.provider.input.send(.requestCurrentWeather)
                 }
-                cityName = newCity
             }
             .store(in: &cancellables)
-        // 날씨 및 대기질 변경 구독
-        Publishers.Zip(
-            openWeatherService.weatherUpdatePublisher,
-            openWeatherService.aqiUpdatePublisher
-        )
-        .sink { [weak self] weather, aqi in
-            guard let self = self else { return }
-            let condition = weather.0
-            let temperature = weather.1.toString(withDecimal: 1)
-            let aqi = self.aqiToString(aqi)
-            let formattedString = "\(condition) | \(temperature)°C 대기질 \(aqi)"
-            self.output.send(.weatherUpdate(formattedString))
-        }
-        .store(in: &cancellables)
+        
+        // ViewModel에서 필요한 정보는 provider로 부터 주입
+        provider.runHomeOutput
+            .sink { [weak self] output in
+                guard let self = self else { return }
+                switch output {
+                case .responseRunningStart:
+                    self.output.send(.responseRunningStart)
+                case .responseCurrentLocation(let location):
+                    self.output.send(.locationUpdate(location))
+                case .responseCurrentCityName(let name):
+                    let updateName = "\(name)에서"
+                    self.output.send(.locationNameUpdate(updateName))
+                case .responseCurrentWeather(let weahter, let aqi):
+                    let weatherString = self.toWeatherString(weahter, aqi)
+                    self.output.send(.weatherUpdate(weatherString))
+                }
+            }
+            .store(in: &cancellables)
     }
 }
-// MARK: - 정보 한글화
+
+// MARK: - 날씨 레이블 형태로 변경
 extension RunHomeViewModel {
-    // MARK: - 대기질 정보 -> 한글
-    private func aqiToString(_ aqi: Int) -> String {
-        switch aqi {
-        case 1: return "좋음"
-        case 2: return "보통"
-        case 3: return "나쁨"
-        case 4: return "매우 나쁨"
-        case 5: return "위험"
-        default: return "정보 없음"
+    private func toWeatherString(_ weather: (Int, Double), _ aqi: Int) -> String {
+        var formattedString = ""
+        if weather.0 == -1 { formattedString = "알 수 없음" }
+        else {
+            let condition = Constants.WeatherCondition.from(weather.0).description
+            let temperature = weather.1.toString(withDecimal: 1)
+            let aqiLevel = Constants.AqiLevel.from(aqi).description
+            formattedString = "\(condition) | \(temperature)°C 대기질 \(aqiLevel)"
         }
-    }
-    // MARK: - 위치 정보 -> 한글
-    private func placemarksToString(_ placemark: CLPlacemark) -> String {
-        var state: String = "" // 도, 광역시
-        var city: String = "" // 시, 군, 구
-        var district: String = "" // 동, 읍, 면
-        if let subLocal = placemark.subLocality, subLocal.hasSuffix("동") {
-            district = subLocal
-        }
-        let description: String = String(
-            placemark
-                .description
-                .split(separator: ",")
-                .filter{ $0.contains("대한민국") }
-                .first
-            ?? "")
-        let components = description.split(separator: " ").map { String($0) }
-        for component in components {
-            if state == "" && (component.hasSuffix("특별시") || component.hasSuffix("광역시") || component.hasSuffix("도")) {
-                state = component
-            }else if city == "" && (component.hasSuffix("시") || component.hasSuffix("군") || component.hasSuffix("구")) {
-                city = component
-            }else if district == "" && (component.hasSuffix("동") || component.hasSuffix("읍") || component.hasSuffix("면") || component.hasSuffix("로")) {
-                district = component
-            }
-        }
-        return district.isEmpty ? "\(state) \(city)" : "\(state) \(city) \(district)"
+        return formattedString
     }
 }

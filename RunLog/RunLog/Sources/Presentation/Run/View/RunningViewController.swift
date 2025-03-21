@@ -15,10 +15,8 @@ final class RunningViewController: UIViewController {
     
     // MARK: - Property
     private let viewModel = RunningViewModel()
-    private let locationManager = LocationManager.shared
-    private let pedometerManager = PedometerManager.shared
     private var cancellables = Set<AnyCancellable>()
-    private var city: String?
+    
     // MARK: - UI
     lazy var mapView = MKMapView().then {
         $0.delegate = self
@@ -29,6 +27,7 @@ final class RunningViewController: UIViewController {
         $0.showsUserTrackingButton = true
         $0.pitchButtonVisibility = .visible
     }
+    // 카드 뷰
     private var cardView = CardView()
     private var foldButton = RLButton().then {
         $0.configureTitle(
@@ -59,33 +58,25 @@ final class RunningViewController: UIViewController {
         $0.setPreferredSymbolConfiguration(sfConfig, forImageIn: .normal)
         $0.isHidden = true
     }
+    
     // MARK: - Init
-    init(city: String) {
+    init() {
         super.init(nibName: nil, bundle: nil)
-        self.city = city
     }
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-//    // MARK: - 더미 테스트용: 테스트 끝나면지우기
-//    override func viewDidAppear(_ animated: Bool) {
-//        super.viewDidAppear(animated)
-//        // 2초 후 특정 함수 실행
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-////            DummyLocation.distanceCheck()
-////            DummyLocation.lineCheck()
-//        }
-//    }
+    
     // MARK: - Life Cycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        // setup
         setupUI()
-        setupNavigationBar()
         
-        // bind
-        bindGesture()
+        // binding
         viewModel.bind()
         bindViewModel()
+        bindGesture()
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -96,6 +87,7 @@ final class RunningViewController: UIViewController {
         super.viewWillDisappear(animated)
         self.navigationController?.setNavigationBarHidden(true, animated: false)
     }
+    
     // MARK: - Setup UI
     private func setupUI() {
         // UI 요소 추가
@@ -122,52 +114,13 @@ final class RunningViewController: UIViewController {
             $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(24)
         }
     }
-    // MARK: - Setup Navigation Bar
-    private func setupNavigationBar() {
-        // 네비게이션바 디테일 설정
-    }
-    // MARK: - Bind Gesture
-    private func bindGesture() {
-        // 종료 버튼 클릭
-        cardView.finishButton.publisher
-            .sink { [weak self] in
-                guard let self = self else { return }
-                // 걸음 측정 종료
-                pedometerManager.input.send(.stopPedometer)
-                viewModel.input.send(.runningStop)
-                // +) 세이브 구현 시 saveLog는 지움 -> ViewModel에서 데이터 저장
-                DispatchQueue.main.async {// 현재 단순 확인 용
-                    self.saveLog() // 결과 확인용 alert띄움
-                }
-//                self.dismiss(animated: false)
-            }
-            .store(in: &cancellables)
-        // 접기 버튼 클릭
-        foldButton.publisher
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] in
-                guard let self = self else { return }
-                self.toggleCardView()
-            }
-            .store(in: &cancellables)
-        // 펼치기 버튼 클릭
-        unfoldButton.publisher
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] in
-                guard let self = self else { return }
-                self.toggleCardView()
-            }
-            .store(in: &cancellables)
-    }
+    
     // MARK: - Setup Data
     private func setupData() {
-        // 맵뷰 초기 데이터 설정
-        let currentLocation = locationManager.currentLocation
-        mapView.setUserTrackingMode(.follow, animated: true)
-        mapView.centerToLocation(currentLocation)
-        
-        viewModel.input.send(.runningStart(city ?? ""))
+        // 처음 위치를 지도에 표현
+        viewModel.input.send(.requestCurrentLocation)
     }
+    
     // MARK: - Bind ViewModel
     private func bindViewModel() {
         viewModel.output
@@ -175,38 +128,59 @@ final class RunningViewController: UIViewController {
             .sink { [weak self] output in
                 guard let self = self else { return }
                 switch output {
+                case .responseRunningStop:
+                    self.dismiss(animated: false)
                 case .locationUpdate(let location):
-                    self.mapView.centerToLocation(location, region: self.mapView.region)
-                case .timerUpdate(let time):
+                    self.mapView.centerToLocation(location)
+                case .responseCurrentTimes(let time):
                     self.cardView.timeLabel.setConfigure(text: time)
-                case .distanceUpdate(let distance):
-                    self.cardView.distanceLabel.setConfigure(text: distance)
-                case .stepsUpdate(let step):
-                    self.cardView.stepsLabel.setConfigure(text: step)
-                case .lineDraw(let lineDraw):
-//                    print("라인 그리는 중")
-                    self.mapView.addOverlay(lineDraw)
+                case .responseCurrentDistances(let distances):
+                    self.cardView.distanceLabel.setConfigure(text: distances)
+                case .responseCurrentSteps(let steps):
+                    self.cardView.stepsLabel.setConfigure(text: steps)
+                case .lineDraw(let polyline):
+                    self.mapView.addOverlay(polyline)
                 }
+            }
+            .store(in: &cancellables)
+    }
+    
+    // MARK: - Bind Gesture
+    private func bindGesture() {
+        // 카드뷰 접었다 펴기
+        Publishers.Merge(
+            foldButton.publisher,
+            unfoldButton.publisher
+        )
+        .receive(on: DispatchQueue.main)
+        .sink { [weak self] in
+            guard let self = self else { return }
+            self.cardView.isHidden.toggle()
+            self.foldButton.isHidden.toggle()
+            self.unfoldButton.isHidden.toggle()
+        }
+        .store(in: &cancellables)
+        
+        // 종료 버튼 클릭
+        cardView.finishButton.publisher
+            .sink { [weak self] in
+                guard let self = self else { return }
+                self.viewModel.input.send(.requestRunningStop)
             }
             .store(in: &cancellables)
     }
 }
 
+// MARK: -  MKMapViewDelegate 함수
 extension RunningViewController: MKMapViewDelegate {
-    // MARK: - 카드 뷰 접었다 펴기
-    private func toggleCardView() {
-        self.cardView.isHidden.toggle()
-        self.foldButton.isHidden.toggle()
-        self.unfoldButton.isHidden.toggle()
-    }
-    // MARK: - 맵뷰 딜리게이트 함수들
+    // 트랙킹 모드 변경
     func mapView(_ mapView: MKMapView, didChange mode: MKUserTrackingMode, animated: Bool) {
         guard let userLocation = mapView.userLocation.location else { return }
-        if mode == .none {
-            // 지도의 위치로 변경
+        if mode == .none { // none이 되면 현재위치로 지도 바로 이동
             mapView.centerToLocation(userLocation, region: self.mapView.region)
         }
     }
+    // 풀리라인 설정
     func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
         guard let polyLine = overlay as? MKPolyline
         else {
@@ -219,37 +193,5 @@ extension RunningViewController: MKMapViewDelegate {
         renderer.alpha = 1.0
         
         return renderer
-    }
-}
-// MARK: - 외부에서 테스트 할때는 log 확인을 못하니 alert로 띄워서 확인
-// 데이터 저장 부분이 다 되면 지워도 됨
-extension RunningViewController {
-    private func saveLog() {
-        guard let startTime = viewModel.section.route.first?.timestamp,
-              let endTime = viewModel.section.route.last?.timestamp
-        else {
-            print("루트가 없음")
-            return
-        }
-        let totalTime = endTime.timeIntervalSince(startTime)
-        let message: String =
-            """
-            ⏹ 운동 종료 ⏹
-            시작 시간: \(startTime.formattedString(.fullTime))초
-            종료 시간: \(endTime.formattedString(.fullTime))초
-            총 운동 시간: \(totalTime)초
-            최종 경로 핀 수: \(viewModel.section.route.count)
-            최종 걸음 수: \(viewModel.section.steps)
-            """
-        let alert = UIAlertController(
-            title: nil,
-            message: message,
-            preferredStyle: .alert
-        )
-        let okAction = UIAlertAction(title: "확인", style: .default) { _ in
-            self.dismiss(animated: false)
-        }
-        alert.addAction(okAction)
-        self.present(alert,animated: true)
     }
 }
