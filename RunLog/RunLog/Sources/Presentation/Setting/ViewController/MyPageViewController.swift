@@ -39,11 +39,11 @@ final class MyPageViewController: UIViewController {
         
         viewModel.bind()
         bindViewModel()
-        viewModel.input.send(.loadData)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        viewModel.input.send(.loadData)
         self.navigationController?.setNavigationBarHidden(false, animated: animated)
     }
     
@@ -51,7 +51,6 @@ final class MyPageViewController: UIViewController {
         super.viewWillDisappear(animated)
         self.navigationController?.setNavigationBarHidden(false, animated: animated)
     }
-    
     
     // MARK: - Setup UI
     private func setupUI() {

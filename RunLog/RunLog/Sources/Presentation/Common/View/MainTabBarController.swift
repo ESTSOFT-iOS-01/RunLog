@@ -9,15 +9,9 @@ import UIKit
 
 class MainTabBarController: UITabBarController {
     
-
-    let appConfigRepository : AppConfigRepositoryImpl!
-//    let dayLogRepository : DayLogRepositoryImpl!
     
     // MARK: - Init
-    init(appConfigRepository : AppConfigRepositoryImpl) {
-        self.appConfigRepository = appConfigRepository
-//        self.dayLogRepository = dayLogRepository
-        
+    init() {
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -49,10 +43,7 @@ class MainTabBarController: UITabBarController {
         )
         
         
-        let usecase = AppConfigUsecaseImpl(appConfigRepository: self.appConfigRepository)
-        let settingVM = MyPageViewModel(appConfigUseCase: usecase)
-        let settingVC = MyPageViewController(viewModel: settingVM)
-        
+        let settingVC = MyPageViewController(viewModel: MyPageViewModel())
         let settingView = UINavigationController(rootViewController: settingVC)
         settingView.title = "Setting"
         settingView.tabBarItem = UITabBarItem(

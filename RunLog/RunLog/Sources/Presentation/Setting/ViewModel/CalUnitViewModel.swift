@@ -21,7 +21,7 @@ final class CalUnitViewModel {
         let saveSuccess = CurrentValueSubject<Bool, Never>(false)
     }
 
-    private let appConfigUseCase : AppConfigUsecaseImpl
+    @Dependency private var appConfigUseCase: AppConfigUsecase
     
     private var cancellables = Set<AnyCancellable>()
     private let inputSubject = PassthroughSubject<Input, Never>() // Input 스트림
@@ -30,9 +30,6 @@ final class CalUnitViewModel {
     private(set) var output: Output = .init()
     
     // MARK: - Init
-    init(appConfigUseCase: AppConfigUsecaseImpl) {
-        self.appConfigUseCase = appConfigUseCase
-    }
     
     // MARK: - Bind (Input -> Output)
     func bind() {

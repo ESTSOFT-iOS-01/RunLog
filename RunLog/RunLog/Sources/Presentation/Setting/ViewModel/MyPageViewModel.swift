@@ -21,7 +21,9 @@ final class MyPageViewModel {
         let navigateToViewController = CurrentValueSubject<UIViewController?, Never>(nil)
     }
     
-    private let appConfigUseCase : AppConfigUsecaseImpl
+    @Dependency private var dayLogUseCase: DayLogUseCase
+    @Dependency private var appConfigUseCase: AppConfigUsecase
+    
     private let menuItems: [SettingMenuType] = SettingMenuType.allCases
     
     private var cancellables = Set<AnyCancellable>()
@@ -31,10 +33,8 @@ final class MyPageViewModel {
     private(set) var output: Output = Output()
 
     // MARK: - Init
-    init(appConfigUseCase: AppConfigUsecaseImpl) {
-        self.appConfigUseCase = appConfigUseCase
-    }
     
+    // MARK: - Bind (Input -> Output)
     func bind() {
         inputSubject
             .receive(on: DispatchQueue.main)
@@ -54,6 +54,7 @@ final class MyPageViewModel {
         Task {
             do {
                 var userInfo = UserInfoVO(nickname: "RunLogger", totalDistance: 0.0, streakCount: 0, logCount: 0)
+                try await dayLogUseCase.updateStreakIfNeeded()
                 
                 userInfo.nickname = try await appConfigUseCase.getNickname()
                 userInfo.totalDistance = try await appConfigUseCase.getTotalDistance()
@@ -76,10 +77,10 @@ final class MyPageViewModel {
     private func createViewController(for selectedItem: SettingMenuType) -> UIViewController {
         switch selectedItem {
         case .changeCalendarUnit:
-            let viewModel = CalUnitViewModel(appConfigUseCase: appConfigUseCase)
+            let viewModel = CalUnitViewModel()
             return ChangeCalUnitViewController(viewModel: viewModel)
         case .changeNickname:
-            let viewModel = ChangeNicknameViewModel(appConfigUseCase: appConfigUseCase)
+            let viewModel = ChangeNicknameViewModel()
             return ChangeNicknameViewController(viewModel: viewModel)
         }
     }
