@@ -35,7 +35,7 @@ final class DetailLogView: UIView {
     
     /// 지도 위에 오버레이될 무빙트랙 버튼
     let movingTrackButton = UIButton(type: .system).then {
-        $0.configuration = nil
+        $0.configuration = UIButton.Configuration.plain()
         
         let attributedTitle = NSAttributedString.RLAttributedString(text: "무빙트랙", font: .Label2)
         $0.setAttributedTitle(attributedTitle, for: .normal)
@@ -47,8 +47,11 @@ final class DetailLogView: UIView {
         $0.setImage(icon, for: .normal)
         $0.tintColor = .Gray000
         
-        $0.titleEdgeInsets = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 0)
+        $0.configuration?.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 8)
+        $0.configuration?.imagePadding = 8
     }
+    
+    
     
     /// 타이틀 라벨
     private let titleLabel = RLLabel(
@@ -235,7 +238,7 @@ final class DetailLogView: UIView {
         
         movingTrackButton.snp.makeConstraints { make in
             make.bottom.trailing.equalToSuperview().inset(8)
-            make.width.equalTo(90)
+            make.width.equalTo(95)
             make.height.equalTo(40)
         }
         

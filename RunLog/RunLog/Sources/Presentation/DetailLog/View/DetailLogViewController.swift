@@ -134,7 +134,7 @@ final class DetailLogViewController: UIViewController {
         
         // reloadData 후 테이블뷰 상태 확인 (비동기)
         DispatchQueue.main.async {
-            let tableView = self.detailLogView.recordDetailView.tableView
+            _ = self.detailLogView.recordDetailView.tableView
             //print("디버그: reloadData 이후 tableView의 contentSize: \(tableView.contentSize), frame: \(tableView.frame), 시각: \(Date())")
         }
     }
