@@ -14,7 +14,18 @@
 		5EB036452D8A57120030DA8F /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 5EB036442D8A57120030DA8F /* Secrets.xcconfig */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		16811EFA2D8A9E520013461D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 16F686AF2D827D6C00C2163F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 16F686B62D827D6C00C2163F;
+			remoteInfo = RunLog;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		16811EF62D8A9E520013461D /* RpTest.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RpTest.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		16F686B72D827D6C00C2163F /* RunLog.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RunLog.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5EB036442D8A57120030DA8F /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -24,10 +35,6 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
-				Sources/Data/Impl/.gitkeep,
-				Sources/Domain/Entity/.gitkeep,
-				Sources/Domain/Repository/.gitkeep,
-				Sources/Domain/UseCase/.gitkeep,
 				Sources/Presentation/Common/Coordinator/.gitkeep,
 				Sources/Presentation/Log/Coordinator/.gitkeep,
 				Sources/Presentation/Log/ViewModel/.gitkeep,
@@ -40,6 +47,11 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		16811EF72D8A9E520013461D /* RpTest */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = RpTest;
+			sourceTree = "<group>";
+		};
 		16F686B92D827D6C00C2163F /* RunLog */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -51,6 +63,13 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		16811EF32D8A9E520013461D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		16F686B42D827D6C00C2163F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -70,6 +89,7 @@
 			children = (
 				5EB036442D8A57120030DA8F /* Secrets.xcconfig */,
 				16F686B92D827D6C00C2163F /* RunLog */,
+				16811EF72D8A9E520013461D /* RpTest */,
 				16F686B82D827D6C00C2163F /* Products */,
 			);
 			indentWidth = 4;
@@ -80,6 +100,7 @@
 			isa = PBXGroup;
 			children = (
 				16F686B72D827D6C00C2163F /* RunLog.app */,
+				16811EF62D8A9E520013461D /* RpTest.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -87,6 +108,29 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		16811EF52D8A9E520013461D /* RpTest */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 16811EFC2D8A9E520013461D /* Build configuration list for PBXNativeTarget "RpTest" */;
+			buildPhases = (
+				16811EF22D8A9E520013461D /* Sources */,
+				16811EF32D8A9E520013461D /* Frameworks */,
+				16811EF42D8A9E520013461D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				16811EFB2D8A9E520013461D /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				16811EF72D8A9E520013461D /* RpTest */,
+			);
+			name = RpTest;
+			packageProductDependencies = (
+			);
+			productName = RpTest;
+			productReference = 16811EF62D8A9E520013461D /* RpTest.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		16F686B62D827D6C00C2163F /* RunLog */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 16F686CA2D827D6F00C2163F /* Build configuration list for PBXNativeTarget "RunLog" */;
@@ -123,6 +167,10 @@
 				LastSwiftUpdateCheck = 1620;
 				LastUpgradeCheck = 1620;
 				TargetAttributes = {
+					16811EF52D8A9E520013461D = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 16F686B62D827D6C00C2163F;
+					};
 					16F686B62D827D6C00C2163F = {
 						CreatedOnToolsVersion = 16.2;
 					};
@@ -148,11 +196,19 @@
 			projectRoot = "";
 			targets = (
 				16F686B62D827D6C00C2163F /* RunLog */,
+				16811EF52D8A9E520013461D /* RpTest */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		16811EF42D8A9E520013461D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		16F686B52D827D6C00C2163F /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -164,6 +220,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		16811EF22D8A9E520013461D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		16F686B32D827D6C00C2163F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -173,7 +236,53 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		16811EFB2D8A9E520013461D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 16F686B62D827D6C00C2163F /* RunLog */;
+			targetProxy = 16811EFA2D8A9E520013461D /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		16811EFD2D8A9E520013461D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 83K577A944;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.IEEE.RpTest;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RunLog.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/RunLog";
+			};
+			name = Debug;
+		};
+		16811EFE2D8A9E520013461D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 83K577A944;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.IEEE.RpTest;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RunLog.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/RunLog";
+			};
+			name = Release;
+		};
 		16F686CB2D827D6F00C2163F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5EB036442D8A57120030DA8F /* Secrets.xcconfig */;
@@ -182,7 +291,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = C5K6DF875Z;
+				DEVELOPMENT_TEAM = 83K577A944;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = RunLog/Info.plist;
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "운동 거리 기록 및 시각화 정보 제공을 위한 위치 권한을 항상 혹은 앱 활성 시에만 허용하시겠습니까?";
@@ -220,7 +329,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = C5K6DF875Z;
+				DEVELOPMENT_TEAM = 83K577A944;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = RunLog/Info.plist;
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "운동 거리 기록 및 시각화 정보 제공을 위한 위치 권한을 항상 혹은 앱 활성 시에만 허용하시겠습니까?";
@@ -372,6 +481,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		16811EFC2D8A9E520013461D /* Build configuration list for PBXNativeTarget "RpTest" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				16811EFD2D8A9E520013461D /* Debug */,
+				16811EFE2D8A9E520013461D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		16F686B22D827D6C00C2163F /* Build configuration list for PBXProject "RunLog" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

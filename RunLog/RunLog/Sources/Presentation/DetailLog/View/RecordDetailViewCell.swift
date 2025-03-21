@@ -34,8 +34,8 @@ final class RecordDetailViewCell: UITableViewCell {
     private lazy var horizontalStack = UIStackView(arrangedSubviews: [timeLabel, distanceLabel, stepsLabel]).then {
         $0.axis = .horizontal
         $0.alignment = .leading
-        $0.distribution = .fillEqually
-        $0.spacing = 16
+        $0.distribution = .fill
+        $0.spacing = 0
     }
     
     // MARK: - Init
@@ -65,6 +65,17 @@ final class RecordDetailViewCell: UITableViewCell {
         horizontalStack.snp.makeConstraints { make in
             make.edges.equalToSuperview().inset(8)
         }
+        
+        // 라벨별로 width 비율 고정 (예: 0.4 : 0.3 : 0.3)
+        timeLabel.snp.makeConstraints { make in
+            make.width.equalTo(horizontalStack.snp.width).multipliedBy(0.334)
+        }
+        distanceLabel.snp.makeConstraints { make in
+            make.width.equalTo(horizontalStack.snp.width).multipliedBy(0.333)
+        }
+        stepsLabel.snp.makeConstraints { make in
+            make.width.equalTo(horizontalStack.snp.width).multipliedBy(0.333)
+        }
     }
     
     // MARK: - Configure
@@ -87,21 +98,27 @@ final class RecordDetailViewCell: UITableViewCell {
         stepsLabel.text = "걸음수"
     }
     
-    func configure(with record: RecordDetail) {
-        timeLabel.font = .RLHeadline2
+    /// 폰트를 외부에서 지정할 수 있도록 수정한 configure 메서드
+    func configure(with record: RecordDetail, font: UIFont) {
+        timeLabel.font = font
         timeLabel.textColor = .LightOrange
         timeLabel.textAlignment = .left
         timeLabel.text = record.timeRange
         
-        distanceLabel.font = .RLHeadline2
+        distanceLabel.font = font
         distanceLabel.textColor = .LightPink
         distanceLabel.textAlignment = .left
         distanceLabel.text = record.distance
         
-        stepsLabel.font = .RLHeadline2
+        stepsLabel.font = font
         stepsLabel.textColor = .LightBlue
         stepsLabel.textAlignment = .left
         stepsLabel.text = record.steps
+    }
+    
+    // 기존 메서드 유지 (디폴트로 headline2 적용)
+    func configure(with record: RecordDetail) {
+        configure(with: record, font: .RLHeadline2)
     }
 }
 

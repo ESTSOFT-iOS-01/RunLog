@@ -35,9 +35,42 @@
             parallelizable = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "5EB0365B2D8BB5F70030DA8F"
+               BlueprintIdentifier = "16811EC52D8A9A9D0013461D"
                BuildableName = "RunLogTests.xctest"
                BlueprintName = "RunLogTests"
+               ReferencedContainer = "container:RunLog.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "16811ED42D8A9AE80013461D"
+               BuildableName = "RunLogTest.xctest"
+               BlueprintName = "RunLogTest"
+               ReferencedContainer = "container:RunLog.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "16811EE52D8A9BAD0013461D"
+               BuildableName = "RepositoryTest.xctest"
+               BlueprintName = "RepositoryTest"
+               ReferencedContainer = "container:RunLog.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "16811EF52D8A9E520013461D"
+               BuildableName = "RpTest.xctest"
+               BlueprintName = "RpTest"
                ReferencedContainer = "container:RunLog.xcodeproj">
             </BuildableReference>
          </TestableReference>
