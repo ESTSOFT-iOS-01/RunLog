@@ -45,7 +45,7 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
     private func setupLocationManager() {
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
-        locationManager.distanceFilter = 5  // Q) 지피티 피셜 걷기+달리기면 5m가 적당하다
+        locationManager.distanceFilter = 5  // Q) 지피티 피셜 걷기+달리기면 5m가 적당하다 - 실제로 3, 5로 해서 측정해보고 결정
         locationManager.allowsBackgroundLocationUpdates = true // 백그라운드 상태에서도 위치 업데이트
         locationManager.pausesLocationUpdatesAutomatically = true //사용자가 멈춰있으면 업데이트 일시정지
         getLocationUsagePermission()
@@ -113,5 +113,17 @@ extension LocationManager {
         if UIApplication.shared.canOpenURL(url) {
             UIApplication.shared.open(url, options: [:], completionHandler: nil)
         }
+    }
+}
+
+
+
+
+// MARK: - 테스트용 더미 셋
+extension LocationManager {
+    func setDummy(location: CLLocation) {
+        self.previousLocation = location
+        self.fetchCityName(location: location)
+        self.locationSubject.send(location)
     }
 }

@@ -92,7 +92,6 @@ final class RunningViewModel {
                 self.section.route.append(current)
                 // 이전 위치와 상관없이 현위치로 이동
                 self.output.send(.locationUpdate(location))
-                
             }
             .store(in: &cancellables)
         // 사용자 걸음 수 변경 구독

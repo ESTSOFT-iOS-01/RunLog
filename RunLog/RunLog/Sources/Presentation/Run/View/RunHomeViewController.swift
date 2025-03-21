@@ -18,18 +18,18 @@ final class RunHomeViewController: UIViewController {
     private var cancellables = Set<AnyCancellable>()
     
     // MARK: - UI
-    lazy var mapView = MKMapView().then {
+    private lazy var mapView = MKMapView().then {
         $0.showsUserLocation = true
     }
-    var totalLabel = UILabel().then {
+    private var totalLabel = UILabel().then {
         $0.numberOfLines = 3
     }
-    var weatherLabel = RLLabel().then {
+    private var weatherLabel = RLLabel().then {
         $0.setImage(image: UIImage(systemName: RLIcon.weather.name))
     }
-    var blurView = MapBlurView()
-    var locationLabel = UILabel()
-    var startButton = RLButton(
+    private var blurView = MapBlurView()
+    private var locationLabel = UILabel()
+    private var startButton = RLButton(
         title: "운동 시작하기",
         titleColor: .Gray900
     ).then {
@@ -109,7 +109,7 @@ final class RunHomeViewController: UIViewController {
         startButton.publisher
             .receive(on: DispatchQueue.main)
             .sink {
-                // Q) 코디네이터를 쓰면 해당 부분들이 전부 거기로 넘어갈듯
+                // +) 코디네이터를 쓰면 해당 부분들이 전부 거기로 넘어갈듯
                 PedometerManager.shared.input.send(.startPedometer)
                 let vc = RunningViewController()
                 vc.modalPresentationStyle = .fullScreen
