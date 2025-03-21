@@ -23,6 +23,13 @@ final class AppConfigRepositoryImpl: AppConfigRepository {
                     throw AppConfigError.notFound
                 }
                 
+                let fetchRequest: NSFetchRequest<AppConfigDTO> = AppConfigDTO.fetchRequest()
+                let results = try self.context.fetch(fetchRequest)
+                
+                guard results.isEmpty else {
+                    throw AppConfigError.duplicatedObject
+                }
+                
                 let data = DataMapper.toDTO(config, context: self.context)
                 
                 do {
