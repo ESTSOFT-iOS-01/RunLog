@@ -16,6 +16,7 @@ final class CalUnitView: UIView {
     
     // MARK: - UI Components 선언
     private let exampleImageView = UIImageView().then {
+        $0.image = UIImage(named: "UnitExample")
         $0.backgroundColor = .clear
         $0.contentMode = .scaleAspectFit
     }

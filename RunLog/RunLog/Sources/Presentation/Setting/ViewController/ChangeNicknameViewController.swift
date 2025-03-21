@@ -39,11 +39,12 @@ final class ChangeNicknameViewController: UIViewController {
         
         viewModel.bind()
         bindViewModel()
-        setupData()
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        setupData()
         self.navigationController?.setNavigationBarHidden(false, animated: animated)
     }
     
