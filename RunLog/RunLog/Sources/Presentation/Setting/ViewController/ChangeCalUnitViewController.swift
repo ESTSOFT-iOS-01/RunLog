@@ -13,7 +13,7 @@ import Combine
 final class ChangeCalUnitViewController: UIViewController {
     
     // MARK: - Properties
-    private let viewModel : CalUnitViewModel!
+    private let viewModel: CalUnitViewModel!
     private var cancellables = Set<AnyCancellable>()
     
     // MARK: - UI
