@@ -297,7 +297,7 @@ extension DetailLogView {
         conditionLabel.label.text = log.level
         
         // 소요시간 업데이트 (예: "1시간 0분")
-        timeValueLabel.label.text = formatTimeInterval(log.totalTime)
+        timeValueLabel.label.text = log.totalTime.hourMinuteString
         
         // 운동거리 업데이트 (예: "5.0km")
         distanceValueLabel.label.text = "\(log.totalDistance)km"
@@ -306,19 +306,6 @@ extension DetailLogView {
         stepsValueLabel.label.text = log.totalSteps.formattedString
     }
     
-    /// TimeInterval (초)를 "X시간 Y분" 형식의 문자열로 변환
-    private func formatTimeInterval(_ interval: TimeInterval) -> String {
-        let hours = Int(interval) / 3600
-        let minutes = (Int(interval) % 3600) / 60
-        return "\(hours)시간 \(minutes)분"
-    }
-    
-    /// 정수를 천단위 구분 기호를 포함한 문자열로 변환
-    private func formatSteps(_ steps: Int) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        return formatter.string(from: NSNumber(value: steps)) ?? "\(steps)"
-    }
 }
 
 extension DetailLogView {
