@@ -21,7 +21,7 @@ final class RunHomeViewModel {
     // MARK: - Properties
     private let locationManager = LocationManager.shared
     private let openWeatherService = OpenWeatherService.shared
-    private var previousLocation: CLLocation?
+    private var previousCity: String? // 이전 도시
     // MARK: - Init
     init() {
         bind()
@@ -43,12 +43,12 @@ final class RunHomeViewModel {
                 let placemark = value.1
                 let city = self.placemarksToString(placemark)
                 // +) 이전과 다른 위치면 정보 업데이트인데 여긴 도시가 달라지면으로 바꿔야할듯
-                if previousLocation != location {
+                if previousCity != city {
                     print("날씨정보 업데이트")
                     self.openWeatherService.input.send(.requestUpdate(location))
                     self.output.send(.locationNameUpdate(city))
                 }
-                previousLocation = location
+                previousCity = city
             }
             .store(in: &cancellables)
         // 날씨 및 대기질 변경 구독
