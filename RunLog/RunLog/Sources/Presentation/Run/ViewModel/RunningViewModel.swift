@@ -20,7 +20,7 @@ final class RunningViewModel {
     private var timeRecord: TimeInterval = 0
     // MARK: - Input & Output
     enum Input {
-        case runningStart // 운동 시작 -> 시간 업데이트 필요
+        case runningStart(String) // 운동 시작 -> 시간 업데이트 필요
         case runningStop // 운동 종료 -> 결과 저장
     }
     enum Output {
@@ -46,7 +46,7 @@ final class RunningViewModel {
         guard let startTime = section.route.first?.timestamp,
               let endTime = section.route.last?.timestamp
         else {
-            print("루트가 없음")
+            print("루트 없음")
             return
         }
         let totalTime = endTime.timeIntervalSince(startTime)
@@ -115,8 +115,8 @@ final class RunningViewModel {
             .sink { [weak self] input in
                 guard let self = self else { return }
                 switch input {
-                case .runningStart:
-                    runningStart()
+                case .runningStart(let locationName):
+                    runningStart(locationName: locationName)
                 case .runningStop:
                     runnungStop()
                 }
@@ -137,7 +137,7 @@ final class RunningViewModel {
             .store(in: &cancellables)
     }
     // 운동 시작
-    private func runningStart() {
+    private func runningStart(locationName: String) {
         // 시작 위치를 경로에 저장
         let currentLocation = locationManager.currentLocation
         let point: Point = Point(
@@ -148,6 +148,8 @@ final class RunningViewModel {
         // 타이머 시작
         self.timerUpdate()
         
+        // +) 데이 로그 생성
+        print(locationName)
         
     }
     // 운동 종료

@@ -18,6 +18,7 @@ final class RunningViewController: UIViewController {
     private let locationManager = LocationManager.shared
     private let pedometerManager = PedometerManager.shared
     private var cancellables = Set<AnyCancellable>()
+    private var city: String?
     // MARK: - UI
     lazy var mapView = MKMapView().then {
         $0.delegate = self
@@ -59,8 +60,9 @@ final class RunningViewController: UIViewController {
         $0.isHidden = true
     }
     // MARK: - Init
-    init() {
+    init(city: String) {
         super.init(nibName: nil, bundle: nil)
+        self.city = city
     }
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -79,9 +81,9 @@ final class RunningViewController: UIViewController {
         super.viewDidLoad()
         setupUI()
         setupNavigationBar()
-        bindGesture()
         
         // bind
+        bindGesture()
         viewModel.bind()
         bindViewModel()
     }
@@ -164,7 +166,7 @@ final class RunningViewController: UIViewController {
         mapView.setUserTrackingMode(.follow, animated: true)
         mapView.centerToLocation(currentLocation)
         
-        viewModel.input.send(.runningStart)
+        viewModel.input.send(.runningStart(city ?? ""))
     }
     // MARK: - Bind ViewModel
     private func bindViewModel() {

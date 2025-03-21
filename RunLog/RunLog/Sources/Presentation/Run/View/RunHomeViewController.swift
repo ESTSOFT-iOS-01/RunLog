@@ -112,7 +112,8 @@ final class RunHomeViewController: UIViewController {
             .sink {
                 // +) 코디네이터를 쓰면 해당 부분들이 전부 거기로 넘어갈듯
                 PedometerManager.shared.input.send(.startPedometer)
-                let vc = RunningViewController()
+                
+                let vc = RunningViewController(city: self.viewModel.cityName ?? "")
                 vc.modalPresentationStyle = .fullScreen
                 self.present(vc, animated: false)
             }

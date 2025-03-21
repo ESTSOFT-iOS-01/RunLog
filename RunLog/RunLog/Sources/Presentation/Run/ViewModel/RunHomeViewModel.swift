@@ -19,9 +19,9 @@ final class RunHomeViewModel {
     let output = PassthroughSubject<Output, Never>()
     private var cancellables = Set<AnyCancellable>()
     // MARK: - Properties
+    var cityName: String? // 이전 도시명
     private let locationManager = LocationManager.shared
     private let openWeatherService = OpenWeatherService.shared
-    private var previousCity: String? // 이전 도시명
     // MARK: - Init
     init() { }
     // MARK: - Bind (Input -> Output)
@@ -39,13 +39,14 @@ final class RunHomeViewModel {
                 guard let self = self else { return }
                 let location = value.0
                 let placemark = value.1
-                let city = self.placemarksToString(placemark)
-                if previousCity != city {
+                let newCity = self.placemarksToString(placemark)
+                if cityName != newCity {
                     print("날씨정보 업데이트")
                     self.openWeatherService.input.send(.requestUpdate(location))
-                    self.output.send(.locationNameUpdate(city))
+                    let nameUpdatedString = "\(newCity)에서"
+                    self.output.send(.locationNameUpdate(nameUpdatedString))
                 }
-                previousCity = city
+                cityName = newCity
             }
             .store(in: &cancellables)
         // 날씨 및 대기질 변경 구독
@@ -102,6 +103,6 @@ extension RunHomeViewModel {
                 district = component
             }
         }
-        return district.isEmpty ? "\(state) \(city)에서" : "\(state) \(city) \(district)에서"
+        return district.isEmpty ? "\(state) \(city)" : "\(state) \(city) \(district)"
     }
 }
