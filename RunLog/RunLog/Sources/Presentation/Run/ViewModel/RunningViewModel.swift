@@ -110,28 +110,9 @@ final class RunningViewModel {
                 guard let self = self else { return }
                 switch input {
                 case .runningStart:
-                    // 시작 위치를 경로에 저장
-                    let currentLocation = locationManager.currentLocation
-                    let point: Point = Point(
-                        latitude: currentLocation.coordinate.latitude,
-                        longitude: currentLocation.coordinate.longitude,
-                        timestamp: Date())
-                    self.section.route.append(point)
-                    // 타이머 시작
-                    self.timerUpdate()
+                    runningStart()
                 case .runningStop:
-                    // 타이머 종료
-                    timer?.invalidate()
-                    timer = nil
-                    // 마지막 위치를 경로에 저장
-                    let currentLocation = locationManager.currentLocation
-                    let point: Point = Point(
-                        latitude: currentLocation.coordinate.latitude,
-                        longitude: currentLocation.coordinate.longitude,
-                        timestamp: Date())
-                    self.section.route.append(point)
-                    // 내용 저장
-                    self.saveLog()
+                    runnungStop()
                 }
             }
             .store(in: &cancellables)
@@ -149,6 +130,34 @@ final class RunningViewModel {
             }
             .store(in: &cancellables)
     }
+    // 운동 시작
+    private func runningStart() {
+        // 시작 위치를 경로에 저장
+        let currentLocation = locationManager.currentLocation
+        let point: Point = Point(
+            latitude: currentLocation.coordinate.latitude,
+            longitude: currentLocation.coordinate.longitude,
+            timestamp: Date())
+        self.section.route.append(point)
+        // 타이머 시작
+        self.timerUpdate()
+    }
+    // 운동 종료
+    private func runnungStop() {
+        // 타이머 종료
+        self.timer?.invalidate()
+        self.timer = nil
+        // 마지막 위치를 경로에 저장
+        let currentLocation = locationManager.currentLocation
+        let point: Point = Point(
+            latitude: currentLocation.coordinate.latitude,
+            longitude: currentLocation.coordinate.longitude,
+            timestamp: Date())
+        self.section.route.append(point)
+        // 내용 저장
+        self.saveLog()
+    }
+    // 운동 종료
     // 운동 시작하면 초당 운동시간 업데이트
     private func timerUpdate() {
         timer = Timer.scheduledTimer(
