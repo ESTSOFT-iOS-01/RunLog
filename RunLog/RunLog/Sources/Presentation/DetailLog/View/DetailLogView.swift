@@ -10,6 +10,7 @@ import MapKit
 import SnapKit
 import Then
 
+
 final class DetailLogView: UIView {
     
     // MARK: - UI Components 선언
@@ -30,9 +31,11 @@ final class DetailLogView: UIView {
         $0.clipsToBounds = true
     }
     
+    
+    
     /// 지도 위에 오버레이될 무빙트랙 버튼
     let movingTrackButton = UIButton(type: .system).then {
-        $0.configuration = nil
+        $0.configuration = UIButton.Configuration.plain()
         
         let attributedTitle = NSAttributedString.RLAttributedString(text: "무빙트랙", font: .Label2)
         $0.setAttributedTitle(attributedTitle, for: .normal)
@@ -44,8 +47,11 @@ final class DetailLogView: UIView {
         $0.setImage(icon, for: .normal)
         $0.tintColor = .Gray000
         
-        $0.titleEdgeInsets = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 0)
+        $0.configuration?.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 8)
+        $0.configuration?.imagePadding = 8
     }
+    
+    
     
     /// 타이틀 라벨
     private let titleLabel = RLLabel(
@@ -175,7 +181,7 @@ final class DetailLogView: UIView {
         stack.axis = .horizontal
         stack.alignment = .center
         stack.spacing = 16
-        stack.distribution = .equalSpacing
+        stack.distribution = .fillEqually
         return stack
     }()
     
@@ -192,6 +198,7 @@ final class DetailLogView: UIView {
         super.init(frame: frame)
         setupUI()
         setupLayout()
+        
         print("LogView initialized")
     }
     
@@ -231,7 +238,7 @@ final class DetailLogView: UIView {
         
         movingTrackButton.snp.makeConstraints { make in
             make.bottom.trailing.equalToSuperview().inset(8)
-            make.width.equalTo(90)
+            make.width.equalTo(95)
             make.height.equalTo(40)
         }
         
@@ -274,38 +281,56 @@ final class DetailLogView: UIView {
         }
     }
     
-    // MARK: - Configure
-    private func configure() {
-        // 뷰 설정
+}
+
+// MARK: - Configure Extension
+extension DetailLogView {
+    /// DisplayDayLog 데이터를 기반으로 UI를 업데이트하는 메서드
+    func configure(with log: DisplayDayLog) {
+        // 타이틀 업데이트
+        titleLabel.label.text = log.title
+        
+        // 위치 업데이트
+        locationLabel.label.text = log.locationName
+        
+        // 날씨 업데이트 (예: "맑음 | 20°C")
+        weatherLabel.label.text = "\(log.weather) | \(log.temperature)°C"
+        
+        // 난이도 업데이트
+        conditionLabel.label.text = log.level
+        
+        // 소요시간 업데이트 (예: "1시간 0분")
+        timeValueLabel.label.text = log.totalTime.hourMinuteString
+        
+        // 운동거리 업데이트 (예: "5.0km")
+        distanceValueLabel.label.text = "\(log.totalDistance)km"
+        
+        // 걸음수 업데이트 (천 단위 구분 기호 포함)
+        stepsValueLabel.label.text = log.totalSteps.formattedString
     }
     
 }
-//
-//#if canImport(SwiftUI) && DEBUG
-//import SwiftUI
-//
-//struct DetailLogView_Preview: PreviewProvider {
-//    static var previews: some View {
-//        UIViewPreview {
-//            DetailLogView()
-//        }
-//        .previewLayout(.sizeThatFits) // 크기를 적절하게 조절하여 미리보기 가능
-//        .padding()
-//    }
-//}
-//
-//// UIKit 뷰를 SwiftUI에서 렌더링하는 Helper
-//struct UIViewPreview<T: UIView>: UIViewRepresentable {
-//    let viewBuilder: () -> T
-//    
-//    init(_ viewBuilder: @escaping () -> T) {
-//        self.viewBuilder = viewBuilder
-//    }
-//    
-//    func makeUIView(context: Context) -> T {
-//        return viewBuilder()
-//    }
-//    
-//    func updateUIView(_ uiView: T, context: Context) {}
-//}
-//#endif
+
+extension DetailLogView {
+    // MARK: - MapView Helper Methods
+    /// 외부에서 MKMapViewDelegate를 주입하기 위한 헬퍼 메서드
+    func setMapViewDelegate(_ delegate: MKMapViewDelegate) {
+        mapView.delegate = delegate
+    }
+    
+    /// 폴리라인 등의 오버레이를 추가
+    func addMapOverlay(_ overlay: MKOverlay) {
+        mapView.addOverlay(overlay)
+    }
+    
+    /// 맵뷰 영역 설정
+    func setMapRegion(_ region: MKCoordinateRegion, animated: Bool) {
+        mapView.setRegion(region, animated: animated)
+    }
+    
+    func removeAllMapOverlays() {
+        mapView.removeOverlays(mapView.overlays)
+    }
+}
+
+

@@ -65,7 +65,7 @@ final class RecordDetailView: UIView {
     private func observeTableViewContentSize() {
         contentSizeObservation = tableView.observe(\.contentSize, options: [.new, .old]) { [weak self] tableView, change in
             guard let self = self, let newSize = change.newValue else { return }
-            print("디버그: tableView의 contentSize가 \(change.oldValue ?? .zero)에서 \(newSize)로 변경됨, 시각: \(Date())")
+            //print("디버그: tableView의 contentSize가 \(change.oldValue ?? .zero)에서 \(newSize)로 변경됨, 시각: \(Date())")
             
             // SnapKit을 통해 높이 제약조건 업데이트
             self.tableView.snp.updateConstraints { make in
@@ -77,7 +77,7 @@ final class RecordDetailView: UIView {
             self.layoutIfNeeded()
             
             // 업데이트 후 실제 테이블뷰의 높이 출력
-            print("디버그: 업데이트 후 tableView의 frame.height: \(self.tableView.frame.height), 시각: \(Date())")
+            //print("디버그: 업데이트 후 tableView의 frame.height: \(self.tableView.frame.height), 시각: \(Date())")
         }
     }
     
@@ -86,3 +86,7 @@ final class RecordDetailView: UIView {
     }
     
 }
+
+
+
+
