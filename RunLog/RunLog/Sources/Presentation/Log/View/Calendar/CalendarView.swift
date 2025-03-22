@@ -12,11 +12,11 @@ import Then
 final class CalendarView: UIView {
     
     // MARK: - UI Components 선언
-    private let walkImage = UIImageView().then {
-        $0.image = UIImage(named: RLIcon.walk.name)
+    lazy var walkImage = UIImageView().then {
+        $0.image = UIImage(named: RLIcon.walkGirl.name)
     }
     
-    private var nicknameLabel = UILabel().then {
+    lazy var nicknameLabel = UILabel().then {
         var nickname = "행복한쿼카러너화이팅"
         $0.attributedText = .RLAttributedString(
             text: nickname + " 님,",
@@ -25,7 +25,7 @@ final class CalendarView: UIView {
         )
     }
     
-    private let bottomLabel = UILabel().then {
+    lazy var bottomLabel = UILabel().then {
         let text = "오늘도 가볍게 동네 산책 어때요?"
         $0.attributedText = .RLAttributedString(
             text: text,
