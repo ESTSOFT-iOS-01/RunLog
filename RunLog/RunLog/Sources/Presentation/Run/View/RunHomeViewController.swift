@@ -118,6 +118,7 @@ final class RunHomeViewController: UIViewController {
         // 처음 위치를 지도에 표현
         viewModel.input.send(.requestCurrentLocation)
         // 로드(기록)정보 표현
+        viewModel.input.send(.requestRoadRecord)
         totalLabelCreate(value: ("올레길", "2.5"))
     }
     
@@ -135,9 +136,20 @@ final class RunHomeViewController: UIViewController {
                 case .locationUpdate(let location):
                     self.mapView.centerToLocation(location)
                 case .locationNameUpdate(let text):
-                    self.locationLabel.attributedText = .RLAttributedString(text: text, font: .Label2, align: .center)
+                    self.locationLabel.attributedText =
+                        .RLAttributedString(
+                            text: text,
+                            font: .Label2,
+                            align: .center
+                        )
                 case .weatherUpdate(let text):
-                    self.weatherLabel.attributedText = .RLAttributedString(text: text, font: .Label2)
+                    self.weatherLabel.attributedText =
+                        .RLAttributedString(
+                            text: text,
+                            font: .Label2
+                        )
+                case .responseRoadRecord(let text):
+                    print(text)
                 }
             }
             .store(in: &cancellables)

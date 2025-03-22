@@ -20,6 +20,7 @@ final class RunHomeViewModel {
         case requestRunningStart // 운동시작 요청
         case requestCurrentLocation
         case requestCurrentWeahter
+        case requestRoadRecord
     }
     let input = PassthroughSubject<Input, Never>()
     
@@ -29,6 +30,7 @@ final class RunHomeViewModel {
         case locationUpdate(CLLocation) // 사용자 위치 데이터
         case locationNameUpdate(String) // 가공된 위치 데이터
         case weatherUpdate(String)  // 가공된 날씨 데이터
+        case responseRoadRecord(String) // 기록 데이터
     }
     let output = PassthroughSubject<Output, Never>()
     
@@ -49,6 +51,8 @@ final class RunHomeViewModel {
                     self.provider.input.send(.requestCurrentLocation)
                 case .requestCurrentWeahter:
                     self.provider.input.send(.requestCurrentWeather)
+                case .requestRoadRecord:
+                    self.provider.input.send(.requestRoadRecord)
                 }
             }
             .store(in: &cancellables)
@@ -68,6 +72,8 @@ final class RunHomeViewModel {
                 case .responseCurrentWeather(let weahter, let aqi):
                     let weatherString = self.toWeatherString(weahter, aqi)
                     self.output.send(.weatherUpdate(weatherString))
+                case .responseRoadRecord(let road):
+                    self.output.send(.responseRoadRecord(road))
                 }
             }
             .store(in: &cancellables)

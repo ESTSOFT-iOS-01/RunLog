@@ -42,8 +42,7 @@ final class RunningDataProvider {
         case responseCurrentLocation(CLLocation) // 현재위치(CLLocatio)를 제공
         case responseCurrentCityName(String) // 도시이름(String)을 제공
         case responseCurrentWeather((Int, Double), Int) // 날씨+대기질(String)을 제공
-        
-        
+        case responseRoadRecord(String) // 기록(?)을 제공
     }
     let runHomeOutput = PassthroughSubject<RunHomeOutput, Never>()
     
@@ -53,9 +52,11 @@ final class RunningDataProvider {
         case responseCurrentTimes(TimeInterval) // 총 운동시간(TimeInterval) 제공
         case responseCurrentDistances(Double) // 총 운동거리(Double) 제공
         case responseCurrentSteps(Int) // 총 걸음수(Int) 제공
-        case responseLineDraw(MKPolyline)
+        case responseLineDraw(MKPolyline) // 이동 경로(MKPolyline)를 제공
     }
     let runningOutput = PassthroughSubject<RunningOutput, Never>()
+    
+    
     
     // MARK: - Properties
     private var cancellables = Set<AnyCancellable>()
@@ -74,6 +75,7 @@ final class RunningDataProvider {
     private let locationManger = LocationManager.shared
     private let pedometerManager = PedometerManager.shared
     private let distanceManager = DistanceManager.shared
+    private let drawingManager = DrawingManager.shared
     
     // MARK: - Service
     private let weatherService = OpenWeatherService.shared
@@ -169,6 +171,19 @@ extension RunningDataProvider {
                 }
             }
             .store(in: &cancellables)
+        
+        // MARK: - Drawing Manager
+        drawingManager.output
+            .sink { [weak self] output in
+                guard let self = self else { return }
+                switch output {
+                case .responsePolyline(let polyline):
+                    self.runningOutput.send(.responseLineDraw(polyline))
+                case .responsePolylines(let polylines):
+                    // 운동 종료 후 데이로그에 반영 후 데이로그의 경로를 가지고 새롭게 만든 폴리라인들 - 사진으로 만들어서 데이로그에 저장!
+                }
+            }
+            .store(in: &cancellables)
     }
     
     // 위치 업데이트
@@ -188,7 +203,7 @@ extension RunningDataProvider {
             )
             self.section.route.append(point)
             self.runningOutput.send(.responseCurrentLocation(current))
-            self.lindDraw(location: current, previous: previous)
+            drawingManager.input.send(.requestLine(previous, current))
             distanceManager.input.send(.requestDistance(
                 previous: previous,
                 current: current)
@@ -197,24 +212,6 @@ extension RunningDataProvider {
         else {
             self.runHomeOutput.send(.responseCurrentLocation(location))
         }
-    }
-    
-    // +) 경로 그리기 - 이걸 다른 곳에 매니저를 만들어서 해야할듯 - 이미지 생성때문
-    // 기본 경로 그리기 움직일때 마다 그려줌
-    // 운동 종료 버튼 클릭 -> 섹션에 단긴 전체 핀으로 위임해서 폴리라인이 담긴 배열을 반환받음
-    private func lindDraw(location: CLLocation, previous: CLLocation) {
-        let point1 = CLLocationCoordinate2DMake(
-            previous.coordinate.latitude,
-            previous.coordinate.longitude
-        )
-        let point2 = CLLocationCoordinate2DMake(
-            location.coordinate.latitude,
-            location.coordinate.longitude
-        )
-        let points: [CLLocationCoordinate2D] = [point1, point2]
-        let polyline = MKPolyline(coordinates: points, count: points.count)
-        
-        self.runningOutput.send(.responseLineDraw(polyline))
     }
 }
 
@@ -225,19 +222,8 @@ extension RunningDataProvider {
 //        dummy.startDummySet()
 //        // Syr) 테스트용 End
         
-        // 운동 시작
-        print("운동 시작!!!")
-        
-        // 1. 운동 정보 초기화
-        guard let startPoint = self.currentLocation else { return }
-        let startRoute: Point = Point(
-            latitude: startPoint.coordinate.latitude,
-            longitude: startPoint.coordinate.longitude,
-            timestamp: Date()
-        )
-        self.section = Section(distance: 0, steps: 0, route: [startRoute])
+        // 데이로그 생성
         Task {
-            // 2. 데이로그를 생성
             guard let locationName = self.currentCity,
                   let weather = self.currentWeather,
                   let temperature = self.currentTemperature
@@ -249,17 +235,28 @@ extension RunningDataProvider {
             )
         }
         
+        // 섹션 생성
+        self.section = Section(distance: 0, steps: 0, route: [])
         
-        // 3. 운동O 상태 변경
+        // 운동 시작 위치를 경로에 저장
+        guard let startLocation = self.currentLocation else { return }
+        let startPoint: Point = Point(
+            latitude: startLocation.coordinate.latitude,
+            longitude: startLocation.coordinate.longitude,
+            timestamp: Date()
+        )
+        self.section.route.append(startPoint)
+        
+        // 운동O 상태로 변경
         currentIsRunning = true
         
-        // 4. 운동시간 측정 시작
+        // 운동 시간 측정 시작
         runningTimerStart()
         
-        // 5. 운동걸음수 측정 시작
+        // 운동 걸음수 측정 시작
         pedometerManager.input.send(.requestPedometerStart)
         
-        // 6. 정상적인 운동 시작
+        // 정상적인으로 운동 시작
         self.runHomeOutput.send(.responseRunningStart)
     }
     
@@ -285,31 +282,52 @@ extension RunningDataProvider {
 //        dummy.stopDummySet()
 //        // Syr) 테스트용 End
         
-        // 운동 종료
-        print("운동 종료!!!")
-        guard let endPoint = self.currentLocation else { return }
-        let endRoute: Point = Point(
-            latitude: endPoint.coordinate.latitude,
-            longitude: endPoint.coordinate.longitude,
+        // 운동 종료 위치를 경로에 저장
+        guard let endLocation = self.currentLocation else { return }
+        let endPoint: Point = Point(
+            latitude: endLocation.coordinate.latitude,
+            longitude: endLocation.coordinate.longitude,
             timestamp: Date()
         )
-        self.section.route.append(endRoute)
-        // 1. 운동걸음수 측정 종료
+        self.section.route.append(endPoint)
+        
+        // 운동걸음수 측정 종료
         pedometerManager.input.send(.requestPedometerStop)
         
-        // 2. 운동시간 측정 종료
+        // 운동시간 측정 종료
         runningTimerStop()
         
-        // 3. 운동X 상태 변경
+        // 운동X 상태로 변경
         currentIsRunning = false
         
-        // 4. 데이로그에 섹션 저장
+        // 데이로그에 섹션 저장
         Task {
             try await dayLogUseCase.addSectionByDate(Date(), section: self.section)
         }
         
-        // 5. 정상적인 운동 종료
+        //+) 여기서 현재까지의 데이로그를 기반으로 전체 폴리라인을 요청을 보냄
+        // -> 요청에 대한 답은 drawingManager.output에서 확인
+        Task {
+            if let dayLog = try await dayLogUseCase.getDayLogByDate(Date()) {
+                var allPoint: [CLLocation] = []
+                for section in dayLog.sections {
+                    for route in section.route {
+                        let location = CLLocation(
+                            latitude: route.latitude,
+                            longitude: route.longitude
+                        )
+                        allPoint.append(location)
+                    }
+                }
+                self.drawingManager.input.send(.requestLines(allPoint))
+            }
+        }
+        
+        // 정상적인 운동 종료
         self.runningOutput.send(.responseRunningStop)
+        
+        
+        // +) 아래는 운동 정보 로그 찍어보기
         guard let startTime = section.route.first?.timestamp,
               let endTime = section.route.last?.timestamp
         else {
