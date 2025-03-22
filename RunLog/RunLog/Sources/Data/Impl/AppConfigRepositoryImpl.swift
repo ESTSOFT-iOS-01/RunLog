@@ -31,6 +31,7 @@ final class AppConfigRepositoryImpl: AppConfigRepository {
                 }
                 
                 let data = DataMapper.toDTO(config, context: self.context)
+                self.context.insert(data)
                 
                 do {
                     try self.context.save()
