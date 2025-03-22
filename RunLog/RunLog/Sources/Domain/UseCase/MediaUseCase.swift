@@ -17,7 +17,14 @@ protocol MediaUseCase {
     ///   - mapView: 폴리라인을 그린 맵 뷰
     /// - Returns: 생성된 이미지 (`UIImage`)
     /// - Throws: 이미지 생성 중 발생할 수 있는 에러
-    func createPolylineImage(mapView: MKMapView) async throws -> UIImage
+//    func createPolylineImage(mapView: MKMapView) async throws -> UIImage
+    
+//    func createPolylineImage(mapView: MKMapView, overlay: MKOverlay) throws -> UIImage
+    func createPolylineImage(mapView: MKMapView, overlays: [MKOverlay]) throws -> UIImage
+    
+//    func createAndSaveImage(mapView: MKMapView) async throws
+    
+    func createAndSaveImage(mapView: MKMapView, overlays: [MKOverlay]) throws
     
     /// 폴리라인 애니메이션을 영상으로 생성합니다.
     ///
