@@ -119,7 +119,6 @@ final class RunHomeViewController: UIViewController {
         viewModel.input.send(.requestCurrentLocation)
         // 로드(기록)정보 표현
         viewModel.input.send(.requestRoadRecord)
-        totalLabelCreate(value: ("올레길", "2.5"))
     }
     
     // MARK: - Bind ViewModel
@@ -149,7 +148,7 @@ final class RunHomeViewController: UIViewController {
                             font: .Label2
                         )
                 case .responseRoadRecord(let text):
-                    print(text)
+                    self.totalLabel.attributedText = text
                 }
             }
             .store(in: &cancellables)
@@ -162,20 +161,5 @@ final class RunHomeViewController: UIViewController {
                 self?.viewModel.input.send(.requestRunningStart)
             }
             .store(in: &cancellables)
-    }
-}
-// MARK: - private functions
-extension RunHomeViewController {
-    private func totalLabelCreate(value: (String, String)) {
-        // 여기서 사용자의 데이터를 받아오면 될듯
-        let nickname = "행복한 쿼카러너화이팅"
-        let road = value.0
-        let number = value.1
-        let string: String = "\(nickname) 님은\n지금까지 \(road) \(number)회\n거리만큼 걸었습니다!"
-        totalLabel.attributedText = string.styledText(
-            highlightText: "\(road) \(number)회",
-            baseFont: .RLMainTitle,
-            highlightFont: .RLMainTitle
-        )
     }
 }

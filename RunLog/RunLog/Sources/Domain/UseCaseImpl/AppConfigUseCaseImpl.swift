@@ -58,7 +58,9 @@ final class AppConfigUseCaseImpl: AppConfigUseCase {
         let totalDistance = try await appConfigRepository.readAppConfig().totalDistance
         
         let eligibleRoads = Constants.allRoads.filter { road in
-            road.distance <= totalDistance * 0.5
+            // 내가 운동한 거리가 road의 반 이상이면 포함
+            road.distance * 0.5 <= totalDistance
+//            road.distance <= totalDistance * 0.5
         }
         
         guard let selectedRoad = eligibleRoads.randomElement() else {
