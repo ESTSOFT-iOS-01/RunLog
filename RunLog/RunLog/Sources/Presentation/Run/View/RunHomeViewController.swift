@@ -18,8 +18,11 @@ final class RunHomeViewController: UIViewController {
     private var cancellables = Set<AnyCancellable>()
     
     // MARK: - UI
-    private lazy var mapView = MKMapView().then {
+    private var mapView = MKMapView().then {
         $0.showsUserLocation = true
+        let zoomRange = MKMapView.CameraZoomRange(maxCenterCoordinateDistance: 20000)
+        $0.setCameraZoomRange(zoomRange, animated: false)
+        $0.initZoomLevel()
     }
     private var totalLabel = UILabel().then {
         $0.numberOfLines = 3
@@ -133,7 +136,7 @@ final class RunHomeViewController: UIViewController {
                     vc.modalPresentationStyle = .fullScreen
                     self.present(vc, animated: false)
                 case .locationUpdate(let location):
-                    self.mapView.centerToLocation(location)
+                    self.mapView.centerToLocation(location, region: self.mapView.region)
                 case .locationNameUpdate(let text):
                     self.locationLabel.attributedText =
                         .RLAttributedString(
