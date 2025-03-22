@@ -21,6 +21,7 @@ final class LogViewModel {
     struct Output {
         let groupedDayLogs = CurrentValueSubject<[Date: [DayLog]], Never>([:])
         let sortedKeys = CurrentValueSubject<[Date], Never>([])
+        let nickname = PassthroughSubject<String, Never>()
         let distanceUnit = CurrentValueSubject<Double, Never>(0.0)
         let navigationEvent = PassthroughSubject<Date, Never>()
     }
@@ -62,6 +63,7 @@ extension LogViewModel {
     private func loadDatas() {
         Task {
             let dayLogs = try await dayLogUseCase.getAllDayLogs()
+            let nickname = try await appConfigUseCase.getNickname()
             let distanceUnit = try await appConfigUseCase.getUnitDistance()
             
             let groupedDayLogs = Dictionary(grouping: dayLogs) { dayLog in
@@ -71,6 +73,7 @@ extension LogViewModel {
             }
             
             output.distanceUnit.send(distanceUnit)
+            output.nickname.send(nickname)
             output.groupedDayLogs.send(groupedDayLogs)
             output.sortedKeys.send(groupedDayLogs.keys.sorted(by: >))
         }
