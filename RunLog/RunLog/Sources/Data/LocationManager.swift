@@ -3,7 +3,6 @@
 //  RunLog
 //
 //  Created by 심근웅 on 3/15/25.
-//
 
 import Foundation
 import UIKit
@@ -12,45 +11,71 @@ import CoreLocation
 import Combine
 
 final class LocationManager: NSObject, CLLocationManagerDelegate {
+    
     // MARK: - Singleton
     static let shared = LocationManager()
-    // MARK: - Properties
-    private var locationManager = CLLocationManager()
-    private var cancellables = Set<AnyCancellable>()
-    var currentLocation: CLLocation {
-        // 현재 위치를 반환, 못찾으면 서울을 기본값으로 반환
-        return locationManager.location ?? CLLocation(latitude: 37.5665, longitude: 126.9780)
-    }
-    // GPS 값 검증을 위한 이전 위치
-    private var previousLocation: CLLocation?
-    // MARK: - Subjects
-    private let locationSubject = PassthroughSubject<CLLocation, Never>()
-    private let locationNameSubject = PassthroughSubject<(CLLocation,CLPlacemark), Never>()
-    // MARK: - Publishers
-    var locationPublisher: AnyPublisher<CLLocation, Never> {
-        locationSubject.eraseToAnyPublisher()
-    }
-    var locationNamePublisher: AnyPublisher<(CLLocation,CLPlacemark), Never> {
-        locationNameSubject.eraseToAnyPublisher()
-    }
-    // MARK: - Init
     private override init() {
         super.init()
         setupLocationManager()
+        bind()
     }
     deinit {
         locationManager.stopUpdatingLocation()
     }
-    // MARK: - CLLocationManager 설정
+    
+    
+    // MARK: - Input
+    enum Input {
+        case requestCurrentLocation
+        case requestCityName(CLLocation) // 도시이름을 요청
+    }
+    let input = PassthroughSubject<Input, Never>()
+    
+    // MARK: - Output
+    enum Output {
+        case locationUpdate(CLLocation) // 현재위치(CLLocatio)를 제공
+        case responseCityName(CLPlacemark) // 도시이름(String)을 제공
+    }
+    let output = PassthroughSubject<Output, Never>()
+    
+    // MARK: - Properties
+    private var cancellables = Set<AnyCancellable>()
+    private var locationManager = CLLocationManager()
+    private var previousLocation: CLLocation? // GPS 값 검증을 위한 이전 위치
+    
+    
+    // MARK: - Binding
+    private func bind() {
+        self.input
+            .sink { [weak self] input in
+                guard let self = self else { return }
+                switch input {
+                case .requestCurrentLocation:
+                    guard let location = self.locationManager.location else { return }
+                    self.output.send(.locationUpdate(location))
+                case .requestCityName(let location):
+                    self.fetchCityName(location: location)
+                }
+            }
+            .store(in: &cancellables)
+    }
+}
+
+// MARK: - CLLocationManager 설정
+extension LocationManager {
     private func setupLocationManager() {
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
-        locationManager.distanceFilter = 5  // Q) 지피티 피셜 걷기+달리기면 5m가 적당하다 - 실제로 3, 5로 해서 측정해보고 결정
-        locationManager.allowsBackgroundLocationUpdates = true // 백그라운드 상태에서도 위치 업데이트
-        locationManager.pausesLocationUpdatesAutomatically = true //사용자가 멈춰있으면 업데이트 일시정지
+        // Q) 지피티 피셜 걷기+달리기면 5m가 적당하다 - 실제로 3, 5로 해서 측정해보고 결정
+        locationManager.distanceFilter = 3
+        // 백그라운드 상태에서도 위치 업데이트
+        locationManager.allowsBackgroundLocationUpdates = true
+        // 사용자가 멈춰있으면 업데이트 일시정지
+        locationManager.pausesLocationUpdatesAutomatically = true
         getLocationUsagePermission()
     }
-    // MARK: - 사용자가 위치를 이동하면 위치를 뿌려줌
+    
+    // MARK: - 사용자가 위치를 이동하면 output으로 send를 보냄
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last else { return }
         // GPS 신호가 불안정한 경우 필터링
@@ -63,11 +88,11 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
             print("이동 거리 1m 이하 - 위치 업데이트 안함")
             return
         }
-        self.previousLocation = location
-        self.fetchCityName(location: location)
-        self.locationSubject.send(location)
+        self.output.send(.locationUpdate(location))
+        previousLocation = location
     }
 }
+
 // MARK: - 도시명 가져오기
 extension LocationManager {
     // MARK: - 도시명 가져오기
@@ -80,10 +105,11 @@ extension LocationManager {
                 print("Geocoding 실패: \(error!.localizedDescription)")
                 return
             }
-            self.locationNameSubject.send((location, placemark))
+            self.output.send(.responseCityName(placemark))
         }
     }
 }
+
 // MARK: - 위치 정보 권한 요청
 extension LocationManager {
     // MARK: - 권한 정보가 바뀌면 실행
@@ -113,17 +139,5 @@ extension LocationManager {
         if UIApplication.shared.canOpenURL(url) {
             UIApplication.shared.open(url, options: [:], completionHandler: nil)
         }
-    }
-}
-
-
-
-
-// MARK: - 테스트용 더미 셋
-extension LocationManager {
-    func setDummy(location: CLLocation) {
-        self.previousLocation = location
-        self.fetchCityName(location: location)
-        self.locationSubject.send(location)
     }
 }

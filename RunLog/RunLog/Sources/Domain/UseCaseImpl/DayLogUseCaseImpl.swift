@@ -86,7 +86,7 @@ final class DayLogUseCaseImpl: DayLogUseCase {
         print("Impl: ", #function)
         
         // 1. update 할 DayLog 가져오기
-        var targetDayLog = try await dayLogRepository.readDayLog(date: date)
+        var targetDayLog = try await dayLogRepository.readDayLog(date: date.toYearMonthDay)
         
         // 2. section에서 시작, 끝 타임 스템프 가져오기
         let startTime = section.route.first?.timestamp ?? Date()
