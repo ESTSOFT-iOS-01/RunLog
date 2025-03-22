@@ -65,7 +65,7 @@ final class RunningViewModel {
                     let timeString = times.asTimeString
                     self.output.send(.responseCurrentTimes(timeString))
                 case .responseCurrentDistances(let distances):
-                    let distanceString = "\((distances / 1000).toString(withDecimal: 2))km"
+                    let distanceString = "\(distances.toString(withDecimal: 2))km"
                     self.output.send(.responseCurrentDistances(distanceString))
                 case .responseCurrentSteps(let steps):
                     let stepString = "\(steps)"

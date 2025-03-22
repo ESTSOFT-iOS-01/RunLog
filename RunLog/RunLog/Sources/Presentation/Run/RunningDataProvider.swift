@@ -31,8 +31,9 @@ final class RunningDataProvider {
         case requestCurrentLocation // 현재 위치를 요청
         case requestCurrentCityName // 도시이름(String) 요청
         case requestCurrentWeather // 날씨 + 대기질 정보 요청
-        
         case requestRoadRecord // +) 기록정보(?) 요청 ex) 올레길 2.5회
+        
+        case requestSaveImage // 데이 로그 이미지 저장
     }
     let input = PassthroughSubject<Input, Never>()
     
@@ -109,6 +110,8 @@ extension RunningDataProvider {
                     self.weatherService.input.send(.requestWeather(location))
                 case .requestRoadRecord:
                     print("Road 요청")
+                default:
+                    print("사진 저장 요청")
                 }
             }
             .store(in: &cancellables)
@@ -139,7 +142,7 @@ extension RunningDataProvider {
                 guard let self = self else { return }
                 switch output {
                 case .responseDistance(let distance):
-                    self.section.distance += distance
+                    self.section.distance += (distance / 1000)
                     let distances = self.section.distance
                     self.runningOutput.send(.responseCurrentDistances(distances))
                 }
@@ -306,9 +309,9 @@ extension RunningDataProvider {
         // -> 요청에 대한 답은 drawingManager.output에서 확인
         Task {
             // 데이로그에 섹션 저장
-            try await dayLogUseCase.addSectionByDate(Date().toYearMonthDay, section: self.section)
+            try await dayLogUseCase.addSectionByDate(Date(), section: self.section)
             
-            if let dayLog = try await dayLogUseCase.getDayLogByDate(Date().toYearMonthDay) {
+            if let dayLog = try await dayLogUseCase.getDayLogByDate(Date()) {
                 var allPoint: [CLLocation] = []
                 for section in dayLog.sections {
                     for route in section.route {
