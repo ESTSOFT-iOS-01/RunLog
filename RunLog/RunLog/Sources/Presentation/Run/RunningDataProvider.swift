@@ -152,7 +152,7 @@ extension RunningDataProvider {
                 guard let self = self else { return }
                 switch output {
                 case .responseSteps(let step):
-                    self.section.steps += step
+                    self.section.steps = step
                     let steps = self.section.steps
                     self.runningOutput.send(.responseCurrentSteps(steps))
                 }

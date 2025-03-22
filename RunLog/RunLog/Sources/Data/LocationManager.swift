@@ -67,7 +67,7 @@ extension LocationManager {
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         // Q) 지피티 피셜 걷기+달리기면 5m가 적당하다 - 실제로 3, 5로 해서 측정해보고 결정
-        locationManager.distanceFilter = 100
+        locationManager.distanceFilter = 3
         // 백그라운드 상태에서도 위치 업데이트
         locationManager.allowsBackgroundLocationUpdates = true
         // 사용자가 멈춰있으면 업데이트 일시정지
