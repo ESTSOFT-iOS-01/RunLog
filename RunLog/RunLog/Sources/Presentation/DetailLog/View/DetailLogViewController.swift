@@ -17,6 +17,8 @@ final class DetailLogViewController: UIViewController {
     private let viewModel: DetailLogViewModel
     private var cancellables = Set<AnyCancellable>()
     
+    let mediaUseCase = MediaUseCaseImpl()
+    
     private var recordDetails: [RecordDetail] = []
     
     /// 각 section에 해당하는 폴리라인 배열
@@ -64,6 +66,16 @@ final class DetailLogViewController: UIViewController {
         super.viewWillDisappear(animated)
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        print("\(#filePath)에서 이미지 추출 시작")
+        do {
+            try mediaUseCase.createAndSaveImage(mapView: detailLogView.mapView, overlays: detailLogView.mapView.overlays)
+        } catch {
+            print(error)
+        }
+    }
     
     // MARK: - Setup UI
     private func setupUI() {
@@ -267,6 +279,7 @@ extension DetailLogViewController {
         
         // 전체 영역이 보이도록 확대
         zoomToAllPoints(dayLog: dayLog)
+
     }
     
     

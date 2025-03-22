@@ -55,14 +55,14 @@ final class MediaUseCaseImpl: MediaUseCase {
 
         return imageRenderer.image { context in
             // 배경을 투명하게 설정 (기본적으로 배경이 투명하게 설정됨)
-            context.cgContext.setFillColor(UIColor.clear.cgColor)
+            context.cgContext.setFillColor(UIColor.black.cgColor)
             context.cgContext.fill(mapView.bounds)
 
             // 3. 폴리라인을 그리기
             for polyline in polylines {
                 let renderer = MKPolylineRenderer(polyline: polyline)
                 renderer.strokeColor = .white  // 폴리라인 색상 설정
-                renderer.lineWidth = 4
+                renderer.lineWidth = 1
 
                 // 폴리라인을 그리기 위한 mapRect와 zoomScale 계산
                 let mapRect = mapView.visibleMapRect
@@ -94,7 +94,6 @@ final class MediaUseCaseImpl: MediaUseCase {
     
     // 4. 이미지 생성 후 저장하는 함수
     func createAndSaveImage(mapView: MKMapView, overlays: [MKOverlay]) throws {
-        print(overlays)
         let image = try createPolylineImage(mapView: mapView, overlays: overlays)
         print("이미지 생성 성공")
         
