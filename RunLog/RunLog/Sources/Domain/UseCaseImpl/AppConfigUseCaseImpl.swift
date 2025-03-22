@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class AppConfigUsecaseImpl: AppConfigUsecase {
+final class AppConfigUseCaseImpl: AppConfigUseCase {
 
     private let appConfigRepository: AppConfigRepository
     
