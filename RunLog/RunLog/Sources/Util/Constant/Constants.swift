@@ -75,7 +75,7 @@ struct Constants {
             case .fair: return "보통"
             case .moderate: return "나쁨"
             case .poor: return "매우 나쁨"
-            case .veryPoor: return "위험"
+            case .veryPoor: return "매우 나쁨"
             case .unknown: return "정보 없음"
             }
         }

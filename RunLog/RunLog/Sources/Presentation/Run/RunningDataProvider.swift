@@ -38,11 +38,12 @@ final class RunningDataProvider {
     
     // MARK: - Output
     enum RunHomeOutput {
-        // Main Response
         case responseRunningStart
         case responseCurrentLocation(CLLocation) // 현재위치(CLLocatio)를 제공
         case responseCurrentCityName(String) // 도시이름(String)을 제공
         case responseCurrentWeather((Int, Double), Int) // 날씨+대기질(String)을 제공
+        
+        
     }
     let runHomeOutput = PassthroughSubject<RunHomeOutput, Never>()
     
@@ -98,17 +99,14 @@ extension RunningDataProvider {
                 // MARK: - RunHome Request
                 case .requestCurrentLocation:
                     locationManger.input.send(.requestCurrentLocation)
-                    
                 case .requestCurrentCityName:
                     guard let location = self.currentLocation else { return }
                     locationManger.input.send(.requestCityName(location))
-                    
                 case .requestCurrentWeather:
                     guard let location = self.currentLocation else { return }
                     self.weatherService.input.send(.requestWeather(location))
-                    
-                default:
-                    print("default")
+                case .requestRoadRecord:
+                    print("Road 요청")
                 }
             }
             .store(in: &cancellables)
@@ -231,10 +229,10 @@ extension RunningDataProvider {
         print("운동 시작!!!")
         
         // 1. 운동 정보 초기화
-        guard let start = self.currentLocation else { return }
+        guard let startPoint = self.currentLocation else { return }
         let startRoute: Point = Point(
-            latitude: start.coordinate.latitude,
-            longitude: start.coordinate.longitude,
+            latitude: startPoint.coordinate.latitude,
+            longitude: startPoint.coordinate.longitude,
             timestamp: Date()
         )
         self.section = Section(distance: 0, steps: 0, route: [startRoute])
@@ -289,7 +287,13 @@ extension RunningDataProvider {
         
         // 운동 종료
         print("운동 종료!!!")
-        
+        guard let endPoint = self.currentLocation else { return }
+        let endRoute: Point = Point(
+            latitude: endPoint.coordinate.latitude,
+            longitude: endPoint.coordinate.longitude,
+            timestamp: Date()
+        )
+        self.section.route.append(endRoute)
         // 1. 운동걸음수 측정 종료
         pedometerManager.input.send(.requestPedometerStop)
         
