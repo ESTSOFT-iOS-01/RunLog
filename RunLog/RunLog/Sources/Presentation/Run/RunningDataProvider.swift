@@ -31,7 +31,6 @@ final class RunningDataProvider {
         case requestCurrentLocation // 현재 위치를 요청
         case requestCurrentCityName // 도시이름(String) 요청
         case requestCurrentWeather // 날씨 + 대기질 정보 요청
-        case requestRoadRecord // +) 기록정보(?) 요청 ex) 올레길 2.5회
         
         case requestSaveImage // 데이 로그 이미지 저장
     }
@@ -43,7 +42,6 @@ final class RunningDataProvider {
         case responseCurrentLocation(CLLocation) // 현재위치(CLLocatio)를 제공
         case responseCurrentCityName(String) // 도시이름(String)을 제공
         case responseCurrentWeather((Int, Double), Int) // 날씨+대기질(String)을 제공
-        case responseRoadRecord(String) // 기록(?)을 제공
     }
     let runHomeOutput = PassthroughSubject<RunHomeOutput, Never>()
     
@@ -108,8 +106,6 @@ extension RunningDataProvider {
                 case .requestCurrentWeather:
                     guard let location = self.currentLocation else { return }
                     self.weatherService.input.send(.requestWeather(location))
-                case .requestRoadRecord:
-                    print("Road 요청")
                 default:
                     print("사진 저장 요청")
                 }

@@ -22,7 +22,7 @@ final class MyPageViewModel {
     }
     
     @Dependency private var dayLogUseCase: DayLogUseCase
-    @Dependency private var appConfigUseCase: AppConfigUsecase
+    @Dependency private var appConfigUseCase: AppConfigUseCase
     
     private let menuItems: [SettingMenuType] = SettingMenuType.allCases
     

@@ -21,7 +21,7 @@ final class CalUnitViewModel {
         let saveSuccess = CurrentValueSubject<Bool, Never>(false)
     }
 
-    @Dependency private var appConfigUseCase: AppConfigUsecase
+    @Dependency private var appConfigUseCase: AppConfigUseCase
     
     private var cancellables = Set<AnyCancellable>()
     private let inputSubject = PassthroughSubject<Input, Never>() // Input 스트림

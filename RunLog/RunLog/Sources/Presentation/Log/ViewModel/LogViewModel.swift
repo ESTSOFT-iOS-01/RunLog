@@ -30,7 +30,7 @@ final class LogViewModel {
     private var cancellables = Set<AnyCancellable>()
     
     @Dependency private var dayLogUseCase: DayLogUseCase
-    @Dependency private var appConfigUseCase: AppConfigUsecase
+    @Dependency private var appConfigUseCase: AppConfigUseCase
     
     // MARK: - Init
     init() {
