@@ -26,6 +26,8 @@ protocol MediaUseCase {
     
     func createAndSaveImage(mapView: MKMapView, overlays: [MKOverlay]) throws
     
+    func saveImageToDocuments(image: UIImage, imageName: String) throws
+    
     /// 폴리라인 애니메이션을 영상으로 생성합니다.
     ///
     /// - Parameters:

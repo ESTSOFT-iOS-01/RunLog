@@ -68,13 +68,46 @@ final class DetailLogViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        makePathImage()
         
-        print("\(#filePath)에서 이미지 추출 시작")
-        do {
-            try mediaUseCase.createAndSaveImage(mapView: detailLogView.mapView, overlays: detailLogView.mapView.overlays)
-        } catch {
-            print(error)
+    }
+    
+    private func makePathImage() {
+        if let image = UIImage.imageFromView(view: detailLogView.mapView) {
+            guard let newImage = self.cropImage(inputImage: image) else {
+                print("이미지 생성 실패")
+                return
+            }
+            do {
+                try mediaUseCase.saveImageToDocuments(image: image, imageName: "test_img.png")
+            } catch {
+                print(error)
+            }
+            
         }
+    }
+    
+    func cropImage(inputImage image: UIImage) -> UIImage? {
+        let mapviewWidth = detailLogView.mapView.bounds.width
+        let mapviewHeight = detailLogView.mapView.bounds.height
+        
+        // 이미지 크기를 확인
+        let imageWidth = image.size.width
+        let imageHeight = image.size.height
+        
+        // 이미지에서 자를 영역을 설정 (mapView에서 필요한 부분만)
+        let cropRect = CGRect(x: 16, y: 24, width: mapviewWidth, height: mapviewHeight)
+        
+        // 이미지 크기를 기준으로 크롭 영역을 조정
+        let imageViewScale = max(imageWidth / mapviewWidth, imageHeight / mapviewHeight)
+        
+        // 크롭할 영역 계산 (이미지 크기와 맞추기 위해 스케일링)
+        let cropZone = CGRect(x: cropRect.origin.x * imageViewScale,
+                              y: cropRect.origin.y * imageViewScale,
+                              width: cropRect.size.width * imageViewScale,
+                              height: cropRect.size.height * imageViewScale)
+        
+        return UIImage.cropImage(image, toRect: cropZone, viewWidth: imageWidth, viewHeight: imageHeight)
     }
     
     // MARK: - Setup UI
