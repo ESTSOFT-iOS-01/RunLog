@@ -174,13 +174,15 @@ extension RunningDataProvider {
         
         // MARK: - Drawing Manager
         drawingManager.output
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] output in
                 guard let self = self else { return }
                 switch output {
                 case .responsePolyline(let polyline):
                     self.runningOutput.send(.responseLineDraw(polyline))
-                case .responsePolylines(let polylines):
-                    // 운동 종료 후 데이로그에 반영 후 데이로그의 경로를 가지고 새롭게 만든 폴리라인들 - 사진으로 만들어서 데이로그에 저장!
+                case .responseFullRoutePolyline(let mapView):
+                    // 사진을 만드는 매니저? 랜더러?에 해당 맵뷰를 send
+                    print("")
                 }
             }
             .store(in: &cancellables)
@@ -300,15 +302,13 @@ extension RunningDataProvider {
         // 운동X 상태로 변경
         currentIsRunning = false
         
-        // 데이로그에 섹션 저장
-        Task {
-            try await dayLogUseCase.addSectionByDate(Date(), section: self.section)
-        }
-        
         //+) 여기서 현재까지의 데이로그를 기반으로 전체 폴리라인을 요청을 보냄
         // -> 요청에 대한 답은 drawingManager.output에서 확인
         Task {
-            if let dayLog = try await dayLogUseCase.getDayLogByDate(Date()) {
+            // 데이로그에 섹션 저장
+            try await dayLogUseCase.addSectionByDate(Date(), section: self.section)
+            
+            if let dayLog = try await dayLogUseCase.getDayLogByDate(Date().toYearMonthDay) {
                 var allPoint: [CLLocation] = []
                 for section in dayLog.sections {
                     for route in section.route {
@@ -319,7 +319,8 @@ extension RunningDataProvider {
                         allPoint.append(location)
                     }
                 }
-                self.drawingManager.input.send(.requestLines(allPoint))
+                print("현재까지 데이로그의 경로 포인트 수 : \(allPoint.count)")
+                await self.drawingManager.input.send(.requestFullRoutePolyline(allPoint))
             }
         }
         
