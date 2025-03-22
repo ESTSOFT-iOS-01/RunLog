@@ -38,6 +38,10 @@ enum RLIcon {
     case korea
     case mandarin
     case medal
+    
+    case run
+    case log
+    case myPage
 }
 
 extension RLIcon {
@@ -97,6 +101,13 @@ extension RLIcon {
             return "Medal"
         case .ellipsis:
             return "ellipsis"
+            
+        case .run:
+            return "figure.run"
+        case .log:
+            return "note.text"
+        case .myPage:
+            return "person.fill"
         }
     }
 }

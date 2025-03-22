@@ -72,7 +72,7 @@ final class LogViewController: UIViewController {
 
     // MARK: - Setup Navigation Bar
     private func setupNavigationBar() {
-        title = "LOGO"
+        //title = "LOGO"
     }
     
     // MARK: - Bind ViewModel
