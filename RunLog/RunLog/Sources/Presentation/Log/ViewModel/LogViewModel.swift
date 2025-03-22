@@ -61,11 +61,8 @@ extension LogViewModel {
     // MARK: - private Functions
     private func loadDatas() {
         Task {
-            
             let dayLogs = try await dayLogUseCase.getAllDayLogs()
-            // TODO: Appconfig 들어오면 주석 풀기
-            // let distanceUnit = try await appConfigUseCase.getUnitDistance()
-            let distanceUnit = 5.0
+            let distanceUnit = try await appConfigUseCase.getUnitDistance()
             
             let groupedDayLogs = Dictionary(grouping: dayLogs) { dayLog in
                 let calendar = Calendar.current
