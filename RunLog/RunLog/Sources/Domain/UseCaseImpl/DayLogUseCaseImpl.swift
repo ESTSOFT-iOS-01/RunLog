@@ -68,7 +68,9 @@ final class DayLogUseCaseImpl: DayLogUseCase {
     func getDayLogByDate(_ date: Date) async throws -> DayLog? {
         print("Impl: ", #function)
         
-        let dayLog = try await dayLogRepository.readDayLog(date: date)
+        let dayLog = try await dayLogRepository.readDayLog(
+            date: date.toYearMonthDay
+        )
         return dayLog
     }
 
@@ -82,7 +84,7 @@ final class DayLogUseCaseImpl: DayLogUseCase {
     func deleteDayLogByDate(_ date: Date) async throws {
         print("Impl: ", #function)
         
-        try await dayLogRepository.deleteDayLog(date: date)
+        try await dayLogRepository.deleteDayLog(date: date.toYearMonthDay)
     }
 
     func addSectionByDate(_ date: Date, section: Section) async throws {
@@ -119,14 +121,18 @@ final class DayLogUseCaseImpl: DayLogUseCase {
     func getTitleByDate(_ date: Date) async throws -> String {
         print("Impl: ", #function)
         
-        let dayLog = try await dayLogRepository.readDayLog(date: date)
+        let dayLog = try await dayLogRepository.readDayLog(
+            date: date.toYearMonthDay
+        )
         return dayLog.title
     }
 
     func updateTitleByDate(_ date: Date, title: String) async throws {
         print("Impl: ", #function)
         
-        var targetDayLog = try await dayLogRepository.readDayLog(date: date)
+        var targetDayLog = try await dayLogRepository.readDayLog(
+            date: date.toYearMonthDay
+        )
         targetDayLog.title = title
         
         try await dayLogRepository.updateDayLog(targetDayLog)
@@ -135,14 +141,18 @@ final class DayLogUseCaseImpl: DayLogUseCase {
     func getLevelByDate(_ date: Date) async throws -> Int {
         print("Impl: ", #function)
         
-        let dayLog = try await dayLogRepository.readDayLog(date: date)
+        let dayLog = try await dayLogRepository.readDayLog(
+            date: date.toYearMonthDay
+        )
         return dayLog.level
     }
 
     func updateLevelByDate(_ date: Date, level: Int) async throws {
         print("Impl: ", #function)
         
-        var targetDayLog = try await dayLogRepository.readDayLog(date: date)
+        var targetDayLog = try await dayLogRepository.readDayLog(
+            date: date.toYearMonthDay
+        )
         targetDayLog.level = level
         
         try await dayLogRepository.updateDayLog(targetDayLog)
