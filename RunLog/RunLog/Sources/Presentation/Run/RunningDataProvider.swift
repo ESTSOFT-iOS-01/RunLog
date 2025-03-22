@@ -306,7 +306,7 @@ extension RunningDataProvider {
         // -> 요청에 대한 답은 drawingManager.output에서 확인
         Task {
             // 데이로그에 섹션 저장
-            try await dayLogUseCase.addSectionByDate(Date(), section: self.section)
+            try await dayLogUseCase.addSectionByDate(Date().toYearMonthDay, section: self.section)
             
             if let dayLog = try await dayLogUseCase.getDayLogByDate(Date().toYearMonthDay) {
                 var allPoint: [CLLocation] = []
@@ -326,7 +326,6 @@ extension RunningDataProvider {
         
         // 정상적인 운동 종료
         self.runningOutput.send(.responseRunningStop)
-        
         
         // +) 아래는 운동 정보 로그 찍어보기
         guard let startTime = section.route.first?.timestamp,
