@@ -31,25 +31,18 @@ final class RunningViewController: UIViewController {
     // 카드 뷰
     private var cardView = CardView()
     private var foldButton = RLButton().then {
-        $0.configureTitle(
-            title: "닫기",
-            titleColor: .Gray000,
-            font: .RLLabel2
-        )
-        $0.setHeight(DynamicSize.scaledSize(40))
-        $0.configureRadius(DynamicSize.scaledSize(8))
-        $0.configureBackgroundColor(.Gray700)
-        $0.tintColor = .Gray000
-        var config = UIButton.Configuration.plain()
-        config.image = UIImage(systemName: RLIcon.fold.name)
-        config.imagePadding = DynamicSize.scaledSize(4)
-        config.imagePlacement = .trailing
-        config.preferredSymbolConfigurationForImage =
-            UIImage.SymbolConfiguration(
-                pointSize: DynamicSize.scaledSize(12),
-                weight: .medium
+        $0.setHeight(DynamicSize.scaledSize(40)) // 높이 지정
+        $0.configureRadius(DynamicSize.scaledSize(8)) // 라운드 지정
+        $0.configureBackgroundColor(.Gray700) // 배경색 지정
+        
+        $0.setRightIcon(systemName: RLIcon.fold.name) // 아이콘 지정
+        $0.setAttributedString(
+            title: .RLAttributedString(
+                text: "닫기",
+                font: .Label2,
+                align: .center
             )
-        $0.configuration = config
+        )
     }
     private var unfoldButton = UIButton().then {
         $0.backgroundColor = .LightGreen
