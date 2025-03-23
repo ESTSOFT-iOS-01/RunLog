@@ -22,7 +22,8 @@ open class RLButton: UIButton {
         self.backgroundColor = .LightGreen
         
         self.titleLabel?.font = .RLTitle
-        self.layer.cornerRadius = 16
+        
+        self.layer.cornerRadius = DynamicSize.getHeight(16)
         
         self.snp.makeConstraints { make in
             make.height.equalTo(DynamicSize.getHeight(63))
@@ -47,7 +48,7 @@ open class RLButton: UIButton {
     
     /// cornerRadius 설정
     public func configureRadius(_ radius: CGFloat) {
-        self.layer.cornerRadius = radius
+        self.layer.cornerRadius = DynamicSize.getHeight(radius)
     }
     
     /// 버튼 높이 설정
