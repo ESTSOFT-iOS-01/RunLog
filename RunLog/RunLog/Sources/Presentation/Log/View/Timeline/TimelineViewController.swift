@@ -93,7 +93,8 @@ extension TimelineViewController: UITableViewDelegate, UITableViewDataSource {
             cell.configure(
                 totalDistance: dayLog.totalDistance,
                 title: dayLog.title,
-                date: dayLog.date
+                date: dayLog.date,
+                trackImage: dayLog.trackImage
             )
         }
 
