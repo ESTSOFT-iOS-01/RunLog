@@ -30,7 +30,7 @@ final class RunHomeViewModel {
         case locationUpdate(CLLocation) // 사용자 위치 데이터
         case locationNameUpdate(String) // 가공된 위치 데이터
         case weatherUpdate(String)  // 가공된 날씨 데이터
-        case responseRoadRecord(String) // 기록 데이터
+        case responseRoadRecord(NSMutableAttributedString) // 기록 데이터
     }
     let output = PassthroughSubject<Output, Never>()
     
@@ -38,6 +38,8 @@ final class RunHomeViewModel {
     private var cancellables = Set<AnyCancellable>()
     private var provider = RunningDataProvider.shared
     
+    // MARK: - Usecase
+    @Dependency private var appConfigUseCase: AppConfigUseCase
     
     // MARK: - Binding
     func bind() {
@@ -52,12 +54,12 @@ final class RunHomeViewModel {
                 case .requestCurrentWeahter:
                     self.provider.input.send(.requestCurrentWeather)
                 case .requestRoadRecord:
-                    self.provider.input.send(.requestRoadRecord)
+                    self.getDistanceIndicator()
                 }
             }
             .store(in: &cancellables)
         
-        // ViewModel에서 필요한 정보는 provider로 부터 주입
+        // ViewModel에서 필요한 정보는 provider에서 주입
         provider.runHomeOutput
             .sink { [weak self] output in
                 guard let self = self else { return }
@@ -72,8 +74,6 @@ final class RunHomeViewModel {
                 case .responseCurrentWeather(let weahter, let aqi):
                     let weatherString = self.toWeatherString(weahter, aqi)
                     self.output.send(.weatherUpdate(weatherString))
-                case .responseRoadRecord(let road):
-                    self.output.send(.responseRoadRecord(road))
                 }
             }
             .store(in: &cancellables)
@@ -92,5 +92,27 @@ extension RunHomeViewModel {
             formattedString = "\(condition) | \(temperature)°C 대기질 \(aqiLevel)"
         }
         return formattedString
+    }
+}
+
+// MARK: - Road Data 받아옴
+extension RunHomeViewModel {
+    private func getDistanceIndicator() {
+        Task {
+            let nickname = try await appConfigUseCase.getNickname()
+            let (roadName, countData) = try await appConfigUseCase.getDistanceIndicators()
+            let count = countData.toString(withDecimal: 2)
+            let string = """
+                         \(nickname) 님은
+                         지금까지 \(roadName) \(count)회
+                         거리만큼 걸었습니다!
+                         """
+            let attributedString = string.styledText(
+                highlightText: "\(roadName) \(count)회",
+                baseFont: .RLMainTitle,
+                highlightFont: .RLMainTitle
+            )
+            self.output.send(.responseRoadRecord(attributedString))
+        }
     }
 }

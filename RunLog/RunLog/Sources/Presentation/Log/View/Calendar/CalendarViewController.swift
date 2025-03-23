@@ -37,6 +37,7 @@ final class CalendarViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        setupCollectionView()
         bindGesture()
         bindViewModel()
     }
@@ -49,6 +50,16 @@ final class CalendarViewController: UIViewController {
         calendarView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
+        
+        // 랜덤 멘트 설정
+        let randomMotivation = Constants.MotivationMessage.random
+        calendarView.walkImage.image = UIImage(
+            named: randomMotivation.icon.name
+        )
+        calendarView.bottomLabel.text = randomMotivation.message
+    }
+    
+    private func setupCollectionView() {
         calendarView.collectionView.dataSource = self
         calendarView.collectionView.delegate = self
     }
@@ -83,10 +94,15 @@ final class CalendarViewController: UIViewController {
     
     // MARK: - Bind ViewModel
     private func bindViewModel() {
+        viewModel.output.nickname
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] name in
+                self?.calendarView.nicknameLabel.text = name
+            }.store(in: &cancellables)
+        
         viewModel.output.sortedKeys
             .receive(on: DispatchQueue.main)
             .sink { [weak self] keys in
-                //guard let self = self, !keys.isEmpty else { return }
                 guard let self = self else { return }
                 let month = viewModel.output.sortedKeys.value.first ?? Date()
                 self.currentMonthDays = generateDaysFor(date: month)
@@ -95,15 +111,13 @@ final class CalendarViewController: UIViewController {
                 )
                 self.updateArrowButtons()
                 
-            }
-            .store(in: &cancellables)
+            }.store(in: &cancellables)
         
         viewModel.output.groupedDayLogs
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.calendarView.collectionView.reloadData()
-            }
-            .store(in: &cancellables)
+            }.store(in: &cancellables)
     }
 }
 

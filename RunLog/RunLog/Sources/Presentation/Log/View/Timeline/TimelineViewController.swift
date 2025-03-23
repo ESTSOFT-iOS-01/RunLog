@@ -31,7 +31,7 @@ final class TimelineViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        bindGesture()
+        setupTableView()
         bindViewModel()
     }
     
@@ -42,13 +42,12 @@ final class TimelineViewController: UIViewController {
         timelineView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
-        timelineView.tableView.delegate = self
-        timelineView.tableView.dataSource = self
     }
 
     // MARK: - bindGesture
-    private func bindGesture() {
-        // 제스처 추가
+    private func setupTableView() {
+        timelineView.tableView.delegate = self
+        timelineView.tableView.dataSource = self
     }
 
     // MARK: - Bind ViewModel

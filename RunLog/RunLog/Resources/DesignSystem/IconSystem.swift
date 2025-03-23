@@ -10,7 +10,6 @@ import Foundation
 // MARK: - 아이콘
 enum RLIcon {
     case ellipsis
-    case walk
     case rightArrow
     case leftArrow
     case document
@@ -26,6 +25,9 @@ enum RLIcon {
     case selectedCircle
     case unslectedCircle
     
+    case walkGirl
+    case walkMan
+    case walkDog
     case noneBeat
     case oneBeat
     case twoBeats
@@ -38,6 +40,10 @@ enum RLIcon {
     case korea
     case mandarin
     case medal
+    
+    case run
+    case log
+    case myPage
 }
 
 extension RLIcon {
@@ -45,8 +51,6 @@ extension RLIcon {
         switch self {
         case .fold:
             return "xmark"
-        case .walk:
-            return "walk"
         case .rightArrow:
             return "arrowtriangle.right.fill"
         case .leftArrow:
@@ -73,6 +77,12 @@ extension RLIcon {
         case .unslectedCircle:
             return "circle"
             
+        case .walkGirl:
+            return "walkGirl"
+        case .walkMan:
+            return "walkMan"
+        case .walkDog:
+            return "walkDog"
         case .noneBeat:
             return "noneBeat"
         case .oneBeat:
@@ -97,6 +107,13 @@ extension RLIcon {
             return "Medal"
         case .ellipsis:
             return "ellipsis"
+            
+        case .run:
+            return "figure.run"
+        case .log:
+            return "note.text"
+        case .myPage:
+            return "person.fill"
         }
     }
 }

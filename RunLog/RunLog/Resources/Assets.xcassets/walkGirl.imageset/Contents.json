@@ -1,11 +1,11 @@
 {
   "images" : [
     {
+      "filename" : "walkGirl.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "walk.png",
       "idiom" : "universal",
       "scale" : "2x"
     },

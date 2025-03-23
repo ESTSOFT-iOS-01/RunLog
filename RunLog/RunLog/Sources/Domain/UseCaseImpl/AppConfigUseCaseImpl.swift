@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class AppConfigUsecaseImpl: AppConfigUsecase {
+final class AppConfigUseCaseImpl: AppConfigUseCase {
 
     private let appConfigRepository: AppConfigRepository
     
@@ -58,7 +58,7 @@ final class AppConfigUsecaseImpl: AppConfigUsecase {
         let totalDistance = try await appConfigRepository.readAppConfig().totalDistance
         
         let eligibleRoads = Constants.allRoads.filter { road in
-            road.distance <= totalDistance * 0.5
+            road.distance * 0.5 <= totalDistance
         }
         
         guard let selectedRoad = eligibleRoads.randomElement() else {

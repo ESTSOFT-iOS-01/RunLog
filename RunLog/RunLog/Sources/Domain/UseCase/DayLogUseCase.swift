@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 protocol DayLogUseCase {
     
@@ -44,7 +45,7 @@ protocol DayLogUseCase {
     /// - Returns: 운동 제목 (`title`)
     func getTitleByDate(_ date: Date) async throws -> String
     
-    /// 특정 날짜의 DayLog에서 운동 제목을 수정합니다.
+    /// 특정 날짜의 DayLog에서 운동 제목을 업데이트 합니다.
     /// - Parameters:
     ///   - date: 수정할 날짜
     ///   - title: 새로 수정할 운동 제목
@@ -55,13 +56,21 @@ protocol DayLogUseCase {
     /// - Returns: 난이도 (`level`)
     func getLevelByDate(_ date: Date) async throws -> Int
     
-    /// 특정 날짜의 DayLog에서 난이도를 수정합니다.
+    /// 특정 날짜의 DayLog에서 난이도를 업데이트 합니다.
     /// - Parameters:
     ///   - date: 수정할 날짜
     ///   - level: 새로 수정할 난이도 값
     func updateLevelByDate(_ date: Date, level: Int) async throws
     
+    /// 특정 날짜의 DayLog에서 트랙 이미지를 수정합니다.
+    /// - Parameters:
+    ///   - date: 수정할 날짜
+    ///   - image: 새로 수정할 트랙 이미지 (`UIImage`)
+    func updateTrackImageByDate(_ date: Date, image: UIImage) async throws
+    
+    /// 운동 streak(연속 달성 여부)를 업데이트합니다.
     func updateStreakIfNeeded() async throws
+    
 }
 
 

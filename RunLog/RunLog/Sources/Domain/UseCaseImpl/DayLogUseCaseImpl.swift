@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 final class DayLogUseCaseImpl: DayLogUseCase {
     
@@ -25,7 +26,7 @@ final class DayLogUseCaseImpl: DayLogUseCase {
         weather: Int,
         temperature: Double
     ) async throws {
-        print("Impl: ", #function)
+        print("Impl:", #function)
         
         let today = Date().toYearMonthDay
         
@@ -61,7 +62,7 @@ final class DayLogUseCaseImpl: DayLogUseCase {
     }
 
     func getDayLogByDate(_ date: Date) async throws -> DayLog? {
-        print("Impl: ", #function)
+        print("Impl:", #function)
         
         let dayLog = try await dayLogRepository.readDayLog(
             date: date.toYearMonthDay
@@ -70,20 +71,20 @@ final class DayLogUseCaseImpl: DayLogUseCase {
     }
 
     func getAllDayLogs() async throws -> [DayLog] {
-        print("Impl: ", #function)
+        print("Impl:", #function)
         
         let dayLogs = try await dayLogRepository.readAllDayLogs()
         return dayLogs
     }
 
     func deleteDayLogByDate(_ date: Date) async throws {
-        print("Impl: ", #function)
+        print("Impl:", #function)
         
         try await dayLogRepository.deleteDayLog(date: date.toYearMonthDay)
     }
 
     func addSectionByDate(_ date: Date, section: Section) async throws {
-        print("Impl: ", #function)
+        print("Impl:", #function)
         
         // 1. update 할 DayLog 가져오기
         var targetDayLog = try await dayLogRepository.readDayLog(date: date.toYearMonthDay)
@@ -114,7 +115,7 @@ final class DayLogUseCaseImpl: DayLogUseCase {
     }
 
     func getTitleByDate(_ date: Date) async throws -> String {
-        print("Impl: ", #function)
+        print("Impl:", #function)
         
         let dayLog = try await dayLogRepository.readDayLog(
             date: date.toYearMonthDay
@@ -123,7 +124,7 @@ final class DayLogUseCaseImpl: DayLogUseCase {
     }
 
     func updateTitleByDate(_ date: Date, title: String) async throws {
-        print("Impl: ", #function)
+        print("Impl:", #function)
         
         var targetDayLog = try await dayLogRepository.readDayLog(
             date: date.toYearMonthDay
@@ -134,7 +135,7 @@ final class DayLogUseCaseImpl: DayLogUseCase {
     }
 
     func getLevelByDate(_ date: Date) async throws -> Int {
-        print("Impl: ", #function)
+        print("Impl:", #function)
         
         let dayLog = try await dayLogRepository.readDayLog(
             date: date.toYearMonthDay
@@ -143,12 +144,27 @@ final class DayLogUseCaseImpl: DayLogUseCase {
     }
 
     func updateLevelByDate(_ date: Date, level: Int) async throws {
-        print("Impl: ", #function)
+        print("Impl:", #function)
         
         var targetDayLog = try await dayLogRepository.readDayLog(
             date: date.toYearMonthDay
         )
         targetDayLog.level = level
+        
+        try await dayLogRepository.updateDayLog(targetDayLog)
+    }
+    
+    func updateTrackImageByDate(_ date: Date, image: UIImage) async throws {
+        print("Impl:", #function)
+        
+        var targetDayLog = try await dayLogRepository.readDayLog(
+            date: date.toYearMonthDay
+        )
+        guard let imageData = image.pngData() else {
+            print("변환에 실패하였습니다!")
+            return
+        }
+        targetDayLog.trackImage = imageData
         
         try await dayLogRepository.updateDayLog(targetDayLog)
     }

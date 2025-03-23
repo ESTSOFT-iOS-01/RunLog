@@ -18,6 +18,38 @@ struct Constants {
         Road(name: "지구에서 달까지", distance: 385000, icon: RLIcon.rocket.name)
     ]
     
+    enum MotivationMessage {
+        case goodWeather
+        case keepGoing
+        case dogWalk
+        
+        var icon: RLIcon {
+            switch self {
+            case .goodWeather:
+                return .walkMan
+            case .keepGoing:
+                return .walkGirl
+            case .dogWalk:
+                return .walkDog
+            }
+        }
+        
+        var message: String {
+            switch self {
+            case .goodWeather:
+                return "날씨 좋은 날에 산뜻한 러닝 어때요?"
+            case .keepGoing:
+                return "지금까지 잘 해왔어요! 앞으로도 화이팅!"
+            case .dogWalk:
+                return "기다리고 있었어요! 산책 가요!"
+            }
+        }
+        
+        static var random: MotivationMessage {
+            [goodWeather, keepGoing, dogWalk].randomElement()!
+        }
+    }
+    
     // MARK: - 날씨 정보
     enum WeatherCondition {
         case thunderstorm // 뇌우

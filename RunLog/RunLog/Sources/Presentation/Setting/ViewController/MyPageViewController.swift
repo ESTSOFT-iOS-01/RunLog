@@ -44,12 +44,10 @@ final class MyPageViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         viewModel.input.send(.loadData)
-        self.navigationController?.setNavigationBarHidden(false, animated: animated)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        self.navigationController?.setNavigationBarHidden(false, animated: animated)
     }
     
     // MARK: - Setup UI
@@ -66,8 +64,8 @@ final class MyPageViewController: UIViewController {
     // MARK: - Setup Navigation Bar
     private func setupNavigationBar() {
         // 네비게이션바 디테일 설정
-        navigationItem.title = "LOGO"
         self.navigationController?.setupAppearance()
+        navigationItem.title = "LOGO"
     }
     
     private func setupTableView() {

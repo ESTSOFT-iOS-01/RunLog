@@ -18,7 +18,7 @@ final class RunningViewController: UIViewController {
     private var cancellables = Set<AnyCancellable>()
     
     // MARK: - UI
-    lazy var mapView = MKMapView().then {
+    private lazy var mapView = MKMapView().then {
         $0.delegate = self
         //최대 줌 거리 제한
         let zoomRange = MKMapView.CameraZoomRange(maxCenterCoordinateDistance: 20000)
@@ -26,6 +26,7 @@ final class RunningViewController: UIViewController {
         $0.showsUserLocation = true
         $0.showsUserTrackingButton = true
         $0.pitchButtonVisibility = .visible
+        $0.initZoomLevel()
     }
     // 카드 뷰
     private var cardView = CardView()
@@ -131,7 +132,7 @@ final class RunningViewController: UIViewController {
                 case .responseRunningStop:
                     self.dismiss(animated: false)
                 case .locationUpdate(let location):
-                    self.mapView.centerToLocation(location)
+                    self.mapView.centerToLocation(location, region: self.mapView.region)
                 case .responseCurrentTimes(let time):
                     self.cardView.timeLabel.setConfigure(text: time)
                 case .responseCurrentDistances(let distances):
