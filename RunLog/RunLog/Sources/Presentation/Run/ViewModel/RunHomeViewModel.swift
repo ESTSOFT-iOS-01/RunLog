@@ -69,7 +69,7 @@ final class RunHomeViewModel {
                 case .responseCurrentLocation(let location):
                     self.output.send(.locationUpdate(location))
                 case .responseCurrentCityName(let name):
-                    let updateName = "\(name)에서"
+                    let updateName = name.hasSuffix("...") ? name : "\(name)에서"
                     self.output.send(.locationNameUpdate(updateName))
                 case .responseCurrentWeather(let weahter, let aqi):
                     let weatherString = self.toWeatherString(weahter, aqi)

@@ -32,7 +32,13 @@ final class RunHomeViewController: UIViewController {
         $0.attributedText = .RLAttributedString(text: "Roading", font: .Label2)
     }
     private var blurView = MapBlurView()
-    private var locationLabel = UILabel()
+    private var locationLabel = UILabel().then {
+        $0.attributedText = .RLAttributedString(
+            text: Constants.LocationMessage.random.message,
+            font: .Label2,
+            align: .center
+        )
+    }
     private var startButton = RLButton(
         title: "운동 시작하기",
         titleColor: .Gray900

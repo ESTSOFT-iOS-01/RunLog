@@ -50,6 +50,30 @@ struct Constants {
         }
     }
     
+    enum LocationMessage {
+        case unknown
+        case consultingWithMap
+        case detectingFootsteps
+        case connectingGPS
+        
+        var message: String {
+            switch self {
+            case .unknown:
+                return "지구 어딘가에서..."
+            case .consultingWithMap:
+                return "지도 앱과 상의 중..."
+            case .detectingFootsteps:
+                return "발걸음을 감지하는 중..."
+            case .connectingGPS:
+                return "GPS 연결 중..."
+            }
+        }
+        
+        static var random: LocationMessage {
+            [unknown, consultingWithMap, detectingFootsteps, connectingGPS].randomElement()!
+        }
+    }
+    
     // MARK: - 날씨 정보
     enum WeatherCondition {
         case thunderstorm // 뇌우
