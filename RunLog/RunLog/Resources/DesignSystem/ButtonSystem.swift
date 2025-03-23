@@ -54,7 +54,7 @@ open class RLButton: UIButton {
     /// 버튼 높이 설정
     public func setHeight(_ height: CGFloat) {
         self.snp.remakeConstraints { make in
-            make.height.equalTo(DynamicSize.getHeight(height))
+            make.height.equalTo(height)
         }
     }
     

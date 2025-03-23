@@ -102,10 +102,10 @@ final class RunningViewController: UIViewController {
         cardView.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(DynamicSize.getWidth(16))
             $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(DynamicSize.getHeight(24))
-            $0.height.equalTo(DynamicSize.getHeight(299))
+            $0.height.equalTo(299)
         }
         foldButton.snp.makeConstraints {
-            $0.width.equalTo(DynamicSize.getWidth(76))
+            $0.width.equalTo(76)
             $0.bottom.equalTo(cardView.snp.top).offset(-DynamicSize.getHeight(8))
             $0.trailing.equalToSuperview().inset(DynamicSize.getWidth(16))
         }
