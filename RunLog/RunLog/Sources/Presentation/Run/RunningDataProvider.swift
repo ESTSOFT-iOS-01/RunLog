@@ -358,7 +358,8 @@ final class SyrDummyTest {
         guard let currentLocation = locationManger.location else { return }
         
 //        dummyRoutes = createRoute(from: currentLocation) // 더미 경로 생성
-        dummyRoutes = createPuppyRoute(from: currentLocation)
+//        dummyRoutes = createPuppyRoute(from: currentLocation)
+        dummyRoutes = createStraightLineRoute(from: currentLocation)
         routeIndex = 0
         
         // 3초 후 시작 (async/await에서의 첫 sleep 대체)
@@ -469,6 +470,25 @@ final class SyrDummyTest {
         locations.append(legBottomRight)
         locations.append(legBottomLeft)
         locations.append(legTopLeft) // 사각형을 닫기 위해 첫 좌표 추가
+        
+        return locations
+    }
+    
+    func createStraightLineRoute(from location: CLLocation, numberOfPoints: Int = 10) -> [CLLocation] {
+        let startCoordinate = location.coordinate
+        var locations: [CLLocation] = [location]
+        
+        // 직선 경로를 위해 경도나 위도를 일정 값씩 증가시키는 방식으로 좌표를 생성
+        let stepSize: Double = 0.0001  // 10m 정도의 간격으로 좌표를 추가 (위도/경도 기준)
+        
+        for i in 1..<numberOfPoints {
+            // X축 방향(위도)으로만 일정 간격 이동 (직선 경로)
+            let newLatitude = startCoordinate.latitude + (stepSize * Double(i))
+            let newLongitude = startCoordinate.longitude
+            
+            let newLocation = CLLocation(latitude: newLatitude, longitude: newLongitude)
+            locations.append(newLocation)
+        }
         
         return locations
     }

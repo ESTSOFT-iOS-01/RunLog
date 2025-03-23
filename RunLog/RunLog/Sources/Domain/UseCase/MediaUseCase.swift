@@ -13,7 +13,11 @@ protocol MediaUseCase {
     
     func convertSectionsToCoordinates(sections: [Section]) -> [CLLocationCoordinate2D]
     
+    func convertSectionsToCoordinates1(sections: [Section]) -> [[CLLocationCoordinate2D]]
+    
     func setRouteImage(route coordinates: [CLLocationCoordinate2D])
+    
+    func setRouteImage1(route coordinates: [[CLLocationCoordinate2D]])
     
     func saveImageToDocuments(image: UIImage, imageName: String) throws
     
