@@ -51,8 +51,8 @@ final class MediaUseCaseImpl: MediaUseCase {
                     path.addLine(to: point)
                 }
                 
-                path.lineWidth = 2
-                UIColor.red.setStroke() // 폴리라인 색상
+                path.lineWidth = 1
+                UIColor.LightGreen.setStroke()
                 path.stroke()
             }
             
@@ -136,15 +136,6 @@ final class MediaUseCaseImpl: MediaUseCase {
         // 4. 이미지 파일 저장
         try imageData.write(to: fileURL)
         print("이미지 저장 완료: \(fileURL.path)")
-    }
-    
-    // 4. 이미지 생성 후 저장하는 함수
-    func createAndSaveImage(mapView: MKMapView, overlays: [MKOverlay]) throws {
-        let image = try createPolylineImage(mapView: mapView, overlays: overlays)
-        print("이미지 생성 성공")
-        
-        // 임시로 "polyline_image.png"로 저장
-        try saveImageToDocuments(image: image, imageName: "polyline_image.png")
     }
     
 }

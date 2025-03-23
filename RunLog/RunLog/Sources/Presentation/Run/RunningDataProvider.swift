@@ -12,7 +12,7 @@ import Combine
 // MARK: - 운동 정보에 대한 각종 정보를 가지고 있고 전달해주는 객체
 final class RunningDataProvider {
 //    // Syr) 테스트용 Start
-//    let dummy = SyrDummyTest()
+    let dummy = SyrDummyTest()
 //    // Syr) 테스트용 End
     
     // MARK: - Singleton
@@ -81,6 +81,7 @@ final class RunningDataProvider {
     
     // MARK: - Usecase
     @Dependency private var dayLogUseCase: DayLogUseCase
+    @Dependency private var mediaUseCase: MediaUseCase
 }
 
 // MARK: - Binding
@@ -220,7 +221,7 @@ extension RunningDataProvider {
 extension RunningDataProvider {
     private func requestRunningStart() {
 //        // Syr) 테스트용 Start
-//        dummy.startDummySet()
+        dummy.startDummySet()
 //        // Syr) 테스트용 End
         
         // 데이로그 생성
@@ -280,7 +281,7 @@ extension RunningDataProvider {
 extension RunningDataProvider {
     private func requestRunningStop() {
 //        // Syr) 테스트용 Start
-//        dummy.stopDummySet()
+        dummy.stopDummySet()
 //        // Syr) 테스트용 End
         
         // 운동 종료 위치를 경로에 저장
@@ -308,18 +309,9 @@ extension RunningDataProvider {
             try await dayLogUseCase.addSectionByDate(Date(), section: self.section)
             
             if let dayLog = try await dayLogUseCase.getDayLogByDate(Date()) {
-                var allPoint: [CLLocation] = []
-                for section in dayLog.sections {
-                    for route in section.route {
-                        let location = CLLocation(
-                            latitude: route.latitude,
-                            longitude: route.longitude
-                        )
-                        allPoint.append(location)
-                    }
-                }
-                print("현재까지 데이로그의 경로 포인트 수 : \(allPoint.count)")
-                await self.drawingManager.input.send(.requestFullRoutePolyline(allPoint))
+                let datas = mediaUseCase.convertSectionsToCoordinates(sections: dayLog.sections)
+                mediaUseCase.setRouteImage(route: datas)
+                await self.drawingManager.input.send(.requestFullRoutePolyline([CLLocation]()))
             }
         }
         
@@ -365,7 +357,8 @@ final class SyrDummyTest {
     func startDummySet() {
         guard let currentLocation = locationManger.location else { return }
         
-        dummyRoutes = createRoute(from: currentLocation) // 더미 경로 생성
+//        dummyRoutes = createRoute(from: currentLocation) // 더미 경로 생성
+        dummyRoutes = createPuppyRoute(from: currentLocation)
         routeIndex = 0
         
         // 3초 후 시작 (async/await에서의 첫 sleep 대체)
@@ -393,6 +386,7 @@ final class SyrDummyTest {
         timer?.invalidate() // 타이머 정지
         timer = nil
     }
+    
     func createRoute(from location: CLLocation) -> [CLLocation] {
         let center = location.coordinate // 현재 위치를 중심으로 설정
         let radius: Double = 0.00135 // 150m 반경 (위도/경도 변환값)
@@ -411,6 +405,70 @@ final class SyrDummyTest {
             locations.append(CLLocation(latitude: newLat, longitude: newLon))
         }
         locations.append(locations.first!) // 원을 닫기 위해 첫 번째 좌표 추가
+        
+        return locations
+    }
+    
+    func createPuppyRoute(from location: CLLocation) -> [CLLocation] {
+        let center = location.coordinate // 현재 위치를 중심으로 설정
+        let width: Double = 0.0015 // 몸통과 머리 크기를 결정할 넓이
+        let height: Double = 0.002 // 몸통과 머리 크기를 결정할 높이
+        
+        var locations: [CLLocation] = []
+        
+        // 몸통 (사각형 경로)
+        let bodyTopLeft = CLLocation(latitude: center.latitude + height / 2, longitude: center.longitude - width / 2)
+        let bodyTopRight = CLLocation(latitude: center.latitude + height / 2, longitude: center.longitude + width / 2)
+        let bodyBottomRight = CLLocation(latitude: center.latitude - height / 2, longitude: center.longitude + width / 2)
+        let bodyBottomLeft = CLLocation(latitude: center.latitude - height / 2, longitude: center.longitude - width / 2)
+        
+        locations.append(bodyTopLeft)
+        locations.append(bodyTopRight)
+        locations.append(bodyBottomRight)
+        locations.append(bodyBottomLeft)
+        locations.append(bodyTopLeft) // 사각형을 닫기 위해 첫 좌표 추가
+        
+        // 머리 (사각형 경로, 몸통 위에 배치)
+        let headWidth: Double = 0.0005
+        let headHeight: Double = 0.0005
+        let headTopLeft = CLLocation(latitude: center.latitude + height / 2 + headHeight / 2, longitude: center.longitude - headWidth / 2)
+        let headTopRight = CLLocation(latitude: center.latitude + height / 2 + headHeight / 2, longitude: center.longitude + headWidth / 2)
+        let headBottomRight = CLLocation(latitude: center.latitude + height / 2 - headHeight / 2, longitude: center.longitude + headWidth / 2)
+        let headBottomLeft = CLLocation(latitude: center.latitude + height / 2 - headHeight / 2, longitude: center.longitude - headWidth / 2)
+        
+        locations.append(headTopLeft)
+        locations.append(headTopRight)
+        locations.append(headBottomRight)
+        locations.append(headBottomLeft)
+        locations.append(headTopLeft) // 사각형을 닫기 위해 첫 좌표 추가
+        
+        // 귀 (사각형 경로, 머리 위쪽에 배치)
+        let earWidth: Double = 0.0002
+        let earHeight: Double = 0.0003
+        let earTopLeft = CLLocation(latitude: center.latitude + height / 2 + headHeight + earHeight / 2, longitude: center.longitude - earWidth / 2)
+        let earTopRight = CLLocation(latitude: center.latitude + height / 2 + headHeight + earHeight / 2, longitude: center.longitude + earWidth / 2)
+        let earBottomRight = CLLocation(latitude: center.latitude + height / 2 + headHeight - earHeight / 2, longitude: center.longitude + earWidth / 2)
+        let earBottomLeft = CLLocation(latitude: center.latitude + height / 2 + headHeight - earHeight / 2, longitude: center.longitude - earWidth / 2)
+        
+        locations.append(earTopLeft)
+        locations.append(earTopRight)
+        locations.append(earBottomRight)
+        locations.append(earBottomLeft)
+        locations.append(earTopLeft) // 사각형을 닫기 위해 첫 좌표 추가
+        
+        // 다리 (사각형 경로, 몸통 아래에 배치)
+        let legWidth: Double = 0.0003
+        let legHeight: Double = 0.0004
+        let legTopLeft = CLLocation(latitude: center.latitude - height / 2 - legHeight / 2, longitude: center.longitude - legWidth / 2)
+        let legTopRight = CLLocation(latitude: center.latitude - height / 2 - legHeight / 2, longitude: center.longitude + legWidth / 2)
+        let legBottomRight = CLLocation(latitude: center.latitude - height / 2 + legHeight / 2, longitude: center.longitude + legWidth / 2)
+        let legBottomLeft = CLLocation(latitude: center.latitude - height / 2 + legHeight / 2, longitude: center.longitude - legWidth / 2)
+        
+        locations.append(legTopLeft)
+        locations.append(legTopRight)
+        locations.append(legBottomRight)
+        locations.append(legBottomLeft)
+        locations.append(legTopLeft) // 사각형을 닫기 위해 첫 좌표 추가
         
         return locations
     }

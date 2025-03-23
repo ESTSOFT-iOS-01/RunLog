@@ -15,10 +15,6 @@ protocol MediaUseCase {
     
     func setRouteImage(route coordinates: [CLLocationCoordinate2D])
     
-    func setSnapshotOption(_ coordinates: [CLLocationCoordinate2D]) -> MKMapSnapshotter.Options
-    
-    func getRouteCenterCoordinate(_ coordinates: [CLLocationCoordinate2D]) -> CLLocationCoordinate2D?
-    
     func saveImageToDocuments(image: UIImage, imageName: String) throws
     
 }
