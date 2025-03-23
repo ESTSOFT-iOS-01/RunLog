@@ -7,70 +7,116 @@
 
 import UIKit
 import MapKit
+import CoreLocation
 
 final class MediaUseCaseImpl: MediaUseCase {
 
     init() {
     }
-
-    // 폴리라인을 캡처하는 함수
-//    func createPolylineImage(mapView: MKMapView) async throws -> UIImage {
-//        // 1. 폴리라인을 맵뷰의 overlays에서 찾기
-//        guard let polyline = await mapView.overlays.compactMap({ $0 as? MKPolyline }).first else {
-//            throw MediaUseCaseError.noPolylineFound
-//        }
-//        
-//        // 2. 폴리라인 렌더러 설정
-//        let renderer = MKPolylineRenderer(polyline: polyline)
-//        renderer.strokeColor = .white // 폴리라인 색상 설정 (하얀색으로 설정)
-//        renderer.lineWidth = 4
-//        
-//        // 3. 맵뷰 크기와 일치하는 이미지를 생성하는 렌더러
-//        let image = try await capturePolylineImage(mapView: mapView, renderer: renderer)
-//
-//        return image
-//    }
     
-//    func createPolylineImage(mapView: MKMapView, overlay: MKOverlay) throws -> UIImage {
-//        // 1. 폴리라인 렌더러 설정 (overlay를 받아서 MKPolylineRenderer로 렌더링)
-//        guard let polyline = overlay as? MKPolyline else {
-//            throw MediaUseCaseError.noPolylineFound
-//        }
-//        
-//        let renderer = MKPolylineRenderer(polyline: polyline)
-//        renderer.strokeColor = .white // 폴리라인 색상 설정 (하얀색으로 설정)
-//        renderer.lineWidth = 4
-//
-//        // 2. 이미지를 생성하고 반환
-//        return try capturePolylineImage(mapView: mapView, renderer: renderer)
-//    }
-    
-    // 2. 실제 폴리라인만 캡처하는 함수
-    func createPolylineImage(mapView: MKMapView, overlays: [MKOverlay]) throws -> UIImage {
-        // 1. `MKPolyline`만 필터링하여 각 폴리라인을 렌더링
-        let polylines = overlays.compactMap { $0 as? MKPolyline }
+    func convertSectionsToCoordinates(sections: [Section]) -> [CLLocationCoordinate2D] {
+        var coordinates: [CLLocationCoordinate2D] = []
 
-        // 2. 이미지를 생성할 렌더러
-        let imageRenderer = UIGraphicsImageRenderer(size: mapView.bounds.size)
-
-        return imageRenderer.image { context in
-            // 배경을 투명하게 설정 (기본적으로 배경이 투명하게 설정됨)
-            context.cgContext.setFillColor(UIColor.black.cgColor)
-            context.cgContext.fill(mapView.bounds)
-
-            // 3. 폴리라인을 그리기
-            for polyline in polylines {
-                let renderer = MKPolylineRenderer(polyline: polyline)
-                renderer.strokeColor = .white  // 폴리라인 색상 설정
-                renderer.lineWidth = 1
-
-                // 폴리라인을 그리기 위한 mapRect와 zoomScale 계산
-                let mapRect = mapView.visibleMapRect
-                let zoomScale = mapView.bounds.width / mapView.visibleMapRect.size.width
-                
-                renderer.draw(mapRect, zoomScale: zoomScale, in: context.cgContext)
+        for section in sections {
+            for point in section.route.sorted(by: { $0.timestamp < $1.timestamp }) {
+                let coordinate = CLLocationCoordinate2D(latitude: point.latitude, longitude: point.longitude)
+                coordinates.append(coordinate)
             }
         }
+        
+        return coordinates
+    }
+    
+    func setRouteImage(route coordinates: [CLLocationCoordinate2D]) {
+        guard let centerCoordinate = getRouteCenterCoordinate(coordinates) else { return }
+        let region = makeRouteSizeRegion(center: centerCoordinate, coordinates: coordinates)
+        
+        let option = setSnapshotOption(coordinates, region: region)
+        let snapShotter = MKMapSnapshotter(options: option)
+        
+        snapShotter.start { snapshot, error in
+            guard let snapshot = snapshot, error == nil else {
+                print("Error: \(String(describing: error))")
+                return
+            }
+            
+            let mapImage = snapshot.image
+            let overlayImage = UIGraphicsImageRenderer(size: mapImage.size).image { context in
+                mapImage.draw(at: .zero)
+                let points = coordinates.map { snapshot.point(for: $0) }
+                let path = UIBezierPath()
+                path.move(to: points.first ?? CGPoint(x: 0, y: 0))
+                
+                for point in points.dropFirst() {
+                    path.addLine(to: point)
+                }
+                
+                path.lineWidth = 2
+                UIColor.red.setStroke() // 폴리라인 색상
+                path.stroke()
+            }
+            
+//            return overlayImage
+            
+            // 임시 저장: 생성된 이미지 처리 후 저장
+            do {
+                try self.saveImageToDocuments(image: overlayImage, imageName: "route_image.png")
+            } catch {
+                print("Error saving image: \(error)")
+            }
+        }
+    }
+    
+    func setSnapshotOption(_ coordinates: [CLLocationCoordinate2D], region: MKCoordinateRegion) -> MKMapSnapshotter.Options {
+        let option = MKMapSnapshotter.Options()
+        option.region = region
+        option.size = CGSize(width: 400, height: 400) // 원하는 이미지 크기 설정
+        let configuration = MKStandardMapConfiguration(emphasisStyle: .muted)
+        configuration.pointOfInterestFilter = .excludingAll
+        option.preferredConfiguration = configuration
+        return option
+    }
+    
+    // 옵션 설정
+    func setSnapshotOption(_ coordinates: [CLLocationCoordinate2D]) -> MKMapSnapshotter.Options {
+        let option = MKMapSnapshotter.Options()
+        
+        let configuration = MKStandardMapConfiguration(emphasisStyle: .muted)
+        configuration.pointOfInterestFilter = .excludingAll
+        option.preferredConfiguration = configuration
+        
+        return option
+    }
+    
+    // 지도 중점 구하기
+    func getRouteCenterCoordinate(_ coordinates: [CLLocationCoordinate2D]) -> CLLocationCoordinate2D? {
+        guard coordinates.isEmpty == false || coordinates.count > 1 else {
+            return nil
+        }
+        
+        var centerLat : CLLocationDegrees = 0
+        var centerLon : CLLocationDegrees = 0
+        
+        for coordinate in coordinates {
+            centerLat += coordinate.latitude
+            centerLon += coordinate.longitude
+        }
+        
+        centerLat /= Double(coordinates.count)
+        centerLon /= Double(coordinates.count)
+        
+        return CLLocationCoordinate2D(latitude: centerLat, longitude: centerLon)
+    }
+    
+    func makeRouteSizeRegion(center: CLLocationCoordinate2D, coordinates: [CLLocationCoordinate2D]) -> MKCoordinateRegion {
+        let minLat = coordinates.min { $0.latitude < $1.latitude }?.latitude ?? 0
+        let maxLat = coordinates.max { $0.latitude < $1.latitude }?.latitude ?? 0
+        let minLon = coordinates.min { $0.longitude < $1.longitude }?.longitude ?? 0
+        let maxLon = coordinates.max { $0.longitude < $1.longitude }?.longitude ?? 0
+        
+        let span = MKCoordinateSpan(latitudeDelta: (maxLat - minLat)*1.5, longitudeDelta: (maxLon - minLon)*1.5)
+        
+        return MKCoordinateRegion(center: center, span: span)
     }
     
     func saveImageToDocuments(image: UIImage, imageName: String) throws {
@@ -99,27 +145,6 @@ final class MediaUseCaseImpl: MediaUseCase {
         
         // 임시로 "polyline_image.png"로 저장
         try saveImageToDocuments(image: image, imageName: "polyline_image.png")
-    }
-    
-//    func createAndSaveImage(mapView: MKMapView) async throws {
-//        let image = try await createPolylineImage(mapView: mapView)
-//        print("이미지 생성 성공")
-//        // 임시로 "polyline_image.png"로 저장
-//        try saveImageToDocuments(image: image, imageName: "polyline_image.png")
-//    }
-    
-    func createPolylineAnimationVideo(polyline: MKPolyline, mapView: MKMapView, videoDuration: Double) async throws -> URL {
-        // 애니메이션 영상 생성 로직
-        return try await withCheckedThrowingContinuation { continuation in
-            // 영상 생성 로직
-        }
-    }
-    
-    func saveVideoToStorage(videoURL: URL, saveToLibrary: Bool) async throws -> Bool {
-        // 영상 저장 로직
-        return try await withCheckedThrowingContinuation { continuation in
-            // 저장 로직
-        }
     }
     
 }
