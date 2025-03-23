@@ -42,10 +42,9 @@ class TimelineViewCell: UITableViewCell {
     }
     
     private lazy var trackImageView = UIImageView().then {
-        // TODO: ImageView로 바꾸기
         $0.image = UIImage()
         $0.backgroundColor = .Gray900
-        $0.contentMode = .scaleToFill
+        $0.contentMode = .scaleAspectFill
         $0.layer.cornerRadius = 4
         $0.clipsToBounds = true
     }
@@ -100,11 +99,13 @@ class TimelineViewCell: UITableViewCell {
     func configure(
         totalDistance: Double,
         title: String,
-        date: Date
+        date: Date,
+        trackImage: Data
     ) {
         self.distanceLabel.text = "\(totalDistance.toString(withDecimal: 1))km"
         self.titleLabel.text = "\(title)"
         self.dateLabel.text = "\(date.formattedString(.fullDate))"
+        self.trackImageView.image = UIImage(data: trackImage)
     }
 }
 

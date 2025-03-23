@@ -97,7 +97,7 @@ final class CalendarViewController: UIViewController {
         viewModel.output.nickname
             .receive(on: DispatchQueue.main)
             .sink { [weak self] name in
-                self?.calendarView.nicknameLabel.text = name
+                self?.calendarView.nicknameLabel.text = "\(name) 님,"
             }.store(in: &cancellables)
         
         viewModel.output.sortedKeys
