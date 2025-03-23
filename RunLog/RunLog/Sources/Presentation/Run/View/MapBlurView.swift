@@ -11,19 +11,20 @@ import Then
 
 final class MapBlurView: UIView {
     
-    // MARK: - UI Components 선언
-    private var background1 = UIView().then {
-        $0.backgroundColor = .black
-    }
-    private var background2 = UIView().then {
+    // MARK: - Focus Area (Blur) UI
+    private var blurBackground = UIView().then {
         $0.backgroundColor = .clear
-    }
-    private var background3 = UIView().then {
-        $0.backgroundColor = .black
     }
     private var gradientLayer = CAGradientLayer().then {
         $0.type = .radial
     }
+    
+    // MARK: - Out of Focus Area UI
+    private var topBackground = UIView()
+    private var bottomBackground = UIView()
+    private var leadingBackground = UIView()
+    private var trailingBackground = UIView()
+    
     // MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -33,32 +34,59 @@ final class MapBlurView: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
     // MARK: - AutoLayout 적용 후 Gradient 추가
     override func layoutSubviews() {
         super.layoutSubviews()
         setupLayout()
     }
+    
     // MARK: - Setup UI
     private func setupUI() {
+        // 블러 제외 배경 검은색 지정
+        [topBackground, bottomBackground, leadingBackground, trailingBackground]
+            .forEach { $0.backgroundColor = .black }
+        
         // UI 요소 추가
-        [background1, background2, background3].forEach { self.addSubview($0) }
+        self.addSubviews(
+            blurBackground,
+            topBackground,
+            bottomBackground,
+            leadingBackground,
+            trailingBackground
+        )
+        
         // 블러 효과가 올라가는 뷰
-        background2.snp.makeConstraints {
-            $0.centerY.equalToSuperview().offset(30)
-            $0.leading.trailing.equalToSuperview()
-            $0.height.equalTo(UIScreen.main.bounds.width)
+        blurBackground.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.centerY.equalToSuperview().offset(DynamicSize.getHeight(30))
+            $0.width.height.equalTo(DynamicSize.getHeight(441))
         }
-        // 블러 효과 위쪽 뷰
-        background1.snp.makeConstraints {
+        
+        topBackground.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview()
             $0.top.equalToSuperview()
-            $0.bottom.equalTo(background2.snp.top)
+            $0.bottom.equalTo(blurBackground.snp.top)
         }
-        // 블러 효과 아래쪽 뷰
-        background3.snp.makeConstraints {
+        
+        bottomBackground.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview()
             $0.bottom.equalToSuperview()
-            $0.top.equalTo(background2.snp.bottom)
+            $0.top.equalTo(blurBackground.snp.bottom)
+        }
+        
+        leadingBackground.snp.makeConstraints {
+            $0.leading.equalToSuperview()
+            $0.trailing.equalTo(blurBackground.snp.leading)
+            $0.top.equalTo(topBackground)
+            $0.bottom.equalTo(snp_bottomMargin)
+        }
+        
+        trailingBackground.snp.makeConstraints {
+            $0.leading.equalTo(blurBackground.snp.trailing)
+            $0.trailing.equalToSuperview()
+            $0.top.equalTo(topBackground)
+            $0.bottom.equalTo(snp_bottomMargin)
         }
     }
     // MARK: - Setup Layout
@@ -67,8 +95,18 @@ final class MapBlurView: UIView {
         gradientLayer.removeFromSuperlayer() // 기존 레이어 제거 (중복 방지)
         gradientLayer = CAGradientLayer()
         gradientLayer.type = .radial
-        gradientLayer.frame = background2.bounds
-        gradientLayer.position = CGPoint(x: background2.bounds.midX, y: background2.bounds.midY)
+        
+        // background2를 전부 덮도록
+        gradientLayer.frame = CGRect(
+            x: 0, y: 0,
+            width: blurBackground.bounds.width,
+            height: blurBackground.bounds.height
+        )
+        
+        gradientLayer.position = CGPoint(
+            x: blurBackground.bounds.midX,
+            y: blurBackground.bounds.midY
+        )
         
         gradientLayer.colors = [
             UIColor.clear.cgColor,
@@ -81,9 +119,8 @@ final class MapBlurView: UIView {
         gradientLayer.startPoint = CGPoint(x: 0.5, y: 0.5)
         gradientLayer.endPoint = CGPoint(x: 1.0, y: 1.0)
         
-        background2.layer.addSublayer(gradientLayer)
+        blurBackground.layer.addSublayer(gradientLayer)
     }
-    
     // MARK: - Configure
     private func configure() {
         // 뷰 설정

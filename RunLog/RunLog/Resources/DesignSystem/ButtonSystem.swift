@@ -25,7 +25,7 @@ open class RLButton: UIButton {
         self.layer.cornerRadius = 16
         
         self.snp.makeConstraints { make in
-            make.height.equalTo(63)
+            make.height.equalTo(DynamicSize.getHeight(63))
         }
     }
     
@@ -51,9 +51,9 @@ open class RLButton: UIButton {
     }
     
     /// 버튼 높이 설정
-    public func setHeight(_ height: CFloat) {
+    public func setHeight(_ height: CGFloat) {
         self.snp.remakeConstraints { make in
-            make.height.equalTo(height)
+            make.height.equalTo(DynamicSize.getHeight(height))
         }
     }
     
