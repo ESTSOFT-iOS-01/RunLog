@@ -13,11 +13,21 @@ import Combine
 final class ChangeNicknameViewController: UIViewController {
     
     // MARK: - Properties
-    private let viewModel = ChangeNicknameViewModel()
+    private let viewModel: ChangeNicknameViewModel!
     private var cancellables = Set<AnyCancellable>()
     
     // MARK: - UI
     private lazy var nicknameView = ChangeNicknameView()
+    
+    // MARK: - Init
+    init(viewModel: ChangeNicknameViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -26,12 +36,15 @@ final class ChangeNicknameViewController: UIViewController {
         setupNavigationBar()
         setupGesture()
         setupTextField()
+        
+        viewModel.bind()
         bindViewModel()
-        setupData()
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        setupData()
         self.navigationController?.setNavigationBarHidden(false, animated: animated)
     }
     
@@ -77,18 +90,25 @@ final class ChangeNicknameViewController: UIViewController {
     // MARK: - Setup Data
     private func setupData() {
         // 초기 데이터 로드
-        nicknameView.nameField.setTextWithUnderline(viewModel.nickname)
+        viewModel.input.send(.loadData)
     }
 
     // MARK: - Bind ViewModel
     private func bindViewModel() {
-        viewModel.output
-            .sink { [weak self] output in
-                switch output {
-                case .nicknameUpdated(let text):
-                    self?.nicknameView.nameField.setTextWithUnderline(text)
-                case .saveSuccess:
+        viewModel.output.nicknameUpdated
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] text in
+                self?.nicknameView.nameField.setTextWithUnderline(text)
+            }
+            .store(in: &cancellables)
+        
+        viewModel.output.saveSuccess
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] success in
+                if success {
                     self?.navigationController?.popViewController(animated: true)
+                } else {
+                    // 저장 실패 시 처리
                 }
             }
             .store(in: &cancellables)

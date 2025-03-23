@@ -31,18 +31,8 @@ final class TimelineViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        bindGesture()
+        setupTableView()
         bindViewModel()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        self.navigationController?.setNavigationBarHidden(false, animated: animated)
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        self.navigationController?.setNavigationBarHidden(true, animated: false)
     }
     
     
@@ -52,18 +42,18 @@ final class TimelineViewController: UIViewController {
         timelineView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
-        timelineView.tableView.delegate = self
-        timelineView.tableView.dataSource = self
     }
 
     // MARK: - bindGesture
-    private func bindGesture() {
-        // 제스처 추가
+    private func setupTableView() {
+        timelineView.tableView.delegate = self
+        timelineView.tableView.dataSource = self
     }
 
     // MARK: - Bind ViewModel
     private func bindViewModel() {
         viewModel.output.groupedDayLogs
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.timelineView.tableView.reloadData()
             }
@@ -131,5 +121,14 @@ extension TimelineViewController: UITableViewDelegate, UITableViewDataSource {
         forRowAt indexPath: IndexPath
     ) {
         cell.backgroundColor = .clear
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let key = viewModel.output.sortedKeys.value[indexPath.section]
+        if let dayLogs = viewModel.output.groupedDayLogs.value[key] {
+            let dayLog = dayLogs[indexPath.row]
+            viewModel.send(.cellTapped(date: dayLog.date))
+        }
+        
     }
 }

@@ -53,20 +53,16 @@ final class DetailLogViewController: UIViewController {
         setupUI()
         setupNavigationBar()
         bindGesture()
-        setupData()
         bindViewModel()
         setupMapView()
-        detailLogView.configure(with: dummyDisplayLog)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        self.navigationController?.setNavigationBarHidden(false, animated: animated)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        self.navigationController?.setNavigationBarHidden(true, animated: false)
     }
     
     
@@ -78,7 +74,6 @@ final class DetailLogViewController: UIViewController {
     // MARK: - Setup Navigation Bar
     private func setupNavigationBar() {
         // 네비게이션바 디테일 설정
-        updateNavigationTitle(with: dummyDisplayLog.date)
         navigationController?.setupAppearance() // 스타일 설정
         navigationController?.navigationItem.backButtonTitle = "chevron.left"
         navigationController?
@@ -124,28 +119,21 @@ final class DetailLogViewController: UIViewController {
             .store(in: &cancellables)
     }
     
-    // MARK: - Setup Data
-    private func setupData() {
-        // 초기 데이터 로드
-        let recordDetailsFromDayLog = dummyDayLog.toRecordDetails()
-        print("DetailLogViewController - 더미데이터 개수: \(recordDetailsFromDayLog.count)")
-        self.recordDetails = recordDetailsFromDayLog
-        
-        detailLogView.recordDetailView.tableView.reloadData()
-        
-        // reloadData 후 테이블뷰 상태 확인 (비동기)
-        DispatchQueue.main.async {
-            _ = self.detailLogView.recordDetailView.tableView
-            //print("디버그: reloadData 이후 tableView의 contentSize: \(tableView.contentSize), frame: \(tableView.frame), 시각: \(Date())")
-        }
-    }
     
     // MARK: - Bind ViewModel
     private func bindViewModel() {
+        
         viewModel.output
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] output in
                 guard let self = self, let output = output else { return }
                 switch output {
+                case .loadedDayLog(let dayLog):
+                    self.detailLogView.configure(with: DisplayDayLog(from: dayLog))
+                    self.recordDetails = dayLog.sections.map {
+                        RecordDetail(from: $0)
+                    }
+                    self.detailLogView.recordDetailView.tableView.reloadData()
                 case .edit:
                     print("수정하기 탭됨 → 수정 로직")
                 case .share:

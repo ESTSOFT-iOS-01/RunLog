@@ -37,18 +37,9 @@ final class CalendarViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        setupCollectionView()
         bindGesture()
         bindViewModel()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        self.navigationController?.setNavigationBarHidden(false, animated: animated)
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        self.navigationController?.setNavigationBarHidden(true, animated: false)
     }
     
     
@@ -59,6 +50,16 @@ final class CalendarViewController: UIViewController {
         calendarView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
+        
+        // 랜덤 멘트 설정
+        let randomMotivation = Constants.MotivationMessage.random
+        calendarView.walkImage.image = UIImage(
+            named: randomMotivation.icon.name
+        )
+        calendarView.bottomLabel.text = randomMotivation.message
+    }
+    
+    private func setupCollectionView() {
         calendarView.collectionView.dataSource = self
         calendarView.collectionView.delegate = self
     }
@@ -93,11 +94,16 @@ final class CalendarViewController: UIViewController {
     
     // MARK: - Bind ViewModel
     private func bindViewModel() {
+        viewModel.output.nickname
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] name in
+                self?.calendarView.nicknameLabel.text = name
+            }.store(in: &cancellables)
+        
         viewModel.output.sortedKeys
             .receive(on: DispatchQueue.main)
             .sink { [weak self] keys in
-                guard let self = self, !keys.isEmpty else { return }
-                
+                guard let self = self else { return }
                 let month = viewModel.output.sortedKeys.value.first ?? Date()
                 self.currentMonthDays = generateDaysFor(date: month)
                 calendarView.calendarTitleLabel.text = month.formattedString(
@@ -105,15 +111,13 @@ final class CalendarViewController: UIViewController {
                 )
                 self.updateArrowButtons()
                 
-            }
-            .store(in: &cancellables)
+            }.store(in: &cancellables)
         
         viewModel.output.groupedDayLogs
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.calendarView.collectionView.reloadData()
-            }
-            .store(in: &cancellables)
+            }.store(in: &cancellables)
     }
 }
 
@@ -210,5 +214,27 @@ extension CalendarViewController: UICollectionViewDelegate, UICollectionViewData
         let dayInfo = currentMonthDays[indexPath.row]
         cell.configure(day: dayInfo.day, heartBeatCount: dayInfo.heartBeatCount)
         return cell
+    }
+    
+    func collectionView(
+        _ collectionView: UICollectionView,
+        didSelectItemAt indexPath: IndexPath
+    ) {
+        guard currentMonthDays[indexPath.row].heartBeatCount > 0 else { return }
+
+        let key = viewModel.output.sortedKeys.value[currentKeyIndex]
+        let calendar = Calendar.current
+
+        // 1. key에서 year, month 꺼내기
+        let components = calendar.dateComponents([.year, .month], from: key)
+
+        // 2. day 붙이기
+        var finalComponents = components
+        finalComponents.day = currentMonthDays[indexPath.row].day
+
+        // 3. 최종 Date 만들기
+        if let date = calendar.date(from: finalComponents) {
+            viewModel.send(.cellTapped(date: date))
+        }
     }
 }

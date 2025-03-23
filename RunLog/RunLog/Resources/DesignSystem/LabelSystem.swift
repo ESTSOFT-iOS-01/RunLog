@@ -24,6 +24,7 @@ final class RLLabel: UIView {
             label.attributedText = newValue
         }
     }
+    
     override var tintColor: UIColor! {
         get {
             return label.tintColor
@@ -66,7 +67,8 @@ final class RLLabel: UIView {
             label.snp.makeConstraints {
                 $0.top.bottom.leading.trailing.equalToSuperview()
             }
-        }else {
+        }
+        else {
             icon.snp.makeConstraints {
                 $0.leading.equalToSuperview()
                 $0.top.bottom.equalToSuperview().inset(4)
@@ -77,6 +79,7 @@ final class RLLabel: UIView {
             }
         }
     }
+    
     /// 아이콘 이미지 설정
     public func setImage(image: UIImage?) {
         self.icon.image = image

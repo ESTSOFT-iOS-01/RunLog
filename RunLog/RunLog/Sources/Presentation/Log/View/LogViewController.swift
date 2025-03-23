@@ -25,17 +25,16 @@ final class LogViewController: UIViewController {
         super.viewDidLoad()
         setupUI()
         setupNavigationBar()
+        bindViewModel()
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        navigationController?.setNavigationBarHidden(false, animated: animated)
         logViewModel.send(.viewWillAppear)
     }
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        navigationController?.setNavigationBarHidden(true, animated: false)
     }
 
     // MARK: - Setup UI
@@ -71,7 +70,22 @@ final class LogViewController: UIViewController {
 
     // MARK: - Setup Navigation Bar
     private func setupNavigationBar() {
-        title = "LOGO"
+        self.navigationController?.setupAppearance()
+        navigationItem.title = "LOGO"
+    }
+    
+    // MARK: - Bind ViewModel
+    private func bindViewModel() {
+        logViewModel.output.navigationEvent
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] date in
+                
+                let detailVM = DetailLogViewModel(date: date)
+                let detailVC = DetailLogViewController(viewModel: detailVM)
+                detailVC.title = date.formattedString(.monthDay)
+                self?.navigationController?.pushViewController(detailVC, animated: true)
+            }
+            .store(in: &cancellables)
     }
 }
 

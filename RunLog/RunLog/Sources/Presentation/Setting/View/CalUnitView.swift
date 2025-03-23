@@ -16,6 +16,7 @@ final class CalUnitView: UIView {
     
     // MARK: - UI Components 선언
     private let exampleImageView = UIImageView().then {
+        $0.image = UIImage(named: "UnitExample")
         $0.backgroundColor = .clear
         $0.contentMode = .scaleAspectFit
     }
@@ -80,8 +81,11 @@ final class CalUnitView: UIView {
     }
     
     // MARK: - Configure
-    func updateDescriptionText(with value: Double) {
-        let unitString = (value * 0.3).toString()
+    func updateDescriptionText(with value: String) {
+        let visibleUnitDouble = (Double(value) ?? 10.0) * 0.3
+        let threeDecimalUnitDouble = Double(visibleUnitDouble.toString(withDecimal: 3)) ?? 3.3
+        let unitString = threeDecimalUnitDouble.formattedString
+        
         let fullText = "하루에 \(unitString)km 이동하면 이렇게 표시돼요"
         
         despLabel.attributedText = fullText.styledText(

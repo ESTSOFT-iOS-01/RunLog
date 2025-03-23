@@ -18,25 +18,32 @@ final class RunHomeViewController: UIViewController {
     private var cancellables = Set<AnyCancellable>()
     
     // MARK: - UI
-    lazy var mapView = MKMapView().then {
+    private var mapView = MKMapView().then {
         $0.showsUserLocation = true
+        let zoomRange = MKMapView.CameraZoomRange(maxCenterCoordinateDistance: 20000)
+        $0.setCameraZoomRange(zoomRange, animated: false)
+        $0.initZoomLevel()
     }
-    var totalLabel = UILabel().then {
+    private var totalLabel = UILabel().then {
         $0.numberOfLines = 3
     }
-    var weatherLabel = RLLabel().then {
+    private var weatherLabel = RLLabel().then {
         $0.setImage(image: UIImage(systemName: RLIcon.weather.name))
+        $0.attributedText = .RLAttributedString(text: "Roading", font: .Label2)
     }
-    var blurView = MapBlurView()
-    var locationLabel = UILabel()
-    var startButton = RLButton(title: "운동 시작하기", titleColor: .Gray900).then {
+    private var blurView = MapBlurView()
+    private var locationLabel = UILabel()
+    private var startButton = RLButton(
+        title: "운동 시작하기",
+        titleColor: .Gray900
+    ).then {
         $0.clipsToBounds = true
     }
+    
     // MARK: - Init
     init() {
         super.init(nibName: nil, bundle: nil)
     }
-
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -44,23 +51,22 @@ final class RunHomeViewController: UIViewController {
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        // setup
         setupUI()
         setupNavigationBar()
         setupTabBar()
-        bindGesture()
-        setupData()
+        
+        // binding
+        viewModel.bind()
         bindViewModel()
+        bindGesture()
     }
-    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        self.navigationController?.setNavigationBarHidden(false, animated: animated)
-        self.mapView.centerToLocation(LocationManager.shared.currentLocation)
+        setupData()
     }
-    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        self.navigationController?.setNavigationBarHidden(true, animated: false)
     }
     
     // MARK: - Setup UI
@@ -101,59 +107,60 @@ final class RunHomeViewController: UIViewController {
         self.setupNavigationBarAppearance()
         navigationItem.title = "LOGO"
     }
+    
     // MARK: - Setup Tab Bar
     private func setupTabBar() {
         // 탭바 디테일 설정
         self.setupTabBarAppearance()
     }
-    // MARK: - Bind Gesture
-    private func bindGesture() {
-        // 제스처 추가
-        startButton.publisher
-            .sink {
-                print("운동 시작하기 버튼 클릭")
-                let vc = RunningViewController()
-                vc.modalPresentationStyle = .fullScreen
-                self.present(vc, animated: false)
-            }
-            .store(in: &cancellables)
-    }
     
     // MARK: - Setup Data
     private func setupData() {
-        // 초기 데이터 로드
-        totalLabelCreate()
+        // 처음 위치를 지도에 표현
+        viewModel.input.send(.requestCurrentLocation)
+        // 로드(기록)정보 표현
+        viewModel.input.send(.requestRoadRecord)
     }
-
+    
     // MARK: - Bind ViewModel
     private func bindViewModel() {
         viewModel.output
             .receive(on: DispatchQueue.main)
             .sink { [weak self] output in
+                guard let self = self else { return }
                 switch output {
+                case .responseRunningStart:
+                    let vc = RunningViewController()
+                    vc.modalPresentationStyle = .fullScreen
+                    self.present(vc, animated: false)
                 case .locationUpdate(let location):
-                    self?.mapView.centerToLocation(location)
+                    self.mapView.centerToLocation(location, region: self.mapView.region)
                 case .locationNameUpdate(let text):
-                    self?.locationLabel.attributedText = .RLAttributedString(text: text, font: .Label2, align: .center)
+                    self.locationLabel.attributedText =
+                        .RLAttributedString(
+                            text: text,
+                            font: .Label2,
+                            align: .center
+                        )
                 case .weatherUpdate(let text):
-                    self?.weatherLabel.attributedText = .RLAttributedString(text: text, font: .Label2)
+                    self.weatherLabel.attributedText =
+                        .RLAttributedString(
+                            text: text,
+                            font: .Label2
+                        )
+                case .responseRoadRecord(let text):
+                    self.totalLabel.attributedText = text
                 }
             }
             .store(in: &cancellables)
     }
-}
-// MARK: - private functions
-extension RunHomeViewController {
-    private func totalLabelCreate() {
-        // 여기서 사용자의 데이터를 받아오면 될듯
-        let nickname = "행복한 쿼카러너화이팅"
-        let road = "올레길"
-        let number = "2.5"
-        let string: String = "\(nickname) 님은\n지금까지 \(road) \(number)회\n거리만큼 걸었습니다!"
-        totalLabel.attributedText = string.styledText(
-            highlightText: "\(road) \(number)회",
-            baseFont: .RLMainTitle,
-            highlightFont: .RLMainTitle
-        )
+    // MARK: - Bind Gesture
+    private func bindGesture() {
+        // 제스처 추가
+        startButton.publisher
+            .sink { [weak self] _ in
+                self?.viewModel.input.send(.requestRunningStart)
+            }
+            .store(in: &cancellables)
     }
 }

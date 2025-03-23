@@ -85,22 +85,22 @@ final class MypageProfileView: UIView {
     }
     
     // MARK: - Configure
-    func configure(with config: AppConfig) {
-        nameLabel.attributedText = .RLAttributedString(text: "\(config.nickname) 님", font: .Title, color: .Gray000)
-        
-        let totalDistanceString = config.totalDistance.toString(withDecimal: 1) + "km"
-        let fullText = "지금까지 총 \(totalDistanceString)를 걸으셨어요!"
-        
-        despLabel.attributedText = fullText.styledText(
-            highlightText: totalDistanceString,
-            baseFont: .RLHeadline2,
-            baseColor: .Gray000,
-            highlightFont: .RLHeadline3,
-            highlightColor: .LightPink
-        )
+    func configure(with config: UserInfoVO) {
+            nameLabel.attributedText = .RLAttributedString(text: "\(config.nickname) 님", font: .Title, color: .Gray000)
+            
+            let totalDistanceString = config.totalDistance.toString(withDecimal: 1) + "km"
+            let fullText = "지금까지 총 \(totalDistanceString)를 걸으셨어요!"
+            
+            despLabel.attributedText = fullText.styledText(
+                highlightText: totalDistanceString,
+                baseFont: .RLHeadline2,
+                baseColor: .Gray000,
+                highlightFont: .RLHeadline3,
+                highlightColor: .LightPink
+            )
 
-        logCard.configure(property: .logCount, value: config.totalDays)
-        streakCard.configure(property: .streak, value: config.streakDays)
+            logCard.configure(property: .logCount, value: config.logCount)
+            streakCard.configure(property: .streak, value: config.streakCount)
     }
 }
 

@@ -17,6 +17,7 @@ protocol DayLogRepository {
     /// - Parameter date: 조회할 DayLog의 날짜
     /// - Returns: 해당 날짜에 해당하는 DayLog 도메인 모델
     /// - Throws: 모델이 존재하지 않거나 변환 실패 시 `CoreDataError` 발생
+    @discardableResult
     func readDayLog(date: Date) async throws -> DayLog
     
     /// 저장된 모든 DayLog를 조회합니다.

@@ -12,16 +12,16 @@ import Then
 final class MapBlurView: UIView {
     
     // MARK: - UI Components 선언
-    var background1 = UIView().then {
+    private var background1 = UIView().then {
         $0.backgroundColor = .black
     }
-    var background2 = UIView().then {
+    private var background2 = UIView().then {
         $0.backgroundColor = .clear
     }
-    var background3 = UIView().then {
+    private var background3 = UIView().then {
         $0.backgroundColor = .black
     }
-    var gradientLayer = CAGradientLayer().then {
+    private var gradientLayer = CAGradientLayer().then {
         $0.type = .radial
     }
     // MARK: - Init

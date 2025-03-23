@@ -10,7 +10,6 @@ import SnapKit
 import Then
 
 final class CardElementView: UIView {
-    // record로 안받고 value로 값만 받을려면 Any로 선언해서 configue에서 캐스팅 해줘도 될듯?
     enum ElementType: String {
         case time = "시간"
         case distance = "거리"
@@ -39,9 +38,9 @@ final class CardElementView: UIView {
         }
     }
     // MARK: - UI Components 선언
-    var type: ElementType
-    var title = UILabel()
-    var value = UILabel()
+    private var type: ElementType
+    private var title = UILabel()
+    private var value = UILabel()
     // MARK: - Init
     init(type: ElementType) {
         self.type = type

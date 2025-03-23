@@ -21,6 +21,17 @@ final class DayLogRepositoryImpl: DayLogRepository {
         print("Impl: ", #function)
         
         try await context.perform {
+            let fetchRequest: NSFetchRequest<DayLogDTO> = DayLogDTO.fetchRequest()
+            fetchRequest.predicate = NSPredicate(
+                format: "date == %@",
+                dayLog.date as CVarArg
+            )
+            
+            let existing = try self.context.fetch(fetchRequest)
+            if !existing.isEmpty {
+                throw CoreDataError.modelAlreadyExist
+            }
+            
             let data = DataMapper.toDTO(dayLog, context: self.context)
             self.context.insert(data)
             try self.context.save()
