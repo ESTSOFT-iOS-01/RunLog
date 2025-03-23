@@ -15,7 +15,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         
         // 화면 사이즈 저장
-        ScreenSizeManager.shared.setScreenSize(windowScene.screen.bounds)
+        DynamicSize.setScreenSize(windowScene.screen.bounds)
         
         window = UIWindow(frame: windowScene.coordinateSpace.bounds)
         window?.windowScene = windowScene
