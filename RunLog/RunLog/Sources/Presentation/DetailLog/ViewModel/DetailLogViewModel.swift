@@ -11,6 +11,10 @@ import Combine
 
 final class DetailLogViewModel {
     
+    // MARK: - Properties
+        let date: Date
+
+    
     // MARK: - Input & Output
     enum Input {
         case menuSelected(String)
@@ -69,6 +73,7 @@ final class DetailLogViewModel {
     
     // MARK: - Init
     init(date: Date) {
+        self.date = date
         bind()
         loadTargetDayLog(date: date)
     }
