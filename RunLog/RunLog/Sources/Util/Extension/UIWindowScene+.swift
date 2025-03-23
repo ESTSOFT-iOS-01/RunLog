@@ -30,7 +30,7 @@ extension UIWindowScene {
     }
 }
 
-struct DynamicPadding {
+struct DynamicSize {
     /// 주어진 높이를 화면 비율에 맞게 변환
     static func getHeight(_ size: CGFloat) -> CGFloat {
         return size * UIWindowScene.screenHeight / 956
