@@ -91,53 +91,67 @@ extension UIFont {
         case semiBold = "Pretendard-SemiBold"
         case thin = "Pretendard-Thin"
     }
+    
+    // 다이나믹 폰트 사이즈 설정
+    private static func dynamicFont(
+        name: String,
+        baseSize: CGFloat,
+        weight: UIFont.Weight
+    ) -> UIFont {
+        let dynamicSize = DynamicSize.scaledSize(baseSize)
+        return UIFont(name: name, size: dynamicSize) ?? UIFont.systemFont(ofSize: dynamicSize, weight: weight)
+    }
+    
     // MARK: - Heading
     public static var RLHeading1: UIFont {
-        return UIFont(name: RLFont.semiBold.rawValue, size: 22) ?? UIFont.systemFont(ofSize: 22, weight: .semibold)
+        dynamicFont(name: RLFont.semiBold.rawValue, baseSize: 22, weight: .semibold)
     }
     public static var RLHeading2: UIFont {
-        return UIFont(name: RLFont.semiBold.rawValue, size: 20) ?? UIFont.systemFont(ofSize: 20, weight: .semibold)
+        dynamicFont(name: RLFont.semiBold.rawValue, baseSize: 20, weight: .semibold)
     }
     public static var RLHeading4: UIFont {
-        return UIFont(name: RLFont.semiBold.rawValue, size: 36) ?? UIFont.systemFont(ofSize: 36, weight: .semibold)
+        dynamicFont(name: RLFont.semiBold.rawValue, baseSize: 36, weight: .semibold)
     }
+    
     // MARK: - Headline
     public static var RLHeadline1: UIFont {
-        return UIFont(name: RLFont.semiBold.rawValue, size: 18) ?? UIFont.systemFont(ofSize: 18, weight: .semibold)
+        dynamicFont(name: RLFont.semiBold.rawValue, baseSize: 18, weight: .semibold)
     }
     public static var RLHeadline2: UIFont {
-        return UIFont(name: RLFont.regular.rawValue, size: 18) ?? UIFont.systemFont(ofSize: 18, weight: .regular)
+        dynamicFont(name: RLFont.regular.rawValue, baseSize: 18, weight: .regular)
     }
     public static var RLHeadline3: UIFont {
-        return UIFont(name: RLFont.semiBold.rawValue, size: 18) ?? UIFont.systemFont(ofSize: 18, weight: .semibold)
+        dynamicFont(name: RLFont.semiBold.rawValue, baseSize: 18, weight: .semibold)
     }
+    
     // MARK: - Title
     public static var RLTitle: UIFont {
-        return UIFont(name: RLFont.semiBold.rawValue, size: 24) ?? UIFont.systemFont(ofSize: 24, weight: .semibold)
+        dynamicFont(name: RLFont.semiBold.rawValue, baseSize: 24, weight: .semibold)
     }
     public static var RLMainTitle: UIFont {
-        return UIFont(name: RLFont.semiBold.rawValue, size: 26) ?? UIFont.systemFont(ofSize: 26, weight: .semibold)
+        dynamicFont(name: RLFont.semiBold.rawValue, baseSize: 26, weight: .semibold)
     }
     public static var RLDetailTitle: UIFont {
-        return UIFont(name: RLFont.semiBold.rawValue, size: 32) ?? UIFont.systemFont(ofSize: 32, weight: .semibold)
+        dynamicFont(name: RLFont.semiBold.rawValue, baseSize: 32, weight: .semibold)
     }
+    
     // MARK: - etc
     public static var RLBody1: UIFont {
-        return UIFont(name: RLFont.regular.rawValue, size: 16) ?? UIFont.systemFont(ofSize: 16, weight: .regular)
+        dynamicFont(name: RLFont.regular.rawValue, baseSize: 16, weight: .regular)
     }
     public static var RLLabel1: UIFont {
-        return UIFont(name: RLFont.bold.rawValue, size: 14) ?? UIFont.systemFont(ofSize: 14, weight: .bold)
+        dynamicFont(name: RLFont.bold.rawValue, baseSize: 14, weight: .bold)
     }
     public static var RLLabel2: UIFont {
-        return UIFont(name: RLFont.regular.rawValue, size: 14) ?? UIFont.systemFont(ofSize: 14, weight: .regular)
+        dynamicFont(name: RLFont.regular.rawValue, baseSize: 14, weight: .regular)
     }
     public static var RLButton: UIFont {
-        return UIFont(name: RLFont.medium.rawValue, size: 24) ?? UIFont.systemFont(ofSize: 24, weight: .medium)
+        dynamicFont(name: RLFont.medium.rawValue, baseSize: 24, weight: .medium)
     }
     public static var RLSegment1: UIFont {
-        return UIFont(name: RLFont.semiBold.rawValue, size: 16) ?? UIFont.systemFont(ofSize: 16, weight: .semibold)
+        dynamicFont(name: RLFont.semiBold.rawValue, baseSize: 16, weight: .semibold)
     }
     public static var RLSegment2: UIFont {
-        return UIFont(name: RLFont.medium.rawValue, size: 16) ?? UIFont.systemFont(ofSize: 16, weight: .medium)
+        dynamicFont(name: RLFont.medium.rawValue, baseSize: 16, weight: .medium)
     }
 }

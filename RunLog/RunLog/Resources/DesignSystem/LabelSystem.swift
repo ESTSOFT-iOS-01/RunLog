@@ -71,10 +71,10 @@ final class RLLabel: UIView {
         else {
             icon.snp.makeConstraints {
                 $0.leading.equalToSuperview()
-                $0.top.bottom.equalToSuperview().inset(4)
+                $0.top.bottom.equalToSuperview().inset(DynamicSize.scaledSize(4))
             }
             label.snp.makeConstraints {
-                $0.leading.equalTo(icon.snp.trailing).offset(8)
+                $0.leading.equalTo(icon.snp.trailing).offset(DynamicSize.scaledSize(8))
                 $0.top.bottom.trailing.equalToSuperview()
             }
         }
@@ -86,10 +86,10 @@ final class RLLabel: UIView {
         self.icon.tintColor = .Gray000
         icon.snp.remakeConstraints {
             $0.leading.equalToSuperview()
-            $0.top.bottom.equalToSuperview().inset(4)
+            $0.top.bottom.equalToSuperview().inset(DynamicSize.scaledSize(4))
         }
         label.snp.remakeConstraints {
-            $0.leading.equalTo(icon.snp.trailing).offset(8)
+            $0.leading.equalTo(icon.snp.trailing).offset(DynamicSize.scaledSize(8))
             $0.top.bottom.trailing.equalToSuperview()
         }
     }

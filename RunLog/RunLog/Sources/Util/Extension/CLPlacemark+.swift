@@ -17,12 +17,12 @@ extension CLPlacemark {
         if let subLocal = self.subLocality, subLocal.hasSuffix("동") {
             district = subLocal
         }
-        let description: String = String(
-            self.description
-                .split(separator: ",")
-                .filter{ $0.contains("대한민국") }
-                .first
-            ?? "")
+        guard let description = self.description
+            .split(separator: ",")
+            .filter({ $0.contains("대한민국") })
+            .first
+        else { return Constants.LocationMessage.random.message }
+        
         let components = description.split(separator: " ").map { String($0) }
         for component in components {
             if state == "" && (component.hasSuffix("특별시") || component.hasSuffix("광역시") || component.hasSuffix("도")) {

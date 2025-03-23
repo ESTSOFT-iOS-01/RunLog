@@ -36,26 +36,30 @@ final class RunningViewController: UIViewController {
             titleColor: .Gray000,
             font: .RLLabel2
         )
-        $0.setHeight(32)
-        $0.configureRadius(8)
+        $0.setHeight(DynamicSize.scaledSize(40))
+        $0.configureRadius(DynamicSize.scaledSize(8))
         $0.configureBackgroundColor(.Gray700)
         $0.tintColor = .Gray000
         var config = UIButton.Configuration.plain()
         config.image = UIImage(systemName: RLIcon.fold.name)
-        config.imagePadding = 4
+        config.imagePadding = DynamicSize.scaledSize(4)
         config.imagePlacement = .trailing
-        config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(
-            pointSize: 12,
-            weight: .medium
-        )
+        config.preferredSymbolConfigurationForImage =
+            UIImage.SymbolConfiguration(
+                pointSize: DynamicSize.scaledSize(12),
+                weight: .medium
+            )
         $0.configuration = config
     }
     private var unfoldButton = UIButton().then {
         $0.backgroundColor = .LightGreen
-        $0.layer.cornerRadius = 40
+        $0.layer.cornerRadius = DynamicSize.scaledSize(40)
         $0.setImage(UIImage(systemName: RLIcon.unfold.name), for: .normal)
         $0.tintColor = .Gray900
-        let sfConfig = UIImage.SymbolConfiguration(pointSize: 32, weight: .medium)
+        let sfConfig = UIImage.SymbolConfiguration(
+            pointSize: DynamicSize.scaledSize(32),
+            weight: .medium
+        )
         $0.setPreferredSymbolConfiguration(sfConfig, forImageIn: .normal)
         $0.isHidden = true
     }
@@ -100,19 +104,19 @@ final class RunningViewController: UIViewController {
         }
         // 카드 뷰
         cardView.snp.makeConstraints {
-            $0.leading.trailing.equalToSuperview().inset(16)
-            $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(24)
-            $0.height.equalTo(299)
+            $0.leading.trailing.equalToSuperview().inset(DynamicSize.scaledSize(16))
+            $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(DynamicSize.scaledSize(24))
+            $0.height.equalTo(DynamicSize.scaledSize(299))
         }
         foldButton.snp.makeConstraints {
-            $0.width.equalTo(76)
-            $0.bottom.equalTo(cardView.snp.top).offset(-8)
-            $0.trailing.equalToSuperview().inset(16)
+            $0.width.equalTo(DynamicSize.scaledSize(80))
+            $0.bottom.equalTo(cardView.snp.top).offset(-DynamicSize.scaledSize(8))
+            $0.trailing.equalToSuperview().inset(DynamicSize.scaledSize(16))
         }
         unfoldButton.snp.makeConstraints {
-            $0.width.height.equalTo(80)
-            $0.trailing.equalToSuperview().inset(16)
-            $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(24)
+            $0.width.height.equalTo(DynamicSize.scaledSize(80))
+            $0.trailing.equalToSuperview().inset(DynamicSize.scaledSize(16))
+            $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(DynamicSize.scaledSize(24))
         }
     }
     
@@ -174,13 +178,16 @@ final class RunningViewController: UIViewController {
 
 // MARK: -  MKMapViewDelegate 함수
 extension RunningViewController: MKMapViewDelegate {
+    
     // 트랙킹 모드 변경
     func mapView(_ mapView: MKMapView, didChange mode: MKUserTrackingMode, animated: Bool) {
         guard let userLocation = mapView.userLocation.location else { return }
-        if mode == .none { // none이 되면 현재위치로 지도 바로 이동
+        // none이 되면 현재위치로 지도 바로 이동
+        if mode == .none {
             mapView.centerToLocation(userLocation, region: self.mapView.region)
         }
     }
+    
     // 풀리라인 설정
     func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
         guard let polyLine = overlay as? MKPolyline
@@ -190,7 +197,7 @@ extension RunningViewController: MKMapViewDelegate {
         }
         let renderer = MKPolylineRenderer(polyline: polyLine)
         renderer.strokeColor = .LightGreen
-        renderer.lineWidth = 3.0
+        renderer.lineWidth = DynamicSize.scaledSize(3.0)
         renderer.alpha = 1.0
         
         return renderer

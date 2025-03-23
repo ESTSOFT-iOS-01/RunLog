@@ -35,31 +35,32 @@ final class CardView: UIView {
         self.addSubviews(timeLabel, distanceLabel, stepsLabel, finishButton)
         
         finishButton.snp.makeConstraints {
-            $0.leading.trailing.equalToSuperview().inset(36)
-            $0.bottom.equalToSuperview().inset(31)
+            $0.leading.trailing.equalToSuperview().inset(DynamicSize.scaledSize(36))
+            $0.bottom.equalToSuperview().inset(DynamicSize.scaledSize(31))
         }
         timeLabel.snp.makeConstraints {
-            $0.top.leading.trailing.equalToSuperview().inset(36)
-            $0.height.equalTo(79)
+            $0.top.equalToSuperview().inset(DynamicSize.scaledSize(36))
+            $0.leading.trailing.equalToSuperview().inset(DynamicSize.scaledSize(36))
+            $0.height.equalTo(DynamicSize.scaledSize(79))
         }
         distanceLabel.snp.makeConstraints {
             $0.leading.equalTo(timeLabel)
             $0.trailing.equalTo(timeLabel.snp.centerX)
-            $0.top.equalTo(timeLabel.snp.bottom).offset(12)
-            $0.bottom.equalTo(finishButton.snp.top).offset(-20)
+            $0.top.equalTo(timeLabel.snp.bottom).offset(DynamicSize.scaledSize(12))
+            $0.bottom.equalTo(finishButton.snp.top).offset(-DynamicSize.scaledSize(20))
         }
         stepsLabel.snp.makeConstraints {
             $0.leading.equalTo(timeLabel.snp.centerX)
             $0.trailing.equalTo(timeLabel)
-            $0.top.equalTo(timeLabel.snp.bottom).offset(12)
-            $0.bottom.equalTo(finishButton.snp.top).offset(-20)
+            $0.top.equalTo(timeLabel.snp.bottom).offset(DynamicSize.scaledSize(12))
+            $0.bottom.equalTo(finishButton.snp.top).offset(-DynamicSize.scaledSize(20))
         }
     }
     
     // MARK: - Setup Layout
     private func setupLayout() {
         // 레이아웃 설정
-        self.layer.cornerRadius = 32
+        self.layer.cornerRadius = DynamicSize.scaledSize(32)
         self.backgroundColor = .Gray700
     }
     
