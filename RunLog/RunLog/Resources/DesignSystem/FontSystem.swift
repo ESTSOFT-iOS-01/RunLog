@@ -93,10 +93,15 @@ extension UIFont {
     }
     
     // 다이나믹 폰트 사이즈 설정
-    private static func dynamicFont(name: String, baseSize: CGFloat, weight: UIFont.Weight) -> UIFont {
-        let dynamicSize = baseSize * (ScreenSizeManager.shared.screenWidth / 440)
+    private static func dynamicFont(
+        name: String,
+        baseSize: CGFloat,
+        weight: UIFont.Weight
+    ) -> UIFont {
+        let dynamicSize = DynamicSize.scaledSize(baseSize)
         return UIFont(name: name, size: dynamicSize) ?? UIFont.systemFont(ofSize: dynamicSize, weight: weight)
     }
+    
     // MARK: - Heading
     public static var RLHeading1: UIFont {
         dynamicFont(name: RLFont.semiBold.rawValue, baseSize: 22, weight: .semibold)

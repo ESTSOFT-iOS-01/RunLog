@@ -56,7 +56,7 @@ open class RLTextField: UITextField {
         underline.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview()
             $0.bottom.equalToSuperview()
-            $0.height.equalTo(DynamicSize.getHeight(2))
+            $0.height.equalTo(DynamicSize.scaledSize(2))
         }
     }
     

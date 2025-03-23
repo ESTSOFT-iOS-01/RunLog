@@ -82,11 +82,11 @@ final class RunHomeViewController: UIViewController {
         view.addSubviews(mapView, blurView, totalLabel, weatherLabel, locationLabel, startButton)
         // 상단 레이블
         totalLabel.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide).offset(DynamicSize.getHeight(36))
-            $0.leading.equalTo(view.safeAreaLayoutGuide).offset(DynamicSize.getWidth(36))
+            $0.top.equalTo(view.safeAreaLayoutGuide).offset(DynamicSize.scaledSize(36))
+            $0.leading.equalTo(view.safeAreaLayoutGuide).offset(DynamicSize.scaledSize(36))
         }
         weatherLabel.snp.makeConstraints {
-            $0.top.equalTo(totalLabel.snp.bottom).offset(DynamicSize.getHeight(8))
+            $0.top.equalTo(totalLabel.snp.bottom).offset(DynamicSize.scaledSize(8))
             $0.leading.equalTo(totalLabel)
         }
         // 맵킷
@@ -98,12 +98,12 @@ final class RunHomeViewController: UIViewController {
         }
         // 운동 시작 버튼
         startButton.snp.makeConstraints {
-            $0.leading.trailing.equalToSuperview().inset(DynamicSize.getWidth(52))
-            $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(DynamicSize.getHeight(40))
+            $0.leading.trailing.equalToSuperview().inset(DynamicSize.scaledSize(52))
+            $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(DynamicSize.scaledSize(40))
         }
         // 위치 레이블
         locationLabel.snp.makeConstraints {
-            $0.bottom.equalTo(startButton.snp.top).offset(-DynamicSize.getHeight(9))
+            $0.bottom.equalTo(startButton.snp.top).offset(-DynamicSize.scaledSize(9))
             $0.centerX.equalToSuperview()
         }
     }

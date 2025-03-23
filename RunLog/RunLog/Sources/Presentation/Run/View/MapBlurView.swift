@@ -59,8 +59,8 @@ final class MapBlurView: UIView {
         // 블러 효과가 올라가는 뷰
         blurBackground.snp.makeConstraints {
             $0.centerX.equalToSuperview()
-            $0.centerY.equalToSuperview().offset(DynamicSize.getHeight(30))
-            $0.width.height.equalTo(DynamicSize.getHeight(441))
+            $0.centerY.equalToSuperview().offset(DynamicSize.scaledSize(30))
+            $0.width.height.equalTo(DynamicSize.scaledSize(441))
         }
         
         topBackground.snp.makeConstraints {
