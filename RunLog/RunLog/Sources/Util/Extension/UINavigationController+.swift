@@ -12,6 +12,7 @@ extension UINavigationController {
     
     /// 네비게이션 바의 스타일 설정
     func setupAppearance() {
+        
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = .Gray900
@@ -28,6 +29,19 @@ extension UINavigationController {
         
         let backButton = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
         navigationBar.topItem?.backBarButtonItem = backButton
+    }
+    
+    func setupLogoTitle() {
+        let titleLabel = UILabel().then {
+            $0.attributedText =
+                .RLAttributedString(
+                    text: "Runlog",
+                    font: .Logo2,
+                    color: .LightGreen
+                )
+            $0.textAlignment = .center
+        }
+        topViewController?.navigationItem.titleView = titleLabel
     }
     
     

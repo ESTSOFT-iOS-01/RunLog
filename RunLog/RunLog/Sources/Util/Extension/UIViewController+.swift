@@ -11,6 +11,7 @@ extension UIViewController {
     
     /// 네비게이션 바의 스타일 설정
     func setupNavigationBarAppearance() {
+        
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = .black

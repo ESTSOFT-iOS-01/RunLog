@@ -112,13 +112,13 @@ final class RunHomeViewController: UIViewController {
     private func setupNavigationBar() {
         // 네비게이션바 디테일 설정
         self.setupNavigationBarAppearance()
-        navigationItem.title = "LOGO"
     }
     
     // MARK: - Setup Tab Bar
     private func setupTabBar() {
         // 탭바 디테일 설정
         self.setupTabBarAppearance()
+        self.navigationController?.setupLogoTitle()
     }
     
     // MARK: - Setup Data
