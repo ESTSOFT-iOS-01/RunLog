@@ -155,7 +155,9 @@ final class MediaUseCaseImpl: MediaUseCase {
     
     func setRouteImage1(route coordinates: [[CLLocationCoordinate2D]]) {
 
-        guard let centerCoordinate = getRouteCenterCoordinate(coordinates.flatMap { $0 }) else { return }
+        guard let centerCoordinate = getRouteCenterCoordinate(coordinates.flatMap { $0 }) else {
+            print("Error: 중심 좌표 생성 안됨")
+            return }
         let region = makeRouteSizeRegion(center: centerCoordinate, coordinates: coordinates.flatMap { $0 }) // 모든 좌표를 합쳐서 영역을 계산
         
         let option = setSnapshotOption(coordinates.flatMap { $0 }, region: region)
