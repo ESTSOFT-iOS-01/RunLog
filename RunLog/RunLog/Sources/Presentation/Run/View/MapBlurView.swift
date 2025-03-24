@@ -36,9 +36,11 @@ final class MapBlurView: UIView {
     }
     
     // MARK: - AutoLayout 적용 후 Gradient 추가
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        setupLayout()
+    override func didMoveToSuperview() {
+        super.didMoveToSuperview()
+        DispatchQueue.main.async {
+            self.setupLayout()
+        }
     }
     
     // MARK: - Setup UI
@@ -56,39 +58,43 @@ final class MapBlurView: UIView {
             trailingBackground
         )
         
-        // 블러 효과가 올라가는 뷰
-        blurBackground.snp.makeConstraints {
-            $0.centerX.equalToSuperview()
-            $0.centerY.equalToSuperview().offset(DynamicSize.scaledSize(30))
-            $0.width.height.equalTo(DynamicSize.scaledSize(441))
+        // 바텀 뷰
+        bottomBackground.snp.makeConstraints {
+            $0.bottom.leading.trailing.equalToSuperview()
+            $0.height.equalTo(DynamicSize.scaledSize(150))
         }
         
+        // 블러 효과가 올라가는 뷰
+        blurBackground.snp.makeConstraints {
+            $0.bottom.equalTo(bottomBackground.snp.top)
+            $0.width.height.equalTo(DynamicSize.scaledSize(430))
+            $0.centerX.equalToSuperview()
+        }
+        
+        // 위쪽 뷰
         topBackground.snp.makeConstraints {
-            $0.leading.trailing.equalToSuperview()
-            $0.top.equalToSuperview()
+            $0.top.leading.trailing.equalToSuperview()
             $0.bottom.equalTo(blurBackground.snp.top)
         }
         
-        bottomBackground.snp.makeConstraints {
-            $0.leading.trailing.equalToSuperview()
-            $0.bottom.equalToSuperview()
-            $0.top.equalTo(blurBackground.snp.bottom)
-        }
-        
+        // 왼쪽 뷰
         leadingBackground.snp.makeConstraints {
+            $0.top.equalTo(topBackground.snp.bottom)
+            $0.bottom.equalTo(bottomBackground.snp.top)
             $0.leading.equalToSuperview()
             $0.trailing.equalTo(blurBackground.snp.leading)
-            $0.top.equalTo(topBackground)
-            $0.bottom.equalTo(snp_bottomMargin)
         }
         
+        // 오른쪽 뷰
         trailingBackground.snp.makeConstraints {
+            $0.top.equalTo(topBackground.snp.bottom)
+            $0.bottom.equalTo(bottomBackground.snp.top)
             $0.leading.equalTo(blurBackground.snp.trailing)
             $0.trailing.equalToSuperview()
-            $0.top.equalTo(topBackground)
-            $0.bottom.equalTo(snp_bottomMargin)
         }
+        
     }
+    
     // MARK: - Setup Layout
     private func setupLayout() {
         // 레이아웃 설정
@@ -121,6 +127,7 @@ final class MapBlurView: UIView {
         
         blurBackground.layer.addSublayer(gradientLayer)
     }
+    
     // MARK: - Configure
     private func configure() {
         // 뷰 설정
