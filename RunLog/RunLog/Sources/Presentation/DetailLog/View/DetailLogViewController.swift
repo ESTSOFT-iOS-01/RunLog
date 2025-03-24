@@ -139,7 +139,8 @@ final class DetailLogViewController: UIViewController {
                     self.detailLogView.recordDetailView.tableView.reloadData()
                     self.setupMapView(with: dayLog)
                 case .edit:
-                    print("수정하기 탭됨 → 수정 로직")
+                    let editViewModel = EditLogInfoViewModel(date: viewModel.date)
+                    self.navigationController?.pushViewController(EditLogInfoViewController(viewModel: editViewModel), animated: true)
                 case .share:
                     self.handleShare(in: self, shareText: "하트런 기록 공유!")
                     
