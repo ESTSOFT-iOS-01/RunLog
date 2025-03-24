@@ -53,15 +53,6 @@ final class PedometerManager {
     
     // MARK: - 걸음 수 측정 시작
     private func pedometerUpdateStart() {
-//        // Syr) 테스트용 Start
-//        for i in 0...200 {
-//            DispatchQueue.main.asyncAfter(deadline: .now() + Double(i)) {
-//                let num = Int.random(in: 1...5)
-//                self.output.send(.responseSteps(num))
-//            }
-//        }
-//        // Syr) 테스트용 End
-        // Syr) 실측정용 Start
         guard CMPedometer.isStepCountingAvailable() else {
             print("측정 불가 기기")
             return
@@ -74,7 +65,6 @@ final class PedometerManager {
             let stepCount = data.numberOfSteps.intValue
             self.output.send(.responseSteps(stepCount))
         }
-        // Syr) 실측정용 Start
     }
     
     // MARK: - 걸음 수 측정 종료
