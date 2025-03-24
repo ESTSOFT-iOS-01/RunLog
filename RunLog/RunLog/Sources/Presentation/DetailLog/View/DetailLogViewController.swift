@@ -64,7 +64,6 @@ final class DetailLogViewController: UIViewController {
         super.viewWillDisappear(animated)
     }
     
-    
     // MARK: - Setup UI
     private func setupUI() {
         // UI 요소 추가
@@ -267,6 +266,7 @@ extension DetailLogViewController {
         
         // 전체 영역이 보이도록 확대
         zoomToAllPoints(dayLog: dayLog)
+
     }
     
     
