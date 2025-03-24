@@ -60,6 +60,10 @@ extension UIColor {
         return UIColor(hex: "#B1F7B1", alpha: 0.8)
     }
     
+    public static var NormalGreen: UIColor {
+        return UIColor(hex: "#04E404")
+    }
+    
     public static var LightBlue: UIColor {
         return UIColor(hex: "#B2E0F4")
     }

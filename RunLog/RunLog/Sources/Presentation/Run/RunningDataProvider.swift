@@ -362,8 +362,8 @@ final class SyrDummyTest {
     func startDummySet() {
         guard let currentLocation = locationManger.location else { return }
         
-        dummyRoutes = createRoute(from: currentLocation) // 더미 경로 생성
-//        dummyRoutes = createLargeStarRoute(from: currentLocation) // 별 그림
+//        dummyRoutes = createRoute(from: currentLocation) // 더미 경로 생성
+        dummyRoutes = createLargeStarRoute(from: currentLocation) // 별 그림
 //        dummyRoutes = createPuppyRoute(from: currentLocation)
 //        dummyRoutes = createStraightLineRoute(from: currentLocation)
         routeIndex = 0
@@ -377,7 +377,7 @@ final class SyrDummyTest {
     func startSendingDummyRoutes() {
         timer?.invalidate() // 기존 타이머 종료 (중복 실행 방지)
         
-        timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in
+        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
             guard let self = self, self.routeIndex < self.dummyRoutes.count else {
                 self?.timer?.invalidate() // 모든 경로 전송 완료 시 타이머 정지
                 return
@@ -396,8 +396,8 @@ final class SyrDummyTest {
     
     func createRoute(from location: CLLocation) -> [CLLocation] {
         let center = location.coordinate // 현재 위치를 중심으로 설정
-        let radius: Double = 0.00300 // 150m 반경 (위도/경도 변환값)
-        let totalPoints = 100 // 50개 좌표
+        let radius: Double = 0.00150 // 150m 반경 (위도/경도 변환값)
+        let totalPoints = 20 // 50개 좌표
         
         var locations: [CLLocation] = []
         

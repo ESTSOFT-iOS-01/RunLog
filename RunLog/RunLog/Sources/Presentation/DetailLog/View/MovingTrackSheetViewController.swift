@@ -268,10 +268,10 @@ extension MovingTrackSheetViewController: MKMapViewDelegate {
         guard let polyline = overlay as? MKPolyline, let title = polyline.title else { return MKOverlayRenderer() }
         let renderer = MKPolylineRenderer(polyline: polyline)
         if title == "진행 경로" {
-            renderer.strokeColor = .systemRed
+            renderer.strokeColor = .NormalGreen
             renderer.lineWidth = 6
         } else {
-            renderer.strokeColor = .systemBlue
+            renderer.strokeColor = .LightGreen
             renderer.lineWidth = 5
         }
         return renderer
