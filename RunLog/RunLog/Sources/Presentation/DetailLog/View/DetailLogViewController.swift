@@ -142,7 +142,7 @@ final class DetailLogViewController: UIViewController {
                     let editViewModel = EditLogInfoViewModel(date: viewModel.date)
                     self.navigationController?.pushViewController(EditLogInfoViewController(viewModel: editViewModel), animated: true)
                 case .share:
-                    self.handleShare(in: self, shareText: "하트런 기록 공유!")
+                    self.handleShare()
                     
                 case .delete:
                     if let log = self.currentDayLog {
@@ -155,10 +155,11 @@ final class DetailLogViewController: UIViewController {
     }
     
     // MARK: - Action Handlers (함수 분리)
-    private func handleShare(in targetVC: UIViewController, shareText: String) {
-        let shareItems: [Any] = [shareText]
+    private func handleShare() {
+        guard let data = currentDayLog?.trackImage else { return }
+        let shareItems: [Any] = [UIImage(data: data)!]
         let activityVC = UIActivityViewController(activityItems: shareItems, applicationActivities: nil)
-        targetVC.present(activityVC, animated: true)
+        self.present(activityVC, animated: true)
     }
     
     private func handleDelete(in targetVC: UIViewController, dateString: String) {
