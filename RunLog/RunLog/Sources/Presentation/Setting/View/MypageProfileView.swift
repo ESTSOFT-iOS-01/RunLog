@@ -65,21 +65,21 @@ final class MypageProfileView: UIView {
     private func setupLayout() {
         nameLabel.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview()
-            $0.top.equalToSuperview().offset(146)
+            $0.top.equalTo(safeAreaLayoutGuide).offset(DynamicSize.scaledSize(40))
         }
         
         despLabel.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview()
-            $0.top.equalTo(nameLabel.snp.bottom).offset(4)
+            $0.top.equalTo(nameLabel.snp.bottom).offset(DynamicSize.scaledSize(4))
         }
         
         cardStackView.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview()
-            $0.top.equalTo(despLabel.snp.bottom).offset(24)
+            $0.top.equalTo(despLabel.snp.bottom).offset(DynamicSize.scaledSize(24))
         }
         
         tableView.snp.makeConstraints {
-            $0.top.equalTo(cardStackView.snp.bottom).offset(40)
+            $0.top.equalTo(cardStackView.snp.bottom).offset(DynamicSize.scaledSize(40))
             $0.leading.trailing.bottom.equalToSuperview()
         }
     }
