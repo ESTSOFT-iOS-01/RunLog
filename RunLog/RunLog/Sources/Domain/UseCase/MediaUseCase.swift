@@ -11,11 +11,7 @@ import MapKit
 /// `MediaUseCase` 프로토콜은 폴리라인을 이미지 또는 영상으로 변환하여 저장하는 기능을 제공합니다.
 protocol MediaUseCase {
     
-//    func convertSectionsToCoordinates(sections: [Section]) -> [CLLocationCoordinate2D]
-    
     func convertSectionsToCoordinates(sections: [Section]) -> [[CLLocationCoordinate2D]]
-    
-//    func setRouteImage(route coordinates: [CLLocationCoordinate2D]) -> UIImage?
     
     func setRouteImage(route coordinates: [[CLLocationCoordinate2D]]) async throws -> UIImage
     

@@ -426,10 +426,10 @@ extension DetailLogViewController: MKMapViewDelegate {
         
         let renderer = MKPolylineRenderer(polyline: polyline)
         if let title = polyline.title, let index = Int(title), index == selectedSectionIndex {
-            renderer.strokeColor = .red  // 선택된 section이면 빨간색으로 표시
+            renderer.strokeColor = .NormalGreen  // 선택된 section이면 NormalGreen색으로 표시
             renderer.lineWidth = 6
         } else {
-            renderer.strokeColor = .systemBlue
+            renderer.strokeColor = .LightGreen
             renderer.lineWidth = 5
         }
         return renderer

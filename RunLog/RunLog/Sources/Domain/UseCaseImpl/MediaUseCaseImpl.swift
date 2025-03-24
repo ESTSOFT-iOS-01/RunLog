@@ -132,7 +132,8 @@ final class MediaUseCaseImpl: MediaUseCase {
     private func setSnapshotOption(_ coordinates: [CLLocationCoordinate2D], region: MKCoordinateRegion) -> MKMapSnapshotter.Options {
         let option = MKMapSnapshotter.Options()
         option.region = region
-        option.size = CGSize(width: 400, height: 400) // 원하는 이미지 크기 설정
+        option.size = CGSize(width: 500, height: 500) // 원하는 이미지 크기 설정
+        
         let configuration = MKStandardMapConfiguration(emphasisStyle: .muted)
         configuration.pointOfInterestFilter = .excludingAll
         option.preferredConfiguration = configuration
@@ -167,16 +168,20 @@ final class MediaUseCaseImpl: MediaUseCase {
         centerLat /= Double(coordinates.count)
         centerLon /= Double(coordinates.count)
         
+//        print("중점 x: \(centerLat)")
+//        print("중점 y: \(centerLon)")
+        
         return CLLocationCoordinate2D(latitude: centerLat, longitude: centerLon)
     }
     
     private func makeRouteSizeRegion(center: CLLocationCoordinate2D, coordinates: [CLLocationCoordinate2D]) -> MKCoordinateRegion {
+        
         let minLat = coordinates.min { $0.latitude < $1.latitude }?.latitude ?? 0
         let maxLat = coordinates.max { $0.latitude < $1.latitude }?.latitude ?? 0
         let minLon = coordinates.min { $0.longitude < $1.longitude }?.longitude ?? 0
         let maxLon = coordinates.max { $0.longitude < $1.longitude }?.longitude ?? 0
         
-        let span = MKCoordinateSpan(latitudeDelta: (maxLat - minLat)*1.3, longitudeDelta: (maxLon - minLon)*1.3)
+        let span = MKCoordinateSpan(latitudeDelta: (maxLat - minLat)*1.7, longitudeDelta: (maxLon - minLon)*1.7)
         
         return MKCoordinateRegion(center: center, span: span)
     }
