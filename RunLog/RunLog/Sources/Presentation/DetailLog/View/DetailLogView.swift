@@ -101,7 +101,7 @@ final class DetailLogView: UIView {
     
     /// 구분선
     private let separatorView = UIView().then {
-        $0.backgroundColor = .Gray000  // 원하는 색상
+        $0.backgroundColor = .Gray300  // 원하는 색상
     }
     
     private let timeTitleLabel = RLLabel(
@@ -179,9 +179,9 @@ final class DetailLogView: UIView {
     private lazy var statsStack: UIStackView = {
         let stack = UIStackView(arrangedSubviews: [timeStack, distanceStack, stepsStack])
         stack.axis = .horizontal
-        stack.alignment = .center
-        stack.spacing = 16
-        stack.distribution = .fillEqually
+        stack.alignment = .leading
+        stack.spacing = 0
+        stack.distribution = .fill
         return stack
     }()
     
@@ -227,7 +227,7 @@ final class DetailLogView: UIView {
         
         contentView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
-            make.width.equalToSuperview()
+            make.width.equalTo(self.safeAreaLayoutGuide.snp.width)
         }
         
         mapView.snp.makeConstraints { make in
@@ -267,6 +267,16 @@ final class DetailLogView: UIView {
             make.leading.trailing.equalToSuperview().inset(24)
         }
         
+        timeStack.snp.makeConstraints { make in
+            make.width.equalTo(statsStack.snp.width).multipliedBy(0.334)
+        }
+        distanceStack.snp.makeConstraints { make in
+            make.width.equalTo(statsStack.snp.width).multipliedBy(0.333)
+        }
+        stepsStack.snp.makeConstraints { make in
+            make.width.equalTo(statsStack.snp.width).multipliedBy(0.333)
+        }
+        
         // 기록상세
         recordTitleLabel.snp.makeConstraints { make in
             make.top.equalTo(statsStack.snp.bottom).offset(24)
@@ -276,7 +286,7 @@ final class DetailLogView: UIView {
         // “기록 상세” 테이블뷰
         recordDetailView.snp.makeConstraints { make in
             make.top.equalTo(recordTitleLabel.snp.bottom).offset(16)
-            make.leading.trailing.equalToSuperview().inset(24)
+            make.leading.trailing.equalToSuperview().inset(16)
             make.bottom.equalToSuperview().offset(-20)
         }
     }
@@ -303,7 +313,7 @@ extension DetailLogView {
         timeValueLabel.label.text = log.totalTime.hourMinuteString
         
         // 운동거리 업데이트 (예: "5.0km")
-        distanceValueLabel.label.text = "\(log.totalDistance)km"
+        distanceValueLabel.label.text = String(format: "%.2fkm", log.totalDistance)
         
         // 걸음수 업데이트 (천 단위 구분 기호 포함)
         stepsValueLabel.label.text = log.totalSteps.formattedString

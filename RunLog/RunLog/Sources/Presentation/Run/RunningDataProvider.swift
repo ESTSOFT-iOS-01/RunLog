@@ -12,7 +12,7 @@ import Combine
 // MARK: - 운동 정보에 대한 각종 정보를 가지고 있고 전달해주는 객체
 final class RunningDataProvider {
 //    // Syr) 테스트용 Start
-//    let dummy = SyrDummyTest()
+    let dummy = SyrDummyTest()
 //    // Syr) 테스트용 End
     
     // MARK: - Singleton
@@ -81,6 +81,7 @@ final class RunningDataProvider {
     
     // MARK: - Usecase
     @Dependency private var dayLogUseCase: DayLogUseCase
+    @Dependency private var mediaUseCase: MediaUseCase
 }
 
 // MARK: - Binding
@@ -220,7 +221,7 @@ extension RunningDataProvider {
 extension RunningDataProvider {
     private func requestRunningStart() {
 //        // Syr) 테스트용 Start
-//        dummy.startDummySet()
+        dummy.startDummySet()
 //        // Syr) 테스트용 End
         
         // 데이로그 생성
@@ -280,7 +281,7 @@ extension RunningDataProvider {
 extension RunningDataProvider {
     private func requestRunningStop() {
 //        // Syr) 테스트용 Start
-//        dummy.stopDummySet()
+        dummy.stopDummySet()
 //        // Syr) 테스트용 End
         
         // 운동 종료 위치를 경로에 저장
@@ -308,23 +309,19 @@ extension RunningDataProvider {
             try await dayLogUseCase.addSectionByDate(Date(), section: self.section)
             
             if let dayLog = try await dayLogUseCase.getDayLogByDate(Date()) {
-                var allPoint: [CLLocation] = []
-                for section in dayLog.sections {
-                    for route in section.route {
-                        let location = CLLocation(
-                            latitude: route.latitude,
-                            longitude: route.longitude
-                        )
-                        allPoint.append(location)
-                    }
+                let datas = mediaUseCase.convertSectionsToCoordinates(sections: dayLog.sections)
+                do{
+                    let trackImage = try await mediaUseCase.setRouteImage(route: datas)
+                    try await dayLogUseCase.updateTrackImageByDate(Date(), image: trackImage)
+                } catch {
+                    print("사진 생성 및 저장 실패 \(error.localizedDescription)")
                 }
-                print("현재까지 데이로그의 경로 포인트 수 : \(allPoint.count)")
-                await self.drawingManager.input.send(.requestFullRoutePolyline(allPoint))
             }
+            // 정상적인 운동 종료
+            self.runningOutput.send(.responseRunningStop)
         }
         
-        // 정상적인 운동 종료
-        self.runningOutput.send(.responseRunningStop)
+        
         
         // +) 아래는 운동 정보 로그 찍어보기
         guard let startTime = section.route.first?.timestamp,
@@ -366,10 +363,13 @@ final class SyrDummyTest {
         guard let currentLocation = locationManger.location else { return }
         
         dummyRoutes = createRoute(from: currentLocation) // 더미 경로 생성
+//        dummyRoutes = createLargeStarRoute(from: currentLocation) // 별 그림
+//        dummyRoutes = createPuppyRoute(from: currentLocation)
+//        dummyRoutes = createStraightLineRoute(from: currentLocation)
         routeIndex = 0
         
         // 3초 후 시작 (async/await에서의 첫 sleep 대체)
-        Timer.scheduledTimer(withTimeInterval: 3, repeats: false) { _ in
+        Timer.scheduledTimer(withTimeInterval: 2, repeats: false) { _ in
             self.startSendingDummyRoutes()
         }
     }
@@ -377,7 +377,7 @@ final class SyrDummyTest {
     func startSendingDummyRoutes() {
         timer?.invalidate() // 기존 타이머 종료 (중복 실행 방지)
         
-        timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { [weak self] _ in
+        timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in
             guard let self = self, self.routeIndex < self.dummyRoutes.count else {
                 self?.timer?.invalidate() // 모든 경로 전송 완료 시 타이머 정지
                 return
@@ -393,10 +393,11 @@ final class SyrDummyTest {
         timer?.invalidate() // 타이머 정지
         timer = nil
     }
+    
     func createRoute(from location: CLLocation) -> [CLLocation] {
         let center = location.coordinate // 현재 위치를 중심으로 설정
-        let radius: Double = 0.00135 // 150m 반경 (위도/경도 변환값)
-        let totalPoints = 10 // 50개 좌표
+        let radius: Double = 0.00300 // 150m 반경 (위도/경도 변환값)
+        let totalPoints = 100 // 50개 좌표
         
         var locations: [CLLocation] = []
         
@@ -411,6 +412,115 @@ final class SyrDummyTest {
             locations.append(CLLocation(latitude: newLat, longitude: newLon))
         }
         locations.append(locations.first!) // 원을 닫기 위해 첫 번째 좌표 추가
+        
+        return locations
+    }
+    
+    func createPuppyRoute(from location: CLLocation) -> [CLLocation] {
+        let center = location.coordinate // 현재 위치를 중심으로 설정
+        let width: Double = 0.0015 // 몸통과 머리 크기를 결정할 넓이
+        let height: Double = 0.002 // 몸통과 머리 크기를 결정할 높이
+        
+        var locations: [CLLocation] = []
+        
+        // 몸통 (사각형 경로)
+        let bodyTopLeft = CLLocation(latitude: center.latitude + height / 2, longitude: center.longitude - width / 2)
+        let bodyTopRight = CLLocation(latitude: center.latitude + height / 2, longitude: center.longitude + width / 2)
+        let bodyBottomRight = CLLocation(latitude: center.latitude - height / 2, longitude: center.longitude + width / 2)
+        let bodyBottomLeft = CLLocation(latitude: center.latitude - height / 2, longitude: center.longitude - width / 2)
+        
+        locations.append(bodyTopLeft)
+        locations.append(bodyTopRight)
+        locations.append(bodyBottomRight)
+        locations.append(bodyBottomLeft)
+        locations.append(bodyTopLeft) // 사각형을 닫기 위해 첫 좌표 추가
+        
+        // 머리 (사각형 경로, 몸통 위에 배치)
+        let headWidth: Double = 0.0005
+        let headHeight: Double = 0.0005
+        let headTopLeft = CLLocation(latitude: center.latitude + height / 2 + headHeight / 2, longitude: center.longitude - headWidth / 2)
+        let headTopRight = CLLocation(latitude: center.latitude + height / 2 + headHeight / 2, longitude: center.longitude + headWidth / 2)
+        let headBottomRight = CLLocation(latitude: center.latitude + height / 2 - headHeight / 2, longitude: center.longitude + headWidth / 2)
+        let headBottomLeft = CLLocation(latitude: center.latitude + height / 2 - headHeight / 2, longitude: center.longitude - headWidth / 2)
+        
+        locations.append(headTopLeft)
+        locations.append(headTopRight)
+        locations.append(headBottomRight)
+        locations.append(headBottomLeft)
+        locations.append(headTopLeft) // 사각형을 닫기 위해 첫 좌표 추가
+        
+        // 귀 (사각형 경로, 머리 위쪽에 배치)
+        let earWidth: Double = 0.0002
+        let earHeight: Double = 0.0003
+        let earTopLeft = CLLocation(latitude: center.latitude + height / 2 + headHeight + earHeight / 2, longitude: center.longitude - earWidth / 2)
+        let earTopRight = CLLocation(latitude: center.latitude + height / 2 + headHeight + earHeight / 2, longitude: center.longitude + earWidth / 2)
+        let earBottomRight = CLLocation(latitude: center.latitude + height / 2 + headHeight - earHeight / 2, longitude: center.longitude + earWidth / 2)
+        let earBottomLeft = CLLocation(latitude: center.latitude + height / 2 + headHeight - earHeight / 2, longitude: center.longitude - earWidth / 2)
+        
+        locations.append(earTopLeft)
+        locations.append(earTopRight)
+        locations.append(earBottomRight)
+        locations.append(earBottomLeft)
+        locations.append(earTopLeft) // 사각형을 닫기 위해 첫 좌표 추가
+        
+        // 다리 (사각형 경로, 몸통 아래에 배치)
+        let legWidth: Double = 0.0003
+        let legHeight: Double = 0.0004
+        let legTopLeft = CLLocation(latitude: center.latitude - height / 2 - legHeight / 2, longitude: center.longitude - legWidth / 2)
+        let legTopRight = CLLocation(latitude: center.latitude - height / 2 - legHeight / 2, longitude: center.longitude + legWidth / 2)
+        let legBottomRight = CLLocation(latitude: center.latitude - height / 2 + legHeight / 2, longitude: center.longitude + legWidth / 2)
+        let legBottomLeft = CLLocation(latitude: center.latitude - height / 2 + legHeight / 2, longitude: center.longitude - legWidth / 2)
+        
+        locations.append(legTopLeft)
+        locations.append(legTopRight)
+        locations.append(legBottomRight)
+        locations.append(legBottomLeft)
+        locations.append(legTopLeft) // 사각형을 닫기 위해 첫 좌표 추가
+        
+        return locations
+    }
+    
+    func createStraightLineRoute(from location: CLLocation, numberOfPoints: Int = 10) -> [CLLocation] {
+        let startCoordinate = location.coordinate
+        var locations: [CLLocation] = [location]
+        
+        // 직선 경로를 위해 경도나 위도를 일정 값씩 증가시키는 방식으로 좌표를 생성
+        let stepSize: Double = 0.0001  // 10m 정도의 간격으로 좌표를 추가 (위도/경도 기준)
+        
+        for i in 1..<numberOfPoints {
+            // X축 방향(위도)으로만 일정 간격 이동 (직선 경로)
+            let newLatitude = startCoordinate.latitude + (stepSize * Double(i))
+            let newLongitude = startCoordinate.longitude
+            
+            let newLocation = CLLocation(latitude: newLatitude, longitude: newLongitude)
+            locations.append(newLocation)
+        }
+        
+        return locations
+    }
+    func createLargeStarRoute(from location: CLLocation) -> [CLLocation] {
+        let center = location.coordinate // 중심 위치
+        let radiusOuter: Double = 0.004 // 외곽 별점 반경 (400m)
+        let radiusInner: Double = 0.0016 // 내부 별점 반경 (160m)
+        
+        var locations: [CLLocation] = []
+        let angleIncrement = Double.pi / 5 // 별 10개의 점을 만들기 위해 36도 간격 (180도/5)
+        
+        for i in 0..<10 {
+            let isOuterPoint = i % 2 == 0 // 짝수면 외곽 점, 홀수면 내부 점
+            let radius = isOuterPoint ? radiusOuter : radiusInner
+            let angle = angleIncrement * Double(i) - Double.pi / 2 // 위쪽 정점이 시작점
+            
+            let latOffset = radius * cos(angle)
+            let lonOffset = radius * sin(angle)
+            
+            let newLat = center.latitude + latOffset
+            let newLon = center.longitude + lonOffset
+            
+            locations.append(CLLocation(latitude: newLat, longitude: newLon))
+        }
+        
+        locations.append(locations.first!) // 별을 닫기 위해 첫 번째 좌표 추가
         
         return locations
     }

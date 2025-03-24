@@ -7,6 +7,10 @@
 import UIKit
 
 public enum RLFont {
+    case Logo1
+    case Logo2
+    case SplashSubTitle
+    
     case Heading1
     case Heading2
     case Heading3
@@ -30,6 +34,12 @@ public enum RLFont {
 extension RLFont {
     var value: UIFont {
         switch self {
+        case .Logo1:
+            return .RLLogo1
+        case .Logo2:
+            return .RLLogo2
+        case .SplashSubTitle:
+            return .RLSplashSubTitle
         case .Heading1, .Heading3:
             return .RLHeading1
         case .Heading2:
@@ -62,6 +72,8 @@ extension RLFont {
     }
     var lineHeightMultiple: CGFloat {
         switch self {
+        case .Logo1, .Logo2:
+            return 1.10
         case .Label1, .Label2:
             return 1.60
         case .Body1, .Body2:
@@ -70,7 +82,8 @@ extension RLFont {
             return 1.45
         case .Heading2:
             return 1.40
-        case .Heading1, .Heading3, .Heading4, .Title, .MainTitle, .DetailTitle, .Button, .ButtonBig:
+        case .SplashSubTitle, .Heading1, .Heading3, .Heading4,
+                .Title, .MainTitle, .DetailTitle, .Button, .ButtonBig:
             return 1.35
         case .Segment1, .Segment2:
             return 1.20
@@ -80,7 +93,16 @@ extension RLFont {
 
 extension UIFont {
     // MARK: - Font Style
-    public enum RLFont : String {
+    public enum RacingSansOne: String {
+        case regular = "RacingSansOne-Regular"
+    }
+    
+    public enum NanumMyeongjo: String {
+        case regular = "NanumMyeongjo-Regular"
+    }
+    
+    // TODO: Pretendard로 네이밍 변경
+    public enum RLFont: String {
         case black = "Pretendard-Black"
         case bold = "Pretendard-Bold"
         case extraBold = "Pretendard-ExtraBold"
@@ -100,6 +122,25 @@ extension UIFont {
     ) -> UIFont {
         let dynamicSize = DynamicSize.scaledSize(baseSize)
         return UIFont(name: name, size: dynamicSize) ?? UIFont.systemFont(ofSize: dynamicSize, weight: weight)
+    }
+    
+    // MARK: - Logo & Splash Title
+    public static var RLLogo1: UIFont {
+        dynamicFont(
+            name: RacingSansOne.regular.rawValue, baseSize: 44, weight: .regular
+        )
+    }
+    
+    public static var RLLogo2: UIFont {
+        dynamicFont(
+            name: RacingSansOne.regular.rawValue, baseSize: 28, weight: .regular
+        )
+    }
+    
+    public static var RLSplashSubTitle: UIFont {
+        dynamicFont(
+            name: NanumMyeongjo.regular.rawValue, baseSize: 16, weight: .regular
+        )
     }
     
     // MARK: - Heading
