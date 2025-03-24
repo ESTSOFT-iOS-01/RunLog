@@ -26,7 +26,7 @@ extension DisplayDayLog {
     init(from dayLog: DayLog) {
         self.date = dayLog.date
         self.locationName = dayLog.locationName
-        self.weather = dayLog.weather.toWeatherDescription()
+        self.weather = Constants.WeatherCondition.from(dayLog.weather).description
         self.temperature = dayLog.temperature
         self.title = dayLog.title
         self.level = dayLog.level.toLevelDescription()
