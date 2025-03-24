@@ -95,6 +95,8 @@ final class DayLogRepositoryImpl: DayLogRepository {
             data.sections = NSSet(array: dayLog.sections.map {
                 DataMapper.toDTO($0, context: self.context)
             })
+            
+            try self.context.save()
         }
     }
 
