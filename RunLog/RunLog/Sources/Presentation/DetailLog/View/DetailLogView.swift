@@ -27,7 +27,7 @@ final class DetailLogView: UIView {
     /// 지도 영역을 표시하는 MKMapView
     private let mapView = MKMapView().then {
         // 추가 delegate 설정 및 커스터마이징 가능
-        $0.layer.cornerRadius = 10
+        $0.layer.cornerRadius = DynamicSize.scaledSize(10)
         $0.clipsToBounds = true
     }
     
@@ -40,15 +40,15 @@ final class DetailLogView: UIView {
         let attributedTitle = NSAttributedString.RLAttributedString(text: "무빙트랙", font: .Label2)
         $0.setAttributedTitle(attributedTitle, for: .normal)
         $0.backgroundColor = .Gray300
-        $0.layer.cornerRadius = 10
+        $0.layer.cornerRadius = DynamicSize.scaledSize(10)
         
-        let config = UIImage.SymbolConfiguration(pointSize: 16, weight: .regular)
+        let config = UIImage.SymbolConfiguration(pointSize: DynamicSize.scaledSize(16), weight: .regular)
         let icon = UIImage(systemName: RLIcon.play.name)?.withConfiguration(config)
         $0.setImage(icon, for: .normal)
         $0.tintColor = .Gray000
         
-        $0.configuration?.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 8)
-        $0.configuration?.imagePadding = 8
+        $0.configuration?.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: DynamicSize.scaledSize(8), bottom: 0, trailing: DynamicSize.scaledSize(8))
+        $0.configuration?.imagePadding = DynamicSize.scaledSize(8)
     }
     
     
@@ -93,7 +93,7 @@ final class DetailLogView: UIView {
     private lazy var weatherStack: UIStackView = {
         let stack = UIStackView(arrangedSubviews: [locationLabel, weatherLabel, conditionLabel])
         stack.axis = .horizontal
-        stack.spacing = 16
+        stack.spacing = DynamicSize.scaledSize(16)
         stack.distribution = .equalSpacing
         stack.alignment = .center
         return stack
@@ -124,7 +124,7 @@ final class DetailLogView: UIView {
         let stack = UIStackView(arrangedSubviews: [timeTitleLabel, timeValueLabel])
         stack.axis = .vertical
         stack.alignment = .leading
-        stack.spacing = 4
+        stack.spacing = DynamicSize.scaledSize(4)
         return stack
     }()
     
@@ -148,7 +148,7 @@ final class DetailLogView: UIView {
         let stack = UIStackView(arrangedSubviews: [distanceTitleLabel, distanceValueLabel])
         stack.axis = .vertical
         stack.alignment = .leading
-        stack.spacing = 4
+        stack.spacing = DynamicSize.scaledSize(4)
         return stack
     }()
     
@@ -172,7 +172,7 @@ final class DetailLogView: UIView {
         let stack = UIStackView(arrangedSubviews: [stepsTitleLabel, stepsValueLabel])
         stack.axis = .vertical
         stack.alignment = .leading
-        stack.spacing = 4
+        stack.spacing = DynamicSize.scaledSize(4)
         return stack
     }()
     
@@ -231,40 +231,40 @@ final class DetailLogView: UIView {
         }
         
         mapView.snp.makeConstraints { make in
-            make.top.equalToSuperview().inset(16)
-            make.leading.trailing.equalToSuperview().inset(24)
+            make.top.equalToSuperview().inset(DynamicSize.scaledSize(16))
+            make.leading.trailing.equalToSuperview().inset(DynamicSize.scaledSize(24))
             make.height.equalTo(mapView.snp.width)
         }
         
         movingTrackButton.snp.makeConstraints { make in
-            make.bottom.trailing.equalToSuperview().inset(8)
-            make.width.equalTo(95)
-            make.height.equalTo(40)
+            make.bottom.trailing.equalToSuperview().inset(DynamicSize.scaledSize(8))
+            make.width.equalTo(DynamicSize.scaledSize(95))
+            make.height.equalTo(DynamicSize.scaledSize(40))
         }
         
         // 타이틀 라벨: 맵뷰 아래
         titleLabel.snp.makeConstraints { make in
-            make.top.equalTo(mapView.snp.bottom).offset(24)
-            make.leading.trailing.equalToSuperview().inset(24)
+            make.top.equalTo(mapView.snp.bottom).offset(DynamicSize.scaledSize(24))
+            make.leading.trailing.equalToSuperview().inset(DynamicSize.scaledSize(24))
         }
         
         // 날씨 스택: 타이틀 아래
         weatherStack.snp.makeConstraints { make in
-            make.top.equalTo(titleLabel.snp.bottom).offset(8)
-            make.leading.equalToSuperview().inset(24)
+            make.top.equalTo(titleLabel.snp.bottom).offset(DynamicSize.scaledSize(8))
+            make.leading.equalToSuperview().inset(DynamicSize.scaledSize(24))
         }
         
         // 구분선:날씨 스택 아래
         separatorView.snp.makeConstraints { make in
-            make.top.equalTo(weatherStack.snp.bottom).offset(8)
-            make.leading.trailing.equalToSuperview().inset(24)
-            make.height.equalTo(1)
+            make.top.equalTo(weatherStack.snp.bottom).offset(DynamicSize.scaledSize(8))
+            make.leading.trailing.equalToSuperview().inset(DynamicSize.scaledSize(24))
+            make.height.equalTo(DynamicSize.scaledSize(1))
         }
         
         // 통계 스택: 구분선 아래
         statsStack.snp.makeConstraints { make in
-            make.top.equalTo(separatorView.snp.bottom).offset(8)
-            make.leading.trailing.equalToSuperview().inset(24)
+            make.top.equalTo(separatorView.snp.bottom).offset(DynamicSize.scaledSize(8))
+            make.leading.trailing.equalToSuperview().inset(DynamicSize.scaledSize(24))
         }
         
         timeStack.snp.makeConstraints { make in
@@ -279,15 +279,15 @@ final class DetailLogView: UIView {
         
         // 기록상세
         recordTitleLabel.snp.makeConstraints { make in
-            make.top.equalTo(statsStack.snp.bottom).offset(24)
-            make.leading.equalToSuperview().inset(24)
+            make.top.equalTo(statsStack.snp.bottom).offset(DynamicSize.scaledSize(24))
+            make.leading.equalToSuperview().inset(DynamicSize.scaledSize(24))
         }
         
         // “기록 상세” 테이블뷰
         recordDetailView.snp.makeConstraints { make in
-            make.top.equalTo(recordTitleLabel.snp.bottom).offset(16)
-            make.leading.trailing.equalToSuperview().inset(16)
-            make.bottom.equalToSuperview().offset(-20)
+            make.top.equalTo(recordTitleLabel.snp.bottom).offset(DynamicSize.scaledSize(16))
+            make.leading.trailing.equalToSuperview().inset(DynamicSize.scaledSize(16))
+            make.bottom.equalToSuperview().offset(DynamicSize.scaledSize(-20))
         }
     }
     

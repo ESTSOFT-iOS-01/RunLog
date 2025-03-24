@@ -22,7 +22,7 @@ final class RecordDetailView: UIView {
         $0.separatorStyle = .singleLine
         $0.separatorColor = .Gray500
         $0.rowHeight = UITableView.automaticDimension
-        $0.estimatedRowHeight = 32
+        $0.estimatedRowHeight = DynamicSize.scaledSize(32)
     }
     // KVO 관찰자 (contentSize 변경)
     private var contentSizeObservation: NSKeyValueObservation?
@@ -51,9 +51,9 @@ final class RecordDetailView: UIView {
         // 초기 제약조건은 임의 높이 (나중에 contentSize에 따라 업데이트됨
         tableView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
-            make.height.equalTo(300) // 초기 높이 (나중에 KVO로 업데이트됨)
+            make.height.equalTo(DynamicSize.scaledSize(300)) // 초기 높이 (나중에 KVO로 업데이트됨)
         }
-        tableView.separatorInset = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 8)
+        tableView.separatorInset = UIEdgeInsets(top: 0, left: DynamicSize.scaledSize(8), bottom: 0, right: DynamicSize.scaledSize(8))
 
     }
     
