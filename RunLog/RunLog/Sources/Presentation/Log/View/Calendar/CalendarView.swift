@@ -98,12 +98,7 @@ final class CalendarView: UIView {
 
     lazy var collectionView = UICollectionView(
         frame: .zero,
-        collectionViewLayout: UICollectionViewFlowLayout().then {
-            let itemWidth = (UIScreen.main.bounds.width - 48) / 7
-            $0.itemSize = CGSize(width: itemWidth, height: itemWidth * 1.5)
-            $0.minimumLineSpacing = 0
-            $0.minimumInteritemSpacing = 0
-        }
+        collectionViewLayout: UICollectionViewFlowLayout()
     ).then {
         $0.backgroundColor = .clear
         $0.register(
@@ -137,58 +132,53 @@ final class CalendarView: UIView {
     // MARK: - Setup Layout
     private func setupLayout() {
         walkImage.snp.makeConstraints {
-            $0.height.width.equalTo(64)
-            $0.top.leading.equalToSuperview().offset(16)
-            $0.bottom.equalToSuperview().offset(-10)
+            $0.height.width.equalTo(DynamicSize.scaledSize(64))
+            $0.top.leading.equalToSuperview().offset(DynamicSize.scaledSize(16))
+            $0.bottom.equalToSuperview().offset(DynamicSize.scaledSize(-10))
         }
         
         nicknameLabel.snp.makeConstraints {
-            $0.height.equalTo(26)
-            $0.leading.equalTo(walkImage.snp.trailing).offset(24)
-            $0.top.equalToSuperview().offset(18)
+            $0.height.equalTo(DynamicSize.scaledSize(26))
+            $0.leading.equalTo(walkImage.snp.trailing).offset(DynamicSize.scaledSize(24))
+            $0.top.equalToSuperview().offset(DynamicSize.scaledSize(18))
         }
         
         bottomLabel.snp.makeConstraints {
-            $0.height.equalTo(17)
-            $0.leading.equalTo(walkImage.snp.trailing).offset(24)
-            $0.bottom.equalToSuperview().offset(-21)
+            $0.height.equalTo(DynamicSize.scaledSize(17))
+            $0.leading.equalTo(walkImage.snp.trailing).offset(DynamicSize.scaledSize(24))
+            $0.bottom.equalToSuperview().offset(DynamicSize.scaledSize(-21))
         }
         
         topBanner.snp.makeConstraints {
-            $0.height.equalTo(90)
-            $0.top.equalToSuperview().offset(24)
-            $0.horizontalEdges.equalToSuperview().inset(24)
+            $0.height.equalTo(DynamicSize.scaledSize(90))
+            $0.top.equalToSuperview().offset(DynamicSize.scaledSize(24))
+            $0.horizontalEdges.equalToSuperview().inset(DynamicSize.scaledSize(24))
         }
         
         leftArrowButton.snp.makeConstraints {
-            $0.width.equalTo(26)
+            $0.width.equalTo(DynamicSize.scaledSize(26))
         }
         
         rightArrowButton.snp.makeConstraints {
-            $0.width.equalTo(26)
+            $0.width.equalTo(DynamicSize.scaledSize(26))
         }
         
         calendarTitleContainer.snp.makeConstraints {
-            $0.height.equalTo(28)
-            $0.top.equalTo(topBanner.snp.bottom).offset(32)
-            $0.leading.equalToSuperview().offset(24)
+            $0.height.equalTo(DynamicSize.scaledSize(28))
+            $0.top.equalTo(topBanner.snp.bottom).offset(DynamicSize.scaledSize(32))
+            $0.leading.equalToSuperview().offset(DynamicSize.scaledSize(24))
         }
         
         weekdaysContainer.snp.makeConstraints {
-            $0.height.equalTo(19)
-            $0.top.equalTo(calendarTitleContainer.snp.bottom).offset(24)
-            $0.horizontalEdges.equalToSuperview().inset(24)
+            $0.height.equalTo(DynamicSize.scaledSize(19))
+            $0.top.equalTo(calendarTitleContainer.snp.bottom).offset(DynamicSize.scaledSize(24))
+            $0.horizontalEdges.equalToSuperview().inset(DynamicSize.scaledSize(24))
         }
         
         collectionView.snp.makeConstraints {
-            $0.top.equalTo(weekdaysContainer.snp.bottom).offset(8)
-            $0.horizontalEdges.equalToSuperview().inset(24)
+            $0.top.equalTo(weekdaysContainer.snp.bottom).offset(DynamicSize.scaledSize(8))
+            $0.horizontalEdges.equalToSuperview().inset(DynamicSize.scaledSize(24))
             $0.bottom.equalToSuperview()
         }
-    }
-    
-    // MARK: - Configure
-    private func configure() {
-        // 뷰 설정
     }
 }
