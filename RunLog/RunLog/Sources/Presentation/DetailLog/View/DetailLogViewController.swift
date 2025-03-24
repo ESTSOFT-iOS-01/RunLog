@@ -249,18 +249,45 @@ extension DetailLogViewController: UITableViewDataSource, UITableViewDelegate {
         // 헤더 셀은 무시 (indexPath.row == 0)
         guard indexPath.row > 0 else { return }
         
-        // 선택된 section 인덱스 업데이트 (헤더 때문에 -1)
-        selectedSectionIndex = indexPath.row - 1
+        let newSelectionIndex = indexPath.row - 1
         
-        // 테이블뷰 리로드: 선택 상태 변경을 반영하기 위해
-        tableView.reloadData()
+        // 이미 선택된 section이 있고, 다른 셀을 선택한 경우
+        if let currentSelected = selectedSectionIndex, currentSelected != newSelectionIndex {
+            // 1. 기존 선택 해제 후 전체 경로(zoomAll)로 줌 처리
+            selectedSectionIndex = nil
+            tableView.reloadData()
+            if let dayLog = currentDayLog {
+                zoomToAllPoints(dayLog: dayLog)
+            }
+            
+            // 2. 약간의 딜레이 후 새 선택 section 줌 처리
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+                guard let self = self else { return }
+                self.selectedSectionIndex = newSelectionIndex
+                tableView.reloadData()
+                if let dayLog = self.currentDayLog,
+                   dayLog.sections.indices.contains(newSelectionIndex) {
+                    let selectedSection = dayLog.sections[newSelectionIndex]
+                    self.zoomToRoute(route: selectedSection.route)
+                }
+            }
+        } else {
+            // 처음 선택하거나 동일한 셀 재선택인 경우 바로 줌 처리
+            selectedSectionIndex = newSelectionIndex
+            tableView.reloadData()
+            if let dayLog = currentDayLog, dayLog.sections.indices.contains(newSelectionIndex) {
+                let selectedSection = dayLog.sections[newSelectionIndex]
+                zoomToRoute(route: selectedSection.route)
+            }
+        }
         
-        // 맵뷰 오버레이를 제거 후 다시 추가하여 렌더러가 다시 호출되도록 함
+        // 맵뷰 오버레이 업데이트 (필요 시)
         detailLogView.removeAllMapOverlays()
         for polyline in polylineOverlays {
             detailLogView.addMapOverlay(polyline)
         }
     }
+    
 }
 
 
@@ -300,7 +327,7 @@ extension DetailLogViewController {
         
         // 전체 영역이 보이도록 확대
         zoomToAllPoints(dayLog: dayLog)
-
+        
     }
     
     /// 모든 경로 점들을 순회하여 바운딩 박스(최소·최대 위도/경도) 구하기
@@ -350,6 +377,40 @@ extension DetailLogViewController {
         detailLogView.setMapRegion(region, animated: true)
     }
     
+    private func zoomToRoute(route: [Point]) {
+        // 경로가 비어있으면 아무 작업도 하지 않음
+        guard !route.isEmpty else { return }
+        
+        var minLat = Double.greatestFiniteMagnitude
+        var maxLat = -Double.greatestFiniteMagnitude
+        var minLon = Double.greatestFiniteMagnitude
+        var maxLon = -Double.greatestFiniteMagnitude
+        
+        // 각 좌표의 최소, 최대 위도/경도 계산
+        for point in route {
+            minLat = min(minLat, point.latitude)
+            maxLat = max(maxLat, point.latitude)
+            minLon = min(minLon, point.longitude)
+            maxLon = max(maxLon, point.longitude)
+        }
+        
+        // 중심 좌표 계산
+        let centerLat = (minLat + maxLat) / 2
+        let centerLon = (minLon + maxLon) / 2
+        let center = CLLocationCoordinate2D(latitude: centerLat, longitude: centerLon)
+        
+        // 두 모서리 좌표 사이의 거리 계산 (여유를 위해 1.2배)
+        let corner1 = CLLocation(latitude: minLat, longitude: minLon)
+        let corner2 = CLLocation(latitude: maxLat, longitude: maxLon)
+        var distance = corner1.distance(from: corner2)
+        distance = (distance == 0) ? 5000 : distance * 1.2
+        
+        // MKCoordinateRegion 생성 후 맵뷰 영역 설정
+        let region = MKCoordinateRegion(center: center,
+                                        latitudinalMeters: distance,
+                                        longitudinalMeters: distance)
+        detailLogView.setMapRegion(region, animated: true)
+    }
     
 }
 

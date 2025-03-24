@@ -285,6 +285,7 @@
 		};
 		16F686CB2D827D6F00C2163F /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 595FD80B2D90474C0073F561 /* Secrets.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
