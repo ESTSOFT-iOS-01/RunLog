@@ -6,8 +6,43 @@
 //
 
 import UIKit
+import SnapKit
+import NVActivityIndicatorView
 
 extension UIViewController {
+    private struct LoadingIndicator {
+        static var activityIndicator: NVActivityIndicatorView?
+    }
+    
+    /// 로딩 인디케이터 시작
+    func startLoading() {
+        print(#function)
+        guard LoadingIndicator.activityIndicator == nil else { return } // 이미 있으면 중복 생성 방지
+        
+        let indicator = NVActivityIndicatorView(
+            frame: .zero,
+            type: .pacman,
+            color: .LightGreen,
+            padding: 44
+        )
+        
+        view.addSubview(indicator)
+        indicator.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+            make.width.height.equalTo(44)
+        }
+        
+        indicator.startAnimating()
+        LoadingIndicator.activityIndicator = indicator
+    }
+    
+    /// 로딩 인디케이터 종료
+    func stopLoading() {
+        print(#function)
+        LoadingIndicator.activityIndicator?.stopAnimating()
+        LoadingIndicator.activityIndicator?.removeFromSuperview()
+        LoadingIndicator.activityIndicator = nil
+    }
     
     /// 네비게이션 바의 스타일 설정
     func setupNavigationBarAppearance() {

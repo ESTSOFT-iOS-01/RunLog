@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		16ACC8892D91220800104179 /* NVActivityIndicatorView in Frameworks */ = {isa = PBXBuildFile; productRef = 16ACC8882D91220800104179 /* NVActivityIndicatorView */; };
+		16ACC88B2D91220800104179 /* NVActivityIndicatorViewExtended in Frameworks */ = {isa = PBXBuildFile; productRef = 16ACC88A2D91220800104179 /* NVActivityIndicatorViewExtended */; };
 		16F688C22D82972000C2163F /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 16F688C12D82972000C2163F /* SnapKit */; };
 		16F688C52D82972900C2163F /* Then in Frameworks */ = {isa = PBXBuildFile; productRef = 16F688C42D82972900C2163F /* Then */; };
 		16F688C82D82974E00C2163F /* CombineMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 16F688C72D82974E00C2163F /* CombineMoya */; };
@@ -74,7 +76,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				16F688C22D82972000C2163F /* SnapKit in Frameworks */,
+				16ACC8892D91220800104179 /* NVActivityIndicatorView in Frameworks */,
 				16F688C52D82972900C2163F /* Then in Frameworks */,
+				16ACC88B2D91220800104179 /* NVActivityIndicatorViewExtended in Frameworks */,
 				16F688CA2D82974E00C2163F /* Moya in Frameworks */,
 				16F688C82D82974E00C2163F /* CombineMoya in Frameworks */,
 			);
@@ -151,6 +155,8 @@
 				16F688C42D82972900C2163F /* Then */,
 				16F688C72D82974E00C2163F /* CombineMoya */,
 				16F688C92D82974E00C2163F /* Moya */,
+				16ACC8882D91220800104179 /* NVActivityIndicatorView */,
+				16ACC88A2D91220800104179 /* NVActivityIndicatorViewExtended */,
 			);
 			productName = RunLog;
 			productReference = 16F686B72D827D6C00C2163F /* RunLog.app */;
@@ -188,6 +194,7 @@
 				16F688C02D82972000C2163F /* XCRemoteSwiftPackageReference "SnapKit" */,
 				16F688C32D82972900C2163F /* XCRemoteSwiftPackageReference "Then" */,
 				16F688C62D82974E00C2163F /* XCRemoteSwiftPackageReference "Moya" */,
+				16ACC8872D91220800104179 /* XCRemoteSwiftPackageReference "NVActivityIndicatorView" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 16F686B82D827D6C00C2163F /* Products */;
@@ -509,6 +516,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		16ACC8872D91220800104179 /* XCRemoteSwiftPackageReference "NVActivityIndicatorView" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ninjaprox/NVActivityIndicatorView";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.2.0;
+			};
+		};
 		16F688C02D82972000C2163F /* XCRemoteSwiftPackageReference "SnapKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SnapKit/SnapKit";
@@ -536,6 +551,16 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		16ACC8882D91220800104179 /* NVActivityIndicatorView */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 16ACC8872D91220800104179 /* XCRemoteSwiftPackageReference "NVActivityIndicatorView" */;
+			productName = NVActivityIndicatorView;
+		};
+		16ACC88A2D91220800104179 /* NVActivityIndicatorViewExtended */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 16ACC8872D91220800104179 /* XCRemoteSwiftPackageReference "NVActivityIndicatorView" */;
+			productName = NVActivityIndicatorViewExtended;
+		};
 		16F688C12D82972000C2163F /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 16F688C02D82972000C2163F /* XCRemoteSwiftPackageReference "SnapKit" */;
