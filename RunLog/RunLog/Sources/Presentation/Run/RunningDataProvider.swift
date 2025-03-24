@@ -309,8 +309,8 @@ extension RunningDataProvider {
             try await dayLogUseCase.addSectionByDate(Date(), section: self.section)
             
             if let dayLog = try await dayLogUseCase.getDayLogByDate(Date()) {
-                let datas = mediaUseCase.convertSectionsToCoordinates(sections: dayLog.sections)
-                mediaUseCase.setRouteImage(route: datas)
+                let datas = mediaUseCase.convertSectionsToCoordinates1(sections: dayLog.sections)
+                mediaUseCase.setRouteImage1(route: datas)
                 await self.drawingManager.input.send(.requestFullRoutePolyline([CLLocation]()))
             }
         }
