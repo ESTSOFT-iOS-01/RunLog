@@ -30,4 +30,10 @@ extension Double {
         }
         return String(format: "%.12f", self).replacingOccurrences(of: "\\.?0*$", with: "", options: .regularExpression)
     }
+    
+    /// 각도를 라디안으로 변환
+    var deg2rad: Double { self * .pi / 180 }
+    
+    /// 라디안을 각도로 변환
+    var rad2deg: Double { self * 180 / .pi }
 }
