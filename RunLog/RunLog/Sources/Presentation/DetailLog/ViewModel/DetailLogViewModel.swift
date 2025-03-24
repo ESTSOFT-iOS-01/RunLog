@@ -36,7 +36,7 @@ final class DetailLogViewModel {
     
     // MARK: - DayLog Subject
     // 외부에서 가져온 DayLog 데이터 저장 및 업데이트를 위해 subject 사용
-    private let dayLogSubject = CurrentValueSubject<DayLog?, Never>(nil)
+    let dayLogSubject = CurrentValueSubject<DayLog?, Never>(nil)
     
     // 외부에서 DayLog를 구독할 수 있는 publisher 제공
     var dayLogPublisher: AnyPublisher<DayLog, Never> {
@@ -105,7 +105,12 @@ final class DetailLogViewModel {
         Task {
             guard let dayLog = try await dayLogUseCase.getDayLogByDate(date)
             else { return }
+            dayLogSubject.send(dayLog)
             output.send(.loadedDayLog(dayLog))
         }
     }
+    
+    func deleteDayLog() async throws {
+            try await dayLogUseCase.deleteDayLogByDate(date)
+        }
 }

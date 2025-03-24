@@ -77,11 +77,6 @@ final class MovingTrackSheetViewController: UIViewController {
             }
             .store(in: &cancellables)
         
-        sheetView.saveButton.controlPublisher(for: .touchUpInside)
-            .sink { _ in
-                print("동선 영상 저장 로직 실행")
-            }
-            .store(in: &cancellables)
     }
     
     // MARK: - Setup Data
@@ -115,6 +110,14 @@ final class MovingTrackSheetViewController: UIViewController {
         
         // (Delegate 설정)
         mapView.delegate = self
+        
+        // 뷰모델에서 받아온 날짜를 전달 (예: dayLog.date)
+        viewModel.dayLogPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] dayLog in
+                self?.sheetView.configure(with: dayLog.date)
+            }
+            .store(in: &cancellables)
     }
     
     /// 각 섹션의 route를 그대로 sectionsCoordinates에 저장
@@ -123,12 +126,16 @@ final class MovingTrackSheetViewController: UIViewController {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] dayLog in
                 guard let self = self else { return }
-                // DayLog의 섹션별 좌표 배열 생성
+                // 섹션별 route를 timestamp 순으로 정렬한 뒤 좌표 배열로 변환
                 self.sectionsCoordinates = dayLog.sections.map { section in
-                    section.route.map { CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude) }
+                    section.route
+                        .sorted(by: { $0.timestamp < $1.timestamp })
+                        .map { CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude) }
                 }
+                
                 // 전체 경로 오버레이 그리기
                 self.drawAllSectionOverlays()
+                
                 // 첫 섹션 카메라 애니메이션 시작
                 self.startCameraAnimationForCurrentSection()
             }
@@ -139,9 +146,11 @@ final class MovingTrackSheetViewController: UIViewController {
     private func drawAllSectionOverlays() {
         let mapView = sheetView.mapView
         mapView.removeOverlays(mapView.overlays)
-        for (index, sectionCoords) in sectionsCoordinates.enumerated() {
-            guard sectionCoords.count >= 2 else { continue }
-            let polyline = MKPolyline(coordinates: sectionCoords, count: sectionCoords.count)
+        
+        for (index, sortedCoordinates) in sectionsCoordinates.enumerated() {
+            guard sortedCoordinates.count >= 2 else { continue }
+            
+            let polyline = MKPolyline(coordinates: sortedCoordinates, count: sortedCoordinates.count)
             polyline.title = "전체 경로-\(index)"
             sheetView.addMapOverlay(polyline)
         }
@@ -178,7 +187,6 @@ final class MovingTrackSheetViewController: UIViewController {
     @objc private func updateCameraForSection() {
         let sectionCoords = sectionsCoordinates[currentSectionIndex]
         guard currentCoordIndexInSection < sectionCoords.count - 1 else {
-            // 현재 섹션의 끝에 도달하면 다음 섹션으로 전환
             moveToNextSectionIfAvailable()
             return
         }

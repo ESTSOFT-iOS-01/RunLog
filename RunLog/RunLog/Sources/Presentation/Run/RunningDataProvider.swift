@@ -12,7 +12,7 @@ import Combine
 // MARK: - 운동 정보에 대한 각종 정보를 가지고 있고 전달해주는 객체
 final class RunningDataProvider {
 //    // Syr) 테스트용 Start
-//    let dummy = SyrDummyTest()
+    let dummy = SyrDummyTest()
 //    // Syr) 테스트용 End
     
     // MARK: - Singleton
@@ -220,7 +220,7 @@ extension RunningDataProvider {
 extension RunningDataProvider {
     private func requestRunningStart() {
 //        // Syr) 테스트용 Start
-//        dummy.startDummySet()
+        dummy.startDummySet()
 //        // Syr) 테스트용 End
         
         // 데이로그 생성
@@ -280,7 +280,7 @@ extension RunningDataProvider {
 extension RunningDataProvider {
     private func requestRunningStop() {
 //        // Syr) 테스트용 Start
-//        dummy.stopDummySet()
+        dummy.stopDummySet()
 //        // Syr) 테스트용 End
         
         // 운동 종료 위치를 경로에 저장

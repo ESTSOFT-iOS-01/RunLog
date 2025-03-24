@@ -313,7 +313,7 @@ extension DetailLogView {
         timeValueLabel.label.text = log.totalTime.hourMinuteString
         
         // 운동거리 업데이트 (예: "5.0km")
-        distanceValueLabel.label.text = "\(log.totalDistance)km"
+        distanceValueLabel.label.text = String(format: "%.2fkm", log.totalDistance)
         
         // 걸음수 업데이트 (천 단위 구분 기호 포함)
         stepsValueLabel.label.text = log.totalSteps.formattedString
