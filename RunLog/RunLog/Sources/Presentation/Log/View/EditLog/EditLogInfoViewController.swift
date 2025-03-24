@@ -13,11 +13,21 @@ import Combine
 final class EditLogInfoViewController: UIViewController {
     
     // MARK: - Properties
-    private let viewModel = EditLogInfoViewModel()
+    private let viewModel: EditLogInfoViewModel!
     private var cancellables = Set<AnyCancellable>()
 
     // MARK: - UI
     private var editView = EditLogInfoView()
+    
+    // MARK: - Init
+    init(viewModel: EditLogInfoViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -27,6 +37,8 @@ final class EditLogInfoViewController: UIViewController {
         setupTableView()
         setupTextField()
         setupGesture()
+        
+        viewModel.bind()
         setupData()
         bindViewModel()
     }
@@ -61,7 +73,7 @@ final class EditLogInfoViewController: UIViewController {
         navigationController?
             .addRightButton(title: "완료")
             .sink { [weak self] in
-                self?.viewModel.input.send(.saveButtonTapped)
+                self?.validateAndSaveInfo()
             }
             .store(in: &cancellables)
     }
@@ -83,25 +95,38 @@ final class EditLogInfoViewController: UIViewController {
     // MARK: - Setup Data
     private func setupData() {
         // 초기 데이터 로드
-        editView.nameField.setTextWithUnderline(viewModel.logName)
+        viewModel.input.send(.loadData)
     }
 
     // MARK: - Bind ViewModel
     private func bindViewModel() {
         viewModel.bindTextField(editView.nameField.publisher)
         
-        viewModel.output
-            .sink { [weak self] output in
-                switch output {
-                case .logLevelUpdated(let index):
-                    self?.updateSelectedCell(index)
-                case .saveSuccess:
+        viewModel.output.logNameUpdated
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] text in
+                self?.editView.nameField.setTextWithUnderline(text)
+            }
+            .store(in: &cancellables)
+        
+        viewModel.output.logLevelUpdated
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] index in
+                self?.updateSelectedCell(index)
+            }
+            .store(in: &cancellables)
+        
+        viewModel.output.saveSuccess
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] success in
+                if success {
                     self?.navigationController?.popViewController(animated: true)
-                case .logNameUpdated(let text):
-                    self?.editView.nameField.setTextWithUnderline(text)
+                } else {
+                    // 저장 실패 시 처리
                 }
             }
             .store(in: &cancellables)
+            
     }
     
     private func updateSelectedCell(_ selectedIndex: Int?) {
@@ -109,6 +134,15 @@ final class EditLogInfoViewController: UIViewController {
             guard let radioButtonCell = cell as? RadioButtonCell else { continue }
             radioButtonCell.changeState(index == selectedIndex)
         }
+    }
+    
+    private func validateAndSaveInfo() {
+        guard let text = editView.nameField.text, !text.isEmpty else {
+            showAlert(message: "기록 제목을 입력해주세요")
+            return
+        }
+        
+        viewModel.input.send(.saveButtonTapped)
     }
 }
 
@@ -128,7 +162,7 @@ extension EditLogInfoViewController: UITextFieldDelegate {
 
 extension EditLogInfoViewController : UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.items.count
+        return Constants.levels.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -136,10 +170,10 @@ extension EditLogInfoViewController : UITableViewDataSource {
             return UITableViewCell()
         }
         
-        let lvlString = viewModel.items[indexPath.row]
+        let lvlString = Constants.levels[indexPath.row]
         cell.configure(title: lvlString)
         
-        let isSelected = indexPath.row == viewModel.selectedIndex
+        let isSelected = indexPath.row == viewModel.output.logLevelUpdated.value
         cell.changeState(isSelected)
         
         return cell
