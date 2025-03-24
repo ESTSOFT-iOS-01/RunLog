@@ -100,10 +100,6 @@ final class MovingTrackSheetViewController: UIViewController {
         // 1) 건물 표시 (3D 데이터가 있는 지역에서만 보임)
         mapView.showsBuildings = true
         
-        // 2) 사용자가 핀치/드래그 제스처로 지도 기울이거나 회전할 수 있게
-        mapView.isPitchEnabled = true
-        mapView.isRotateEnabled = true
-        
         // 3) 나머지 옵션
         mapView.showsCompass = true
         mapView.showsScale = true
