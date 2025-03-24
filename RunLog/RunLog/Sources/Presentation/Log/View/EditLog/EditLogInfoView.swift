@@ -57,23 +57,22 @@ final class EditLogInfoView: UIView {
     // MARK: - Setup Layout
     private func setupLayout() {
         titleLabel.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(130)
+            $0.top.equalTo(safeAreaLayoutGuide).offset(DynamicSize.scaledSize(24))
             $0.leading.trailing.equalToSuperview()
         }
         
         nameField.snp.makeConstraints {
-            $0.top.equalTo(titleLabel.snp.bottom).offset(4)
+            $0.top.equalTo(titleLabel.snp.bottom).offset(DynamicSize.scaledSize(4))
             $0.leading.trailing.equalToSuperview()
-            $0.height.equalTo(64)
         }
         
         levelLabel.snp.makeConstraints {
-            $0.top.equalTo(nameField.snp.bottom).offset(40)
+            $0.top.equalTo(nameField.snp.bottom).offset(DynamicSize.scaledSize(40))
             $0.leading.trailing.equalToSuperview()
         }
         
         tableView.snp.makeConstraints {
-            $0.top.equalTo(levelLabel.snp.bottom).offset(16)
+            $0.top.equalTo(levelLabel.snp.bottom).offset(DynamicSize.scaledSize(16))
             $0.leading.trailing.bottom.equalToSuperview()
         }
     }

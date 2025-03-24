@@ -49,7 +49,7 @@ final class EditLogInfoViewController: UIViewController {
         view.addSubview(editView)
         
         editView.snp.makeConstraints {
-            $0.horizontalEdges.equalToSuperview().inset(24)
+            $0.horizontalEdges.equalToSuperview().inset(DynamicSize.scaledSize(24))
             $0.verticalEdges.equalToSuperview()
         }
     }
