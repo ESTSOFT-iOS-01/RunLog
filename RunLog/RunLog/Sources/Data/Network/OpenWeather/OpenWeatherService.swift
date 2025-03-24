@@ -80,7 +80,10 @@ extension OpenWeatherService {
             let condition: Int = response.weather.first?.id ?? -1
             return (condition, temperature)
         }
-        .catch { _ in Just((-1, 0.0)) } // 오류 발생 시 기본값 반환
+        .catch { error in
+            print(error.errorMessage)
+            return Just((-1, 0.0))
+        }
         .eraseToAnyPublisher()
     }
 }
@@ -99,7 +102,10 @@ extension OpenWeatherService {
         .map { response in
             response.list.first?.main.aqi ?? -1
         }
-        .catch { _ in Just(-1) } // 오류 발생 시 기본값 반환
+        .catch { error in
+            print(error.errorMessage)
+            return Just(-1)
+        }
         .eraseToAnyPublisher()
     }
 }
