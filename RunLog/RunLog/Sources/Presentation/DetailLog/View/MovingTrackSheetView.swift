@@ -36,7 +36,7 @@ final class MovingTrackSheetView: UIView {
     
     let mapView = MKMapView().then {
         // 추가 delegate 설정 및 커스터마이징 가능
-        $0.layer.cornerRadius = 16
+        $0.layer.cornerRadius = DynamicSize.scaledSize(16)
         $0.clipsToBounds = true
     }
     
@@ -65,28 +65,28 @@ final class MovingTrackSheetView: UIView {
         // 레이아웃 설정
         // 상단 날짜 라벨
         dateLabel.snp.makeConstraints { make in
-            make.top.equalTo(safeAreaLayoutGuide).offset(48)
+            make.top.equalTo(safeAreaLayoutGuide).offset(DynamicSize.scaledSize(48))
             make.centerX.equalToSuperview()
         }
         
         // 닫기 버튼
         closeButton.snp.makeConstraints { make in
             make.centerY.equalTo(dateLabel)
-            make.trailing.equalToSuperview().inset(32)
+            make.trailing.equalToSuperview().inset(DynamicSize.scaledSize(32))
         }
         
         // 서브타이틀
         subtitleLabel.snp.makeConstraints { make in
-            make.top.equalTo(dateLabel.snp.bottom).offset(4)
+            make.top.equalTo(dateLabel.snp.bottom).offset(DynamicSize.scaledSize(4))
             make.centerX.equalToSuperview()
         }
         
         // 지도
         mapView.snp.makeConstraints { make in
-            make.top.equalTo(subtitleLabel.snp.bottom).offset(48)
-            make.leading.trailing.equalToSuperview().inset(24)
+            make.top.equalTo(subtitleLabel.snp.bottom).offset(DynamicSize.scaledSize(48))
+            make.leading.trailing.equalToSuperview().inset(DynamicSize.scaledSize(24))
             make.height.equalTo(mapView.snp.width).multipliedBy(498.0 / 392.0)
-            make.bottom.equalTo(safeAreaLayoutGuide).offset(-60)
+            make.bottom.equalTo(safeAreaLayoutGuide).offset(DynamicSize.scaledSize(-60))
         }
         
     }

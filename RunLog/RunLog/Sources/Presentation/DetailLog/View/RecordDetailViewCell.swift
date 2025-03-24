@@ -63,7 +63,7 @@ final class RecordDetailViewCell: UITableViewCell {
     private func setupLayout() {
         // 레이아웃 설정
         horizontalStack.snp.makeConstraints { make in
-            make.edges.equalToSuperview().inset(8)
+            make.edges.equalToSuperview().inset(DynamicSize.scaledSize(8))
         }
         
         // 라벨별로 width 비율 고정 (예: 0.4 : 0.3 : 0.3)

@@ -100,7 +100,7 @@ final class DetailLogViewController: UIViewController {
                 sheetVC.modalPresentationStyle = .pageSheet
                 if let sheet = sheetVC.sheetPresentationController {
                     let customDetent = UISheetPresentationController.Detent.custom(identifier: .init("myCustomDetent")) { _ in
-                        712
+                        DynamicSize.scaledSize(712)
                     }
                     sheet.detents = [customDetent]
                     sheet.selectedDetentIdentifier = customDetent.identifier
@@ -111,7 +111,7 @@ final class DetailLogViewController: UIViewController {
                     sheet.prefersScrollingExpandsWhenScrolledToEdge = false
                     sheet.prefersEdgeAttachedInCompactHeight = true
                     sheet.widthFollowsPreferredContentSizeWhenEdgeAttached = true
-                    sheet.preferredCornerRadius = 16
+                    sheet.preferredCornerRadius = DynamicSize.scaledSize(16)
                 }
                 
                 
