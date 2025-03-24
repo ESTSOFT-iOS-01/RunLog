@@ -25,8 +25,8 @@ final class TimelineView: UIView {
             forCellReuseIdentifier: TimelineViewCell.identifier
         )
         
-        let cellHeight = 148.0
-        let spacing = 18.0
+        let cellHeight = DynamicSize.scaledSize(148)
+        let spacing = DynamicSize.scaledSize(18)
         
         $0.rowHeight = cellHeight + spacing
         $0.showsVerticalScrollIndicator = false
@@ -58,7 +58,7 @@ final class TimelineView: UIView {
         // 레이아웃 설정
         tableView.snp.makeConstraints {
             $0.top.bottom.equalToSuperview()
-            $0.horizontalEdges.equalToSuperview().inset(24)
+            $0.horizontalEdges.equalToSuperview().inset(DynamicSize.scaledSize(24))
         }
     }
     

@@ -71,27 +71,27 @@ class TimelineViewCell: UITableViewCell {
     private func setupLayout() {
         cellContainer.snp.makeConstraints {
             $0.top.leading.trailing.equalToSuperview()
-            $0.bottom.equalToSuperview().offset(-18)
+            $0.bottom.equalToSuperview().offset(DynamicSize.scaledSize(-18))
         }
         
         distanceLabel.snp.makeConstraints {
-            $0.height.equalTo(49)
-            $0.top.leading.equalToSuperview().offset(24)
+            $0.height.equalTo(DynamicSize.scaledSize(49))
+            $0.top.leading.equalToSuperview().offset(DynamicSize.scaledSize(24))
         }
         titleLabel.snp.makeConstraints {
-            $0.height.equalTo(26)
-            $0.leading.equalToSuperview().offset(24)
+            $0.height.equalTo(DynamicSize.scaledSize(26))
+            $0.leading.equalToSuperview().offset(DynamicSize.scaledSize(24))
             $0.top.equalTo(distanceLabel.snp.bottom)
         }
         dateLabel.snp.makeConstraints {
-            $0.height.equalTo(22)
-            $0.leading.equalToSuperview().offset(24)
-            $0.top.equalTo(titleLabel.snp.bottom).offset(8)
+            $0.height.equalTo(DynamicSize.scaledSize(22))
+            $0.leading.equalToSuperview().offset(DynamicSize.scaledSize(24))
+            $0.top.equalTo(titleLabel.snp.bottom).offset(DynamicSize.scaledSize(8))
         }
         trackImageView.snp.makeConstraints {
-            $0.width.height.equalTo(100)
+            $0.width.height.equalTo(DynamicSize.scaledSize(100))
             $0.centerY.equalToSuperview()
-            $0.trailing.equalToSuperview().offset(-24)
+            $0.trailing.equalToSuperview().offset(DynamicSize.scaledSize(-24))
         }
     }
     
@@ -142,10 +142,10 @@ class TimelineHeaderView: UITableViewHeaderFooterView {
     // MARK: - Setup Layout
     private func setupLayout() {
         headerLabel.snp.makeConstraints {
-            $0.height.equalTo(32)
+            $0.height.equalTo(DynamicSize.scaledSize(32))
             $0.leading.equalToSuperview()
-            $0.top.equalToSuperview().offset(24)
-            $0.bottom.equalToSuperview().offset(-16)
+            $0.top.equalToSuperview().offset(DynamicSize.scaledSize(24))
+            $0.bottom.equalToSuperview().offset(DynamicSize.scaledSize(-16))
         }
     }
     
