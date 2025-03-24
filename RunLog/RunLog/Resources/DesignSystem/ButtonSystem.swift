@@ -59,3 +59,58 @@ open class RLButton: UIButton {
     }
     
 }
+
+// MARK: - 이미지가 오른쪽에 들어가 있는 AttributedString Title
+extension RLButton {
+    /// 버튼의 타이틀 오른쪽에 이미지를 추가
+    /// - Parameters:
+    ///   - imageName: **버튼에 추가할 이미지 systemName**
+    ///   - tintColor: **버튼의 틴트 색상 (기본갑시 `.Gray000`)**
+    ///
+    /// - Example:
+    ///   ```swift
+    ///   let button = RLButton()
+    ///   button.setRightIcon(systemName: "xmark")
+    ///   ```
+    public func setRightIcon(
+        systemName: String,
+        tintColor: UIColor = .Gray000
+    ) {
+        var config = UIButton.Configuration.plain()
+        config.image = UIImage(systemName: systemName)
+        config.imagePadding = DynamicSize.scaledSize(4)
+        config.imagePlacement = .trailing
+        config.preferredSymbolConfigurationForImage =
+        UIImage.SymbolConfiguration(
+            pointSize: DynamicSize.scaledSize(12),
+            weight: .medium
+        )
+        self.tintColor = tintColor
+        self.configuration = config
+    }
+    
+    /// 기존의 Title을 지우고 새로운 AttributedTitle을 Set
+    /// - Parameters:
+    ///   - title: **적용할 타이틀**
+    ///   - state: **적용할 버튼 상태 (기본값: `.normal`)**
+    ///
+    /// - Example:
+    ///   ```swift
+    ///   let button = RLButton()
+    ///   button.setAttributedString(
+    ///     title: .RLAttributedString(
+    ///         text: "닫기",
+    ///         font: .Label2,
+    ///         align: .center
+    ///     )
+    ///   )
+    ///   ```
+    public func setAttributedString(
+        title: NSAttributedString,
+        for state: UIControl.State = .normal
+    ) {
+        //기존의 title 제거
+        self.setTitle(nil, for: .normal)
+        self.setAttributedTitle(title, for: state)
+    }
+}
