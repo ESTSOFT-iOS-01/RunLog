@@ -49,7 +49,7 @@ final class ProfileCardView: UIView {
     // MARK: - Setup UI
     private func setupUI() {
         backgroundColor = .LightGreen80
-        layer.cornerRadius = 8
+        layer.cornerRadius = DynamicSize.scaledSize(8)
         clipsToBounds = true
         
         propertyView.addSubviews(propertyTitle, propertyValue)

@@ -32,7 +32,7 @@ final class CalUnitView: UIView {
     
     private let exampleView = UIView().then {
         $0.backgroundColor = .Gray700
-        $0.layer.cornerRadius = 12
+        $0.layer.cornerRadius = DynamicSize.scaledSize(12)
         $0.clipsToBounds = true
     }
     
