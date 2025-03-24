@@ -76,6 +76,13 @@ final class MyPageViewController: UIViewController {
 
     // MARK: - Bind ViewModel
     private func bindViewModel() {
+        viewModel.output.stopLoading
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] off in
+                off ? self?.stopLoading() : self?.startLoading()
+            }
+            .store(in: &cancellables)
+        
         viewModel.output.profileDataUpdated
             .receive(on: DispatchQueue.main)
             .sink { [weak self] config in

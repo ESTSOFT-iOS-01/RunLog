@@ -17,6 +17,7 @@ final class MyPageViewModel {
     }
     
     struct Output {
+        let stopLoading = CurrentValueSubject<Bool, Never>(false)
         let profileDataUpdated = CurrentValueSubject<UserInfoVO, Never>(UserInfoVO(nickname: "RunLogger", totalDistance: 0.0, streakCount: 0, logCount: 0))
         let navigateToViewController = CurrentValueSubject<UIViewController?, Never>(nil)
     }
@@ -53,6 +54,7 @@ final class MyPageViewModel {
     private func fetchProfileData() {
         Task {
             do {
+                output.stopLoading.send(false)
                 var userInfo = UserInfoVO(nickname: "RunLogger", totalDistance: 0.0, streakCount: 0, logCount: 0)
                 try await dayLogUseCase.updateStreakIfNeeded()
                 
@@ -61,7 +63,9 @@ final class MyPageViewModel {
                 (userInfo.streakCount, userInfo.logCount) = try await appConfigUseCase.getUserIndicators()
                 
                 output.profileDataUpdated.send(userInfo)
+                output.stopLoading.send(true)
             } catch {
+                output.stopLoading.send(true)
                 print("usecase error : \(error)")
             }
         }

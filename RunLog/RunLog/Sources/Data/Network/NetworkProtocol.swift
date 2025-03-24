@@ -23,7 +23,8 @@ extension NetworkService {
         return provider.requestPublisher(target)
             .tryMap { response in
                 if !(200...299).contains(response.statusCode) {
-                    throw self.handleError(response.statusCode)
+                    let error = try self.parseError(from: response.data)
+                    throw handleError(error.cod, message: error.message)
                 }
                 
                 do {
@@ -38,17 +39,26 @@ extension NetworkService {
             .eraseToAnyPublisher()
     }
     
-    /// HTTP 상태 코드에 따른 에러 처리
-    private func handleError(_ statusCode: Int) -> NetworkError {
+    // HTTP 상태 코드에 따른 에러 처리
+    private func handleError(_ statusCode: Int, message: String) -> NetworkError {
         switch statusCode {
         case 300..<400:
             return .redirectionError
         case 400..<500:
-            return .clientError(statusCode)
+            return .clientError(statusCode, message)
         case 500..<600:
-            return .serverError(statusCode)
+            return .serverError(statusCode, message)
         default:
             return .unknown
+        }
+    }
+    
+    private func parseError(from data: Data) throws -> OpenWeatherError {
+        do {
+            let errorResponse = try JSONDecoder().decode(OpenWeatherError.self, from: data)
+            return errorResponse
+        } catch {
+            throw NetworkError.decodingFailed
         }
     }
 }
