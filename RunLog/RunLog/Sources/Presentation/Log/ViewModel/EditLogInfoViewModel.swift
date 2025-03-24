@@ -12,48 +12,44 @@ final class EditLogInfoViewModel {
     
     // MARK: - Input & Output
     enum Input {
+        case loadData // 유저 데이터 호출
         case saveButtonTapped // 저장 버튼 클릭
         case logLevelSelected(Int) // 난이도 저장
-        case logNameChanged(String) // 로그 네임 변경
     }
     
-    enum Output {
-        case logNameUpdated(String)
-        case logLevelUpdated(Int)
-        case saveSuccess // 저장 완료 이벤트
+    struct Output {
+        let logNameUpdated = CurrentValueSubject<String, Never>("기록 이름")
+        let logLevelUpdated = CurrentValueSubject<Int, Never>(2)
+        let saveSuccess = CurrentValueSubject<Bool, Never>(false)
     }
+    
+    @Dependency private var dayLogUseCase: DayLogUseCase
     
     private var cancellables = Set<AnyCancellable>()
     private let inputSubject = PassthroughSubject<Input, Never>() // Input 스트림
-    private let outputSubject = PassthroughSubject<Output, Never>() // Output 스트림
     
     var input: PassthroughSubject<Input, Never> { inputSubject }
-    var output: AnyPublisher<Output, Never> { outputSubject.eraseToAnyPublisher() }
+    private(set) var output: Output = Output()
     
-    let items = ["매우 쉬움", "쉬움", "보통", "어려움", "매우 어려움"]
-
-    private(set) var selectedIndex: Int = 2
-    private(set) var logName: String = "화요일 오후 산책" // 기록 이름
+    private(set) var date : Date?
     
     // MARK: - Init
-    init() {
-        bind()
+    init(date: Date) {
+        self.date = date
     }
     
     // MARK: - Bind (Input -> Output)
-    private func bind() {
+    func bind() {
         inputSubject
             .receive(on: DispatchQueue.main)
             .sink { [weak self] event in
                 switch event {
+                case .loadData:
+                    self?.fetchLogInfo()
                 case .saveButtonTapped:
                     self?.saveLogInfo()
                 case .logLevelSelected(let index):
-                    self?.selectedIndex = index
-                    self?.outputSubject.send(.logLevelUpdated(index))
-                case .logNameChanged(let name):
-                    self?.logName = name
-                    self?.outputSubject.send(.logNameUpdated(name))
+                    self?.output.logLevelUpdated.send(index)
                 }
             }
             .store(in: &cancellables)
@@ -61,17 +57,39 @@ final class EditLogInfoViewModel {
     
     func bindTextField(_ textPublisher: AnyPublisher<String, Never>) {
         textPublisher
-            .removeDuplicates()
             .sink { [weak self] text in
-                self?.inputSubject.send(.logNameChanged(text))
+                self?.output.logNameUpdated.send(text)
             }
             .store(in: &cancellables)
     }
     
     private func saveLogInfo() {
-        // 저장 로직 (예: CoreData, UserDefaults)
-        print("[Debug] 로그 저장됨: 이름=\(logName), 난이도=\(selectedIndex)")
-        outputSubject.send(.saveSuccess)
+        guard let date = self.date else { return }
+        Task {
+            do {
+                try await dayLogUseCase.updateTitleByDate(date, title: output.logNameUpdated.value)
+                
+                try await dayLogUseCase.updateLevelByDate(date, level: output.logLevelUpdated.value)
+                
+                self.output.saveSuccess.send(true)
+            } catch {
+                print("Error saving Info: \(error)")
+                self.output.saveSuccess.send(false)
+            }
+        }
+    }
+    
+    private func fetchLogInfo() {
+        guard let date = self.date else { return }
+        Task {
+            do {
+                let title = try await  dayLogUseCase.getTitleByDate(date)
+                let level = try await dayLogUseCase.getLevelByDate(date)
+                
+                output.logNameUpdated.send(title)
+                output.logLevelUpdated.send(level)
+            }
+        }
     }
     
 }

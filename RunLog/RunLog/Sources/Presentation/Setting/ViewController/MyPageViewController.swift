@@ -66,7 +66,7 @@ final class MyPageViewController: UIViewController {
     private func setupNavigationBar() {
         // 네비게이션바 디테일 설정
         self.navigationController?.setupAppearance()
-        navigationItem.title = "LOGO"
+        self.navigationController?.setupLogoTitle()
     }
     
     private func setupTableView() {

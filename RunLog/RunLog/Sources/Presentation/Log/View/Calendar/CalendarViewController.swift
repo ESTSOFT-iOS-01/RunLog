@@ -195,7 +195,7 @@ extension CalendarViewController {
     }
 }
 
-extension CalendarViewController: UICollectionViewDelegate, UICollectionViewDataSource {
+extension CalendarViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(
         _ collectionView: UICollectionView,
         numberOfItemsInSection section: Int
@@ -236,5 +236,32 @@ extension CalendarViewController: UICollectionViewDelegate, UICollectionViewData
         if let date = calendar.date(from: finalComponents) {
             viewModel.send(.cellTapped(date: date))
         }
+    }
+    
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        sizeForItemAt indexPath: IndexPath
+    ) -> CGSize {
+        
+        let width = collectionView.bounds.width / 7
+        let height = collectionView.bounds.height / 6
+        return CGSize(width: width, height: height)
+    }
+    
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        minimumLineSpacingForSectionAt section: Int
+    ) -> CGFloat {
+        return 0
+    }
+
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        minimumInteritemSpacingForSectionAt section: Int
+    ) -> CGFloat {
+        return 0
     }
 }

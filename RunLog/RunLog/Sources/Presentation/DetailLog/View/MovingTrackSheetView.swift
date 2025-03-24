@@ -14,7 +14,7 @@ final class MovingTrackSheetView: UIView {
     
     // MARK: - UI Components 선언
     private let dateLabel = RLLabel(
-        text: "2025년 3월 3일 수요일",
+        text: "날짜",
         textColor: .Gray000,
         icon: nil,
         align: .left,
@@ -22,7 +22,7 @@ final class MovingTrackSheetView: UIView {
     )
     
     private let subtitleLabel = RLLabel(
-        text: "이날의 동선을 영상으로 간직하고 공유해 보세요!",
+        text: "이날의 동선을 영상으로 확인해 보세요!",
         textColor: .Gray100,
         icon: nil,
         align: .left,
@@ -34,23 +34,18 @@ final class MovingTrackSheetView: UIView {
         $0.tintColor = .white
     }
     
-    private let mapView = MKMapView().then {
+    let mapView = MKMapView().then {
         // 추가 delegate 설정 및 커스터마이징 가능
         $0.layer.cornerRadius = 16
         $0.clipsToBounds = true
     }
     
-    let saveButton = RLButton(title: "라이브러리에 저장하기", titleColor: .Gray900).then {
-        $0.configureBackgroundColor(.LightGreen)
-    }
-    
-    
+
     // MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
         setupLayout()
-        configure(with: dummyDisplayLog.date)
     }
     
     required init?(coder: NSCoder) {
@@ -62,7 +57,7 @@ final class MovingTrackSheetView: UIView {
         // UI 요소 추가
         backgroundColor = .Gray700
         
-        self.addSubviews(dateLabel, subtitleLabel, closeButton, mapView, saveButton)
+        self.addSubviews(dateLabel, subtitleLabel, closeButton, mapView)
     }
     
     // MARK: - Setup Layout
@@ -91,15 +86,9 @@ final class MovingTrackSheetView: UIView {
             make.top.equalTo(subtitleLabel.snp.bottom).offset(48)
             make.leading.trailing.equalToSuperview().inset(24)
             make.height.equalTo(mapView.snp.width).multipliedBy(498.0 / 392.0)
-        }
-        
-        // 저장하기 버튼
-        saveButton.snp.makeConstraints { make in
-            make.leading.trailing.equalToSuperview().inset(52)
-            make.height.equalTo(63)
-            // 바텀 마진
             make.bottom.equalTo(safeAreaLayoutGuide).offset(-60)
         }
+        
     }
     
     // MARK: - Configure
@@ -112,7 +101,20 @@ extension MovingTrackSheetView {
     /// 날짜를 받아서 dateLabel에 반영
     func configure(with date: Date) {
         let dateString = date.formattedString(.detailedFull)
+        print("MovingTrackSheetView configure 호출됨, 날짜: \(dateString)")
         dateLabel.label.text = dateString
     }
 }
 
+extension MovingTrackSheetView {
+    
+    // 메서드: MapOverlay 추가
+    func addMapOverlay(_ overlay: MKOverlay) {
+        mapView.addOverlay(overlay)
+    }
+    
+    // 메서드: 맵 영역 설정
+    func setMapRegion(_ region: MKCoordinateRegion, animated: Bool) {
+        mapView.setRegion(region, animated: animated)
+    }
+}

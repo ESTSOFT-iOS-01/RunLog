@@ -8,6 +8,8 @@
 import Foundation
 
 struct Constants {
+    static let levels = ["매우 쉬움", "쉬움", "보통", "어려움", "매우 어려움"]
+    
     static let allRoads: [Road] = [
         Road(name: "마라톤", distance: 42.195, icon: RLIcon.medal.name),
         Road(name: "서울둘레길", distance: 156.5, icon: RLIcon.flag.name),
