@@ -187,6 +187,13 @@ final class MediaUseCaseImpl: MediaUseCase {
                 }
             }
             
+            // 중심좌표 원 그리기 : 테스트용
+            let centerPoint = snapshot.point(for: centerCoordinate)
+            let radius: CGFloat = 3 // 원의 반지름 크기
+            let centerCircle = UIBezierPath(arcCenter: centerPoint, radius: radius, startAngle: 0, endAngle: .pi * 2, clockwise: true)
+            UIColor.red.setFill()
+            centerCircle.fill()
+            
             // 이미지 저장
             do {
                 try self.saveImageToDocuments(image: overlayImage, imageName: "route_image.png")
