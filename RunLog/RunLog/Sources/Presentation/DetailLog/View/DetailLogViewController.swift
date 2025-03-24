@@ -17,8 +17,6 @@ final class DetailLogViewController: UIViewController {
     private let viewModel: DetailLogViewModel
     private var cancellables = Set<AnyCancellable>()
     
-    let mediaUseCase = MediaUseCaseImpl()
-    
     private var recordDetails: [RecordDetail] = []
     
     /// 각 section에 해당하는 폴리라인 배열

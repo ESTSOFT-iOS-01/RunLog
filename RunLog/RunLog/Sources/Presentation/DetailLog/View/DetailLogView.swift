@@ -25,7 +25,7 @@ final class DetailLogView: UIView {
     let contentView = UIView().then { _ in }
     
     /// 지도 영역을 표시하는 MKMapView
-    let mapView = MKMapView().then {
+    private let mapView = MKMapView().then {
         // 추가 delegate 설정 및 커스터마이징 가능
         $0.layer.cornerRadius = 10
         $0.clipsToBounds = true
