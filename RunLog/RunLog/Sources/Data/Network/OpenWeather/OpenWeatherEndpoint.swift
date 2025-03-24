@@ -41,7 +41,7 @@ extension OpenWeatherEndpoint: TargetType {
                 parameters: [
                     "lat": lat,
                     "lon": lon,
-                    "appid": Bundle.main.weatherKey ?? ""
+                    "appid": Bundle.main.weatherKey
                 ],
                 encoding: URLEncoding.queryString)
         case .weather(let lat, let lon):
@@ -49,7 +49,7 @@ extension OpenWeatherEndpoint: TargetType {
                 parameters: [
                     "lat": lat,
                     "lon": lon,
-                    "appid": Bundle.main.weatherKey ?? "",
+                    "appid": Bundle.main.weatherKey,
                     "units": "metric",
                     "lang": "kr"
                 ],
