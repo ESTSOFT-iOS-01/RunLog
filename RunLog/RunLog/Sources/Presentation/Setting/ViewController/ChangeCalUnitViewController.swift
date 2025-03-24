@@ -59,9 +59,8 @@ final class ChangeCalUnitViewController: UIViewController {
         view.addSubview(calUnitView)
         
         calUnitView.snp.makeConstraints {
-            $0.horizontalEdges.equalToSuperview().inset(24)
-            $0.top.equalToSuperview().offset(130)
-            $0.bottom.equalToSuperview()
+            $0.horizontalEdges.equalToSuperview().inset(DynamicSize.scaledSize(24))
+            $0.verticalEdges.equalToSuperview()
         }
     }
     

@@ -52,14 +52,14 @@ final class SettingMenuCell: UITableViewCell {
     // MARK: - Setup Layout
     private func setupLayout() {
         titleLabel.snp.makeConstraints {
-            $0.leading.equalToSuperview().offset(4)
+            $0.leading.equalToSuperview().offset(DynamicSize.scaledSize(4))
             $0.centerY.equalToSuperview()
         }
         
         arrowImageView.snp.makeConstraints {
-            $0.trailing.equalToSuperview().inset(4)
+            $0.trailing.equalToSuperview().inset(DynamicSize.scaledSize(4))
             $0.centerY.equalToSuperview()
-            $0.height.equalTo(16)
+            $0.height.equalTo(DynamicSize.scaledSize(16))
         }
     }
     

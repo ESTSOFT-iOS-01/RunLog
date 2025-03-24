@@ -38,8 +38,8 @@ final class ChangeNicknameView: UIView {
     // MARK: - Setup Layout
     private func setupLayout() {
         nameField.snp.makeConstraints {
-            $0.top.leading.trailing.equalToSuperview()
-            $0.height.equalTo(64)
+            $0.leading.trailing.equalToSuperview()
+            $0.top.equalTo(safeAreaLayoutGuide).offset(DynamicSize.scaledSize(24))
         }
     }
     

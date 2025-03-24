@@ -60,22 +60,23 @@ final class CalUnitView: UIView {
     private func setupLayout() {
         // 레이아웃 설정
         exampleImageView.snp.makeConstraints {
-            $0.horizontalEdges.equalToSuperview().inset(24)
-            $0.top.equalToSuperview().inset(32)
+            $0.horizontalEdges.equalToSuperview().inset(DynamicSize.scaledSize(24))
+            $0.top.equalToSuperview().inset(DynamicSize.scaledSize(32))
         }
         
         despLabel.snp.makeConstraints {
-            $0.horizontalEdges.equalToSuperview().inset(24)
-            $0.bottom.equalToSuperview().inset(32)
+            $0.horizontalEdges.equalToSuperview().inset(DynamicSize.scaledSize(24))
+            $0.bottom.equalToSuperview().inset(DynamicSize.scaledSize(32))
         }
         
         exampleView.snp.makeConstraints {
-            $0.top.horizontalEdges.equalToSuperview()
+            $0.top.equalTo(safeAreaLayoutGuide).offset(DynamicSize.scaledSize(24))
+            $0.horizontalEdges.equalToSuperview()
             $0.height.equalTo(exampleImageView.snp.width).multipliedBy(256.0 / 393.0)
         }
         
         unitField.snp.makeConstraints {
-            $0.top.equalTo(exampleView.snp.bottom).offset(48)
+            $0.top.equalTo(exampleView.snp.bottom).offset(DynamicSize.scaledSize(48))
             $0.horizontalEdges.equalToSuperview()
         }
     }

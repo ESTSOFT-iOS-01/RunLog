@@ -55,8 +55,9 @@ final class MyPageViewController: UIViewController {
         // UI 요소 추가
         view.backgroundColor = .Gray900
         view.addSubview(mypageView)
+        
         mypageView.snp.makeConstraints {
-            $0.horizontalEdges.equalToSuperview().inset(24)
+            $0.horizontalEdges.equalToSuperview().inset(DynamicSize.scaledSize(24))
             $0.verticalEdges.equalToSuperview()
         }
     }

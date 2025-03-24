@@ -68,16 +68,16 @@ final class ProfileCardView: UIView {
         }
         
         propertyView.snp.makeConstraints {
-            $0.leading.equalToSuperview().offset(24)
-            $0.top.equalToSuperview().offset(16)
-            $0.trailing.lessThanOrEqualTo(iconImg.snp.leading).offset(-8)
-            $0.bottom.equalToSuperview().inset(16)
+            $0.leading.equalToSuperview().offset(DynamicSize.scaledSize(24))
+            $0.top.equalToSuperview().offset(DynamicSize.scaledSize(16))
+            $0.trailing.lessThanOrEqualTo(iconImg.snp.leading).offset(-DynamicSize.scaledSize(8))
+            $0.bottom.equalToSuperview().inset(DynamicSize.scaledSize(16))
         }
         
         iconImg.snp.makeConstraints {
             $0.centerY.equalToSuperview()
-            $0.trailing.equalToSuperview().inset(24)
-            $0.height.equalTo(32.0)
+            $0.trailing.equalToSuperview().inset(DynamicSize.scaledSize(24))
+            $0.height.equalTo(DynamicSize.scaledSize(32.0))
         }
         
     }
