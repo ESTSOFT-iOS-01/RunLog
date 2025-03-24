@@ -71,7 +71,7 @@ final class LogViewController: UIViewController {
     // MARK: - Setup Navigation Bar
     private func setupNavigationBar() {
         self.navigationController?.setupAppearance()
-        navigationItem.title = "LOGO"
+        self.navigationController?.setupLogoTitle()
     }
     
     // MARK: - Bind ViewModel
