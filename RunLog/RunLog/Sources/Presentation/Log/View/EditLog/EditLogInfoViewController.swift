@@ -39,12 +39,12 @@ final class EditLogInfoViewController: UIViewController {
         setupGesture()
         
         viewModel.bind()
-        setupData()
         bindViewModel()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        setupData()
         self.navigationController?.setNavigationBarHidden(false, animated: animated)
     }
     
