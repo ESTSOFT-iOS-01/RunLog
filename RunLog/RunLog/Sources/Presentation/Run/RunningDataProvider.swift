@@ -310,7 +310,7 @@ extension RunningDataProvider {
             
             if let dayLog = try await dayLogUseCase.getDayLogByDate(Date()) {
                 let datas = mediaUseCase.convertSectionsToCoordinates(sections: dayLog.sections)
-                do{
+                do {
                     let trackImage = try await mediaUseCase.setRouteImage(route: datas)
                     try await dayLogUseCase.updateTrackImageByDate(Date(), image: trackImage)
                 } catch {

@@ -15,7 +15,7 @@ class CalendarViewCell: UICollectionViewCell {
     
     private var dayLabel = UILabel().then {
         $0.attributedText = .RLAttributedString(
-            text: "",
+            text: "1",
             font: .Label2,
             color: .Gray000
         )
@@ -49,7 +49,7 @@ class CalendarViewCell: UICollectionViewCell {
     // MARK: - Setup Layout
     private func setupLayout() {
         dayLabel.snp.makeConstraints {
-            $0.height.equalTo(19)
+            $0.height.equalTo(DynamicSize.scaledSize(19))
             $0.top.equalToSuperview()
             $0.centerX.equalToSuperview()
         }

@@ -304,7 +304,7 @@ extension DetailLogView {
         locationLabel.label.text = log.locationName
         
         // 날씨 업데이트 (예: "맑음 | 20°C")
-        weatherLabel.label.text = "\(log.weather) | \(log.temperature)°C"
+        weatherLabel.label.text = "\(log.weather) | \(String(format: "%.1f", log.temperature))°C"
         
         // 난이도 업데이트
         conditionLabel.label.text = log.level
