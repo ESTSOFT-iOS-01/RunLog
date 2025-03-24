@@ -142,7 +142,6 @@ class TimelineHeaderView: UITableViewHeaderFooterView {
     // MARK: - Setup Layout
     private func setupLayout() {
         headerLabel.snp.makeConstraints {
-            $0.height.equalTo(DynamicSize.scaledSize(32))
             $0.leading.equalToSuperview()
             $0.top.equalToSuperview().offset(DynamicSize.scaledSize(24))
             $0.bottom.equalToSuperview().offset(DynamicSize.scaledSize(-16))

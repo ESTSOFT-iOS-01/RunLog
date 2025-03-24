@@ -61,9 +61,4 @@ final class TimelineView: UIView {
             $0.horizontalEdges.equalToSuperview().inset(DynamicSize.scaledSize(24))
         }
     }
-    
-    // MARK: - Configure
-    private func configure() {
-        // 뷰 설정
-    }
 }
