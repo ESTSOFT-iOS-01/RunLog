@@ -80,31 +80,41 @@ final class RunHomeViewController: UIViewController {
         // UI 요소 추가
         view.backgroundColor = .systemBackground
         view.addSubviews(mapView, blurView, totalLabel, weatherLabel, locationLabel, startButton)
-        // 상단 레이블
+        
+        // 맵뷰
+        mapView.snp.makeConstraints {
+            $0.top.leading.trailing.equalToSuperview()
+            $0.bottom.equalTo(view.safeAreaLayoutGuide)
+        }
+        
+        // Road 정보
         totalLabel.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide).offset(DynamicSize.scaledSize(36))
             $0.leading.equalTo(view.safeAreaLayoutGuide).offset(DynamicSize.scaledSize(36))
         }
+        
+        // 날씨 정보
         weatherLabel.snp.makeConstraints {
             $0.top.equalTo(totalLabel.snp.bottom).offset(DynamicSize.scaledSize(8))
             $0.leading.equalTo(totalLabel)
         }
-        // 맵킷
-        mapView.snp.makeConstraints {
-            $0.top.bottom.leading.trailing.equalToSuperview()
-        }
-        blurView.snp.makeConstraints {
-            $0.top.bottom.leading.trailing.equalTo(mapView)
-        }
+        
         // 운동 시작 버튼
         startButton.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(DynamicSize.scaledSize(52))
             $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(DynamicSize.scaledSize(40))
         }
+        
         // 위치 레이블
         locationLabel.snp.makeConstraints {
             $0.bottom.equalTo(startButton.snp.top).offset(-DynamicSize.scaledSize(9))
             $0.centerX.equalToSuperview()
+        }
+        
+        // 블러 뷰
+        blurView.snp.makeConstraints {
+            $0.top.bottom.equalTo(view.safeAreaLayoutGuide)
+            $0.leading.trailing.equalToSuperview()
         }
     }
     
