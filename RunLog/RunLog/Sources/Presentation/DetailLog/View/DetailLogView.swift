@@ -326,7 +326,6 @@ extension DetailLogView {
     /// 맵뷰 영역 설정
     func setMapRegion(_ region: MKCoordinateRegion, animated: Bool) {
         mapView.setRegion(region, animated: animated)
-    
     }
     
     func removeAllMapOverlays() {
