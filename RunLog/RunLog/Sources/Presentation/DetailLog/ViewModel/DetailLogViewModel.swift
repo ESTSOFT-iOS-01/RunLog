@@ -12,7 +12,7 @@ import Combine
 final class DetailLogViewModel {
     
     // MARK: - Properties
-        let date: Date
+    let date: Date
 
     
     // MARK: - Input & Output
