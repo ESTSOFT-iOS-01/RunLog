@@ -97,6 +97,9 @@ final class MovingTrackSheetViewController: UIViewController {
     private func setupMapView() {
         let mapView = sheetView.mapView
         
+        // 사용자 상호작용 모두 비활성화
+        mapView.isUserInteractionEnabled = false
+        
         // 1) 건물 표시 (3D 데이터가 있는 지역에서만 보임)
         mapView.showsBuildings = true
         

@@ -61,6 +61,8 @@ final class DetailLogViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        viewModel.refreshDayLog()
+        refreshUI()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -118,6 +120,18 @@ final class DetailLogViewController: UIViewController {
                 self.present(sheetVC, animated: true)
             }
             .store(in: &cancellables)
+        
+        // 통계 스택 탭 시 전체 경로 줌아웃 처리
+        let statsTapGesture = UITapGestureRecognizer()
+        detailLogView.statsStack.addGestureRecognizer(statsTapGesture)
+        
+        statsTapGesture.tapPublisher
+            .sink { [weak self] _ in
+                guard let self = self, let dayLog = self.currentDayLog else { return }
+                self.zoomToAllPoints(dayLog: dayLog) // 전체 경로로 줌아웃
+            }
+            .store(in: &cancellables)
+        
     }
     
     
@@ -131,6 +145,19 @@ final class DetailLogViewController: UIViewController {
                 switch output {
                 case .loadedDayLog(let dayLog):
                     self.currentDayLog = dayLog
+                    
+                    // 첫 지점의 timestamp 기준으로 각 섹션 정렬 (최신순: 내림차순)
+                    let sortedSections = dayLog.sections.sorted { lhsSection, rhsSection in
+                        let lhsStartTime = lhsSection.route.sorted { $0.timestamp < $1.timestamp }
+                            .first?.timestamp ?? Date.distantPast
+                        let rhsStartTime = rhsSection.route.sorted { $0.timestamp < $1.timestamp }
+                            .first?.timestamp ?? Date.distantPast
+                        
+                        return lhsStartTime > rhsStartTime
+                    }
+                    
+                    self.recordDetails = sortedSections.map { RecordDetail(from: $0) }
+                    
                     
                     self.detailLogView.configure(with: DisplayDayLog(from: dayLog))
                     self.recordDetails = dayLog.sections.map {
@@ -202,6 +229,14 @@ final class DetailLogViewController: UIViewController {
     private func updateNavigationTitle(with date: Date) {
         self.title = date.formattedString(.monthDay)
     }
+    
+    private func refreshUI() {
+        guard let dayLog = currentDayLog else { return }
+        detailLogView.configure(with: DisplayDayLog(from: dayLog))
+        recordDetails = dayLog.sections.map { RecordDetail(from: $0) }
+        detailLogView.recordDetailView.tableView.reloadData()
+        setupMapView(with: dayLog)
+    }
 }
 
 // MARK: - UITableViewDataSource, UITableViewDelegate
@@ -252,21 +287,35 @@ extension DetailLogViewController: UITableViewDataSource, UITableViewDelegate {
         guard indexPath.row > 0 else { return }
         
         let newSelectionIndex = indexPath.row - 1
+        let previousSelection = selectedSectionIndex
         
-        // 이미 선택된 section이 있고, 다른 셀을 선택한 경우
-        if let currentSelected = selectedSectionIndex, currentSelected != newSelectionIndex {
-            // 1. 기존 선택 해제 후 전체 경로(zoomAll)로 줌 처리
+        if let previous = previousSelection, previous != newSelectionIndex {
+            // 다른 셀을 선택한 경우: 기존 선택 해제 후 전체 경로 줌 (줌 아웃)
             selectedSectionIndex = nil
             tableView.reloadData()
+            
+            // 줌 아웃 전에 오버레이 업데이트
+            detailLogView.removeAllMapOverlays()
+            for polyline in polylineOverlays {
+                detailLogView.addMapOverlay(polyline)
+            }
+            
             if let dayLog = currentDayLog {
                 zoomToAllPoints(dayLog: dayLog)
             }
             
-            // 2. 약간의 딜레이 후 새 선택 section 줌 처리
+            // 약간의 딜레이 후 새 선택 셀 줌 (줌 인)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
                 guard let self = self else { return }
                 self.selectedSectionIndex = newSelectionIndex
                 tableView.reloadData()
+                
+                // 줌 인 전에 오버레이 업데이트
+                self.detailLogView.removeAllMapOverlays()
+                for polyline in self.polylineOverlays {
+                    self.detailLogView.addMapOverlay(polyline)
+                }
+                
                 if let dayLog = self.currentDayLog,
                    dayLog.sections.indices.contains(newSelectionIndex) {
                     let selectedSection = dayLog.sections[newSelectionIndex]
@@ -274,22 +323,23 @@ extension DetailLogViewController: UITableViewDataSource, UITableViewDelegate {
                 }
             }
         } else {
-            // 처음 선택하거나 동일한 셀 재선택인 경우 바로 줌 처리
+            // 동일한 셀을 선택한 경우 즉시 줌 처리
             selectedSectionIndex = newSelectionIndex
             tableView.reloadData()
-            if let dayLog = currentDayLog, dayLog.sections.indices.contains(newSelectionIndex) {
+            
+            // 줌 처리 전에 오버레이 업데이트
+            detailLogView.removeAllMapOverlays()
+            for polyline in polylineOverlays {
+                detailLogView.addMapOverlay(polyline)
+            }
+            
+            if let dayLog = currentDayLog,
+               dayLog.sections.indices.contains(newSelectionIndex) {
                 let selectedSection = dayLog.sections[newSelectionIndex]
                 zoomToRoute(route: selectedSection.route)
             }
         }
-        
-        // 맵뷰 오버레이 업데이트 (필요 시)
-        detailLogView.removeAllMapOverlays()
-        for polyline in polylineOverlays {
-            detailLogView.addMapOverlay(polyline)
-        }
     }
-    
 }
 
 
