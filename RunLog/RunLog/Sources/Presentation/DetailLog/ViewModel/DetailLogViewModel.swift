@@ -113,4 +113,8 @@ final class DetailLogViewModel {
     func deleteDayLog() async throws {
             try await dayLogUseCase.deleteDayLogByDate(date)
         }
+    
+    func refreshDayLog() {
+            loadTargetDayLog(date: date)
+        }
 }

@@ -61,6 +61,8 @@ final class DetailLogViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        viewModel.refreshDayLog()
+        refreshUI()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -201,6 +203,14 @@ final class DetailLogViewController: UIViewController {
     
     private func updateNavigationTitle(with date: Date) {
         self.title = date.formattedString(.monthDay)
+    }
+    
+    private func refreshUI() {
+        guard let dayLog = currentDayLog else { return }
+        detailLogView.configure(with: DisplayDayLog(from: dayLog))
+        recordDetails = dayLog.sections.map { RecordDetail(from: $0) }
+        detailLogView.recordDetailView.tableView.reloadData()
+        setupMapView(with: dayLog)
     }
 }
 
