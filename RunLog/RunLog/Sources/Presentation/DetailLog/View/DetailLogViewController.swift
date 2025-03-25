@@ -275,33 +275,35 @@ extension DetailLogViewController: UITableViewDataSource, UITableViewDelegate {
         guard indexPath.row > 0 else { return }
         
         let newSelectionIndex = indexPath.row - 1
-        // 이전 선택값을 임시 변수에 저장
         let previousSelection = selectedSectionIndex
         
-        // 즉시 선택된 셀 색상 변경
-        selectedSectionIndex = newSelectionIndex
-        tableView.reloadData()
-        
-        // 맵 오버레이 업데이트
-        detailLogView.removeAllMapOverlays()
-        for polyline in polylineOverlays {
-            detailLogView.addMapOverlay(polyline)
-        }
-        
-        // 만약 이미 선택된 섹션이 있고, 다른 셀을 선택한 경우
         if let previous = previousSelection, previous != newSelectionIndex {
-            // 기존 선택 해제 후 전체 경로로 줌 처리
+            // 다른 셀을 선택한 경우: 기존 선택 해제 후 전체 경로 줌 (줌 아웃)
             selectedSectionIndex = nil
             tableView.reloadData()
+            
+            // 줌 아웃 전에 오버레이 업데이트
+            detailLogView.removeAllMapOverlays()
+            for polyline in polylineOverlays {
+                detailLogView.addMapOverlay(polyline)
+            }
+            
             if let dayLog = currentDayLog {
                 zoomToAllPoints(dayLog: dayLog)
             }
             
-            // 약간의 딜레이 후 새 선택 섹션 줌 처리
+            // 약간의 딜레이 후 새 선택 셀 줌 (줌 인)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
                 guard let self = self else { return }
                 self.selectedSectionIndex = newSelectionIndex
                 tableView.reloadData()
+                
+                // 줌 인 전에 오버레이 업데이트
+                self.detailLogView.removeAllMapOverlays()
+                for polyline in self.polylineOverlays {
+                    self.detailLogView.addMapOverlay(polyline)
+                }
+                
                 if let dayLog = self.currentDayLog,
                    dayLog.sections.indices.contains(newSelectionIndex) {
                     let selectedSection = dayLog.sections[newSelectionIndex]
@@ -309,14 +311,23 @@ extension DetailLogViewController: UITableViewDataSource, UITableViewDelegate {
                 }
             }
         } else {
-            // 처음 선택하거나 동일한 셀 재선택인 경우 바로 줌 처리
-            if let dayLog = currentDayLog, dayLog.sections.indices.contains(newSelectionIndex) {
+            // 동일한 셀을 선택한 경우 즉시 줌 처리
+            selectedSectionIndex = newSelectionIndex
+            tableView.reloadData()
+            
+            // 줌 처리 전에 오버레이 업데이트
+            detailLogView.removeAllMapOverlays()
+            for polyline in polylineOverlays {
+                detailLogView.addMapOverlay(polyline)
+            }
+            
+            if let dayLog = currentDayLog,
+               dayLog.sections.indices.contains(newSelectionIndex) {
                 let selectedSection = dayLog.sections[newSelectionIndex]
                 zoomToRoute(route: selectedSection.route)
             }
         }
     }
-    
 }
 
 
