@@ -26,7 +26,22 @@ extension DisplayDayLog {
     init(from dayLog: DayLog) {
         self.date = dayLog.date
         let splitted = dayLog.locationName.split(separator: " ").map { String($0) }
-        self.locationName =  splitted[1]
+        if splitted.isEmpty {
+            self.locationName = ""
+        } else {
+            let first = splitted[0]
+            if first.hasSuffix("시") {
+                // 첫 번째 토큰이 "시"로 끝나면 첫 번째 토큰만 사용
+                self.locationName = first
+            } else {
+                // 그렇지 않으면, 두 번째 토큰까지 합쳐서 사용 (단, 두 번째 토큰이 없으면 첫 번째 토큰만 사용)
+                if splitted.count >= 2 {
+                    self.locationName = "\(first) \(splitted[1])"
+                } else {
+                    self.locationName = first
+                }
+            }
+        }
         self.weather = Constants.WeatherCondition.from(dayLog.weather).description
         self.temperature = dayLog.temperature
         self.title = dayLog.title
