@@ -160,82 +160,50 @@
 ## 📁 Foldering Convention 📁
 ```markdown
 📦RunLog
- ┣ 📂RpTest
- ┣ 📂RunLog
- ┃ ┣ 📂Resources
- ┃ ┃ ┣ 📂DesignSystem
- ┃ ┃ ┗ 📂Fonts
- ┃ ┣ 📂Sources
- ┃ ┃ ┣ 📂App
- ┃ ┃ ┣ 📂Data
- ┃ ┃ ┃ ┣ 📂DTO
- ┃ ┃ ┃ ┣ 📂Impl
- ┃ ┃ ┃ ┗ 📂Network
- ┃ ┃ ┃   ┗ 📂OpenWeather
- ┃ ┃ ┣ 📂Domain
- ┃ ┃ ┃ ┣ 📂Entity
- ┃ ┃ ┃ ┣ 📂Repository
- ┃ ┃ ┃ ┣ 📂UseCase
- ┃ ┃ ┃ ┗ 📂UseCaseImpl
- ┃ ┃ ┣ 📂Presentation
- ┃ ┃ ┃ ┣ 📂Common
- ┃ ┃ ┃ ┃ ┣ 📂Coordinator
- ┃ ┃ ┃ ┃ ┗ 📂View
- ┃ ┃ ┃ ┣ 📂DetailLog
- ┃ ┃ ┃ ┃ ┣ 📂Model
- ┃ ┃ ┃ ┃ ┣ 📂View
- ┃ ┃ ┃ ┃ ┗ 📂ViewModel
- ┃ ┃ ┃ ┣ 📂Log
- ┃ ┃ ┃ ┃ ┣ 📂Component
- ┃ ┃ ┃ ┃ ┣ 📂Coordinator
- ┃ ┃ ┃ ┃ ┣ 📂View
- ┃ ┃ ┃ ┃ ┃ ┣ 📂Calendar
- ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📂Model
- ┃ ┃ ┃ ┃ ┃ ┣ 📂EditLog
- ┃ ┃ ┃ ┃ ┃ ┗ 📂Timeline
- ┃ ┃ ┃ ┃ ┗ 📂ViewModel
- ┃ ┃ ┃ ┣ 📂Run
- ┃ ┃ ┃ ┃ ┣ 📂View
- ┃ ┃ ┃ ┃ ┃ ┣ 📜CardElementView.swift
- ┃ ┃ ┃ ┃ ┃ ┣ 📜CardView.swift
- ┃ ┃ ┃ ┃ ┃ ┣ 📜MapBlurView.swift
- ┃ ┃ ┃ ┃ ┃ ┣ 📜RunHomeViewController.swift
- ┃ ┃ ┃ ┃ ┃ ┗ 📜RunningViewController.swift
- ┃ ┃ ┃ ┃ ┗ 📂ViewModel
- ┃ ┃ ┃ ┗ 📂Setting
- ┃ ┃ ┃ ┃ ┣ 📂Coordinator
- ┃ ┃ ┃ ┃ ┣ 📂Model
- ┃ ┃ ┃ ┃ ┣ 📂View
- ┃ ┃ ┃ ┃ ┣ 📂ViewController
- ┃ ┃ ┃ ┃ ┗ 📂ViewModel
- ┃ ┃ ┗ 📂Util
- ┃ ┃ ┃ ┣ 📂Constant
- ┃ ┃ ┃ ┗ 📂Extension
- ┃ ┃ ┃ ┃ 
- ┃ ┃ ┃ ┃ 
- ┃ ┃ ┃ ┃ 
- ┃ ┃ ┃ ┃ 
- ┃ ┃ ┃ ┃ 
- ┃ ┃ ┃ ┃ 
- ┃ ┃ ┃ ┃ 
- ┃ ┃ ┃ ┃ 
- ┃ ┗ 📜Info.plist
- ┣ 📂RunLog.xcodeproj
- ┃ ┣ 📂project.xcworkspace
- ┃ ┃ ┣ 📂xcshareddata
- ┃ ┃ ┃ ┗ 📂swiftpm
- ┃ ┃ ┃ ┃ ┣ 📂configuration
- ┃ ┃ ┃ ┃ ┃ ┗ 📜.gitkeep
- ┃ ┃ ┃ ┃ ┗ 📜Package.resolved
- ┃ ┃ ┣ 📂xcuserdata
- ┃ ┃ ┃ ┗ 📂simgeun-ung.xcuserdatad
- ┃ ┃ ┃ ┃ ┗ 📜UserInterfaceState.xcuserstate
- ┃ ┃ ┗ 📜contents.xcworkspacedata
- ┃ ┣ 📂xcshareddata
- ┃ ┃ ┗ 📂xcschemes
- ┃ ┃ ┃ ┗ 📜RunLog.xcscheme
- ┃ ┗ 📜project.pbxproj
- ┗ 📜Secrets.xcconfig
+ ┗ 📂RunLog
+   ┣ 📂Resources
+   ┃ ┣ 📂DesignSystem
+   ┃ ┗ 📂Fonts
+   ┗ 📂Sources
+     ┣ 📂App
+     ┣ 📂Data
+     ┃ ┣ 📂DTO
+     ┃ ┣ 📂Impl
+     ┃ ┗ 📂Network
+     ┃   ┗ 📂OpenWeather
+     ┣ 📂Domain
+     ┃ ┣ 📂Entity
+     ┃ ┣ 📂Repository
+     ┃ ┣ 📂UseCase
+     ┃ ┗ 📂UseCaseImpl
+     ┣ 📂Presentation
+     ┃ ┣ 📂Common
+     ┃ ┣ 📂Coordinator
+     ┃ ┃ ┗ 📂View
+     ┃ ┣ 📂DetailLog
+     ┃ ┃ ┣ 📂Model
+     ┃ ┃ ┣ 📂View
+     ┃ ┃ ┗ 📂ViewModel
+     ┃ ┣ 📂Log
+     ┃ ┃ ┣ 📂Component
+     ┃ ┃ ┣ 📂Coordinator
+     ┃ ┃ ┣ 📂View
+     ┃ ┃ ┃ ┣ 📂Calendar
+     ┃ ┃ ┃ ┃ ┗ 📂Model
+     ┃ ┃ ┃ ┣ 📂EditLog
+     ┃ ┃ ┃ ┗ 📂Timeline
+     ┃ ┃ ┗ 📂ViewModel
+     ┃ ┣ 📂Run
+     ┃ ┃ ┣ 📂View
+     ┃ ┃ ┗ 📂ViewModel
+     ┃ ┗ 📂Setting
+     ┃   ┣ 📂Model
+     ┃   ┣ 📂View
+     ┃   ┣ 📂ViewController
+     ┃   ┗ 📂ViewModel
+     ┗ 📂Util
+      ┣ 📂Constant
+      ┗ 📂Extension
 ```
 
 ## 🔥 Trouble Shooting 🔥
