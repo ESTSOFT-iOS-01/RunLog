@@ -176,7 +176,7 @@ final class DetailLogView: UIView {
         return stack
     }()
     
-    private lazy var statsStack: UIStackView = {
+    lazy var statsStack: UIStackView = {
         let stack = UIStackView(arrangedSubviews: [timeStack, distanceStack, stepsStack])
         stack.axis = .horizontal
         stack.alignment = .leading

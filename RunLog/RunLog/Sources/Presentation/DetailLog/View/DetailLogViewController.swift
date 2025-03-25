@@ -120,6 +120,18 @@ final class DetailLogViewController: UIViewController {
                 self.present(sheetVC, animated: true)
             }
             .store(in: &cancellables)
+        
+        // 통계 스택 탭 시 전체 경로 줌아웃 처리
+        let statsTapGesture = UITapGestureRecognizer()
+        detailLogView.statsStack.addGestureRecognizer(statsTapGesture)
+        
+        statsTapGesture.tapPublisher
+            .sink { [weak self] _ in
+                guard let self = self, let dayLog = self.currentDayLog else { return }
+                self.zoomToAllPoints(dayLog: dayLog) // 전체 경로로 줌아웃
+            }
+            .store(in: &cancellables)
+        
     }
     
     
