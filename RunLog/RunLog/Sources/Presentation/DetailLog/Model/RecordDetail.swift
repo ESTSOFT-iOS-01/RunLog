@@ -17,9 +17,10 @@ struct RecordDetail {
 extension RecordDetail {
     /// Section 데이터를 기반으로 RecordDetail 생성
     init(from section: Section) {
-        // route의 첫번째와 마지막 timestamp를 이용하여 timeRange 생성
-        let startTime = section.route.first?.timestamp
-        let endTime = section.route.last?.timestamp
+        // route 배열을 timestamp 기준으로 정렬
+        let sortedRoute = section.route.sorted { $0.timestamp < $1.timestamp }
+        let startTime = sortedRoute.first?.timestamp
+        let endTime = sortedRoute.last?.timestamp
         let timeRange: String
         if let start = startTime, let end = endTime {
             let formatter = DateFormatter()
@@ -35,3 +36,4 @@ extension RecordDetail {
         self.route = section.route
     }
 }
+
