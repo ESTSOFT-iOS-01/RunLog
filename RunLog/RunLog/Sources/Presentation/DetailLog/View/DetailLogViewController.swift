@@ -134,6 +134,19 @@ final class DetailLogViewController: UIViewController {
                 case .loadedDayLog(let dayLog):
                     self.currentDayLog = dayLog
                     
+                    // 첫 지점의 timestamp 기준으로 각 섹션 정렬 (최신순: 내림차순)
+                    let sortedSections = dayLog.sections.sorted { lhsSection, rhsSection in
+                        let lhsStartTime = lhsSection.route.sorted { $0.timestamp < $1.timestamp }
+                            .first?.timestamp ?? Date.distantPast
+                        let rhsStartTime = rhsSection.route.sorted { $0.timestamp < $1.timestamp }
+                            .first?.timestamp ?? Date.distantPast
+                        
+                        return lhsStartTime > rhsStartTime
+                    }
+                    
+                    self.recordDetails = sortedSections.map { RecordDetail(from: $0) }
+                    
+                    
                     self.detailLogView.configure(with: DisplayDayLog(from: dayLog))
                     self.recordDetails = dayLog.sections.map {
                         RecordDetail(from: $0)
