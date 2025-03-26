@@ -1,9 +1,9 @@
 <div align=center>
 
 # RunLog
-### **야외 운동 시 거리와 걸음수를 측정하고 기록을 공유하여 재미를 더하는 서비스**
+### **야외 운동 시 위치 기반으로 경로를 기록하고, 그 순간을 이미지로 남기는 러닝 기록 서비스**
 
-사용자의 야외 운동 데이터를 기반으로 거리, 걸음 수를 측정하고 경로를 시각적으로 표현해줍니다. 나아가, 이 기록을 바탕으로 무빙트랙 영상까지 자동 생성해 누구나 쉽게 공유하고 재미를 느낄 수 있는 서비스입니다.
+사용자의 야외 운동 데이터를 기반으로 거리, 걸음 수를 측정하고 경로를 시각적으로 표현해줍니다. 나아가, 이 기록을 바탕으로 무빙트랙 영상을 확인하고 트랙 이미지를 자동 생성해 누구나 쉽게 공유하고 재미를 느낄 수 있는 서비스입니다.
 
 [📑 RunLog FigJam 📑](https://www.figma.com/board/zYmssJJqQJ7GctcqUV3Jo4/%EB%B8%8C%EB%A0%88%EC%9D%B8%EC%8A%A4%ED%86%A0%EB%B0%8D?node-id=64-408&t=b1natT9ZZemZOsmq-0)
 
@@ -21,10 +21,10 @@
 
 <table>
   <tr>
-    <td align="center">타이머</td>
-    <td align="center">통계</td>
-    <td align="center">투두리스트</td>
-    <td align="center">세팅</td>
+    <td align="center">러닝</td>
+    <td align="center">기록</td>
+    <td align="center">상세 기록</td>
+    <td align="center">마이</td>
   </tr>
   <tr>
     <td>
@@ -47,13 +47,13 @@
 ![Xcode](https://img.shields.io/badge/Xcode-007ACC?style=for-the-badge&logo=Xcode&logoColor=white)
 
 ## 🥞 Stacks 🥞
-| Name          | Description   |
-| ------------  | ------------- |
-| <img src="https://img.shields.io/badge/Swift-F05138?style=flat&logo=Swift&logoColor=white"> | iOS 앱의 UI를 구축하고 사용자 인터페이스를 관리하는 기본 프레임워크.|
-| <img src="https://img.shields.io/badge/-Git-F05032?style=flat&logo=git&logoColor=white"> | 분산 버전 관리 시스템으로, 코드 히스토리 관리와 협업을 효율적으로 지원.|
-| <img src="https://img.shields.io/badge/-Notion-000000?style=flat&logo=notion&logoColor=white"> | 작업 관리 및 문서화를 위한 통합 협업 도구.|
-| <img src="https://img.shields.io/badge/-figma-5856D6?style=flat&logo=figma&logoColor=white"> | 피그마 |
-| <img src="https://img.shields.io/badge/Swift-252323?style=flat&logo=Swift&logoColor=white"> | iOS 로컬 데이터 관리를 위한 DB 프레임워크.|
+### Tech Stack
+<img src="https://github.com/user-attachments/assets/d69d6c63-662a-4781-8f79-c25b6b3a1844" width="50"> <img src="https://github.com/user-attachments/assets/d7d1746b-b996-44e0-95e7-dad3d4eb10b3" width="50"> <img src="https://github.com/user-attachments/assets/b939216b-81c6-4fb2-98c4-55835898a116" width="50"> <img src="https://github.com/user-attachments/assets/36967f6a-4960-4919-8bcf-11a59f117641" width="50"> <img src="https://github.com/user-attachments/assets/ff75aee9-c30c-4fc0-967d-b20d38b73a2e" width="50"> <img src="https://github.com/user-attachments/assets/1015396c-3bb4-4709-b718-d2a228b0b51a" width="50"> <img src="https://github.com/user-attachments/assets/689a08fc-91cd-4586-8a4d-dba8f830662c" width="50"> <img src="https://github.com/user-attachments/assets/622d907e-a121-40f3-894f-06f98b980c07" width="50">
+### Library & API
+<img src="https://github.com/user-attachments/assets/d377643f-3a73-4316-b84c-78a61c8d762d" width="50"> <img src="https://github.com/user-attachments/assets/da6785ff-6bba-4913-8fd4-7a984aaa5da1" width="50"> <img src="https://github.com/user-attachments/assets/30f4eabb-a01a-4284-b158-03e339c9fff3" width="50"> <img src="https://github.com/user-attachments/assets/fececa85-34ff-460b-961e-9e42931c45fd" width="50"> <img src="https://github.com/user-attachments/assets/8a1f2364-ff23-4e94-bba5-3f92a155f1e5" width="50">
+### Tools
+<img src="https://img.shields.io/badge/-Github-181717?style=flat&logo=github&logoColor=white"> <img src="https://img.shields.io/badge/-Git-F05032?style=flat&logo=git&logoColor=white"> <img src="https://img.shields.io/badge/-figma-5856D6?style=flat&logo=figma&logoColor=white"> <img src="https://img.shields.io/badge/-Notion-000000?style=flat&logo=notion&logoColor=white"> <img src="https://img.shields.io/badge/Discord-5865F2?style=flat&logo=Discord&logoColor=white">
+
 
 ## ✏️ Project Design ✏️
 ![프로젝트 아키텍쳐](https://github.com/user-attachments/assets/56edce6a-8ff1-4fdf-83f5-5cb8029031f5)
@@ -159,7 +159,51 @@
 ---
 ## 📁 Foldering Convention 📁
 ```markdown
-📦 RunLog
+📦RunLog
+ ┗ 📂RunLog
+   ┣ 📂Resources
+   ┃ ┣ 📂DesignSystem
+   ┃ ┗ 📂Fonts
+   ┗ 📂Sources
+     ┣ 📂App
+     ┣ 📂Data
+     ┃ ┣ 📂DTO
+     ┃ ┣ 📂Impl
+     ┃ ┗ 📂Network
+     ┃   ┗ 📂OpenWeather
+     ┣ 📂Domain
+     ┃ ┣ 📂Entity
+     ┃ ┣ 📂Repository
+     ┃ ┣ 📂UseCase
+     ┃ ┗ 📂UseCaseImpl
+     ┣ 📂Presentation
+     ┃ ┣ 📂Common
+     ┃ ┣ 📂Coordinator
+     ┃ ┃ ┗ 📂View
+     ┃ ┣ 📂DetailLog
+     ┃ ┃ ┣ 📂Model
+     ┃ ┃ ┣ 📂View
+     ┃ ┃ ┗ 📂ViewModel
+     ┃ ┣ 📂Log
+     ┃ ┃ ┣ 📂Component
+     ┃ ┃ ┣ 📂Coordinator
+     ┃ ┃ ┣ 📂View
+     ┃ ┃ ┃ ┣ 📂Calendar
+     ┃ ┃ ┃ ┃ ┗ 📂Model
+     ┃ ┃ ┃ ┣ 📂EditLog
+     ┃ ┃ ┃ ┗ 📂Timeline
+     ┃ ┃ ┗ 📂ViewModel
+     ┃ ┣ 📂Run
+     ┃ ┃ ┣ 📂View
+     ┃ ┃ ┗ 📂ViewModel
+     ┃ ┗ 📂Setting
+     ┃   ┣ 📂Model
+     ┃   ┣ 📂View
+     ┃   ┣ 📂ViewController
+     ┃   ┗ 📂ViewModel
+     ┗ 📂Util
+      ┣ 📂Constant
+      ┗ 📂Extension
 ```
 
 ## 🔥 Trouble Shooting 🔥
