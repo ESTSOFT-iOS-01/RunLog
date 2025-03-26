@@ -18,7 +18,6 @@
 <br/>
 
 ## 🎥 주요 기능 시연 영상
-
 <table>
   <tr>
     <td align="center">러닝</td>
@@ -28,16 +27,16 @@
   </tr>
   <tr>
     <td>
-      <img src="" width="200">
+      <img src="https://github.com/user-attachments/assets/5595f660-f1fd-4a3d-a8d6-d2daf4f32fb7" width="200">
     </td>
     <td>
-      <img src="" width="200">
+      <img src="https://github.com/user-attachments/assets/f6ad80b8-7ebf-419c-a204-a95dfdd3dc56" width="240">
     </td>
     <td>
-      <img src="" width="200">
+      <img src="https://github.com/user-attachments/assets/01aa60b9-a5b8-49ae-bffa-b9d52cce129e" width="240">
     </td>
     <td>
-      <img src="" width="200">
+      <img src="https://github.com/user-attachments/assets/26e4ce1e-9913-4db9-8a35-bfffabea2573" width="240">
     </td>
   </tr>
 </table>
