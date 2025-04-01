@@ -128,7 +128,7 @@ extension TimelineViewController: UITableViewDelegate, UITableViewDataSource {
         let key = viewModel.output.sortedKeys.value[indexPath.section]
         if let dayLogs = viewModel.output.groupedDayLogs.value[key] {
             let dayLog = dayLogs[indexPath.row]
-            viewModel.send(.cellTapped(date: dayLog.date))
+            viewModel.input.send(.cellTapped(date: dayLog.date))
         }
         
     }

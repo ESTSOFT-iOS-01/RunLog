@@ -30,7 +30,7 @@ final class LogViewController: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        logViewModel.send(.viewWillAppear)
+        logViewModel.input.send(.viewWillAppear)
     }
 
     override func viewWillDisappear(_ animated: Bool) {

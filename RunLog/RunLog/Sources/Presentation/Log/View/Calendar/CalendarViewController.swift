@@ -229,7 +229,7 @@ extension CalendarViewController: UICollectionViewDelegate, UICollectionViewData
 
         // 3. 최종 Date 만들기
         if let date = calendar.date(from: finalComponents) {
-            viewModel.send(.cellTapped(date: date))
+            viewModel.input.send(.cellTapped(date: date))
         }
     }
     
