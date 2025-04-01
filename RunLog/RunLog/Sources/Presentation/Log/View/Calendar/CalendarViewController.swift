@@ -18,6 +18,8 @@ final class CalendarViewController: UIViewController {
     
     // 화면에 표시되고 있는 달력의 년, 월이 들어간 딕셔너리의 키 인덱스
     private var currentKeyIndex = 0
+    // 캘린더에 표시되고 있는 달력 년,월
+    private var currentYearMonth: Date = Date()
     // 캘린더에 표시되고 있는 하루하루의 데이터
     private var currentMonthDays: [CalendarDay] = []
     
@@ -73,38 +75,51 @@ final class CalendarViewController: UIViewController {
                 guard let self = self else { return }
                 
                 // 1. 년/월의 정보가 들어있는 키가 들어있는 배열의 크기를 가져온다.
-                let keysCount = self.viewModel.output.sortedKeys.value.count
+                let keys = self.viewModel.output.sortedKeys.value
                 
                 // 2. 현재 인덱스에 + 1
                 let newIndex = self.currentKeyIndex + 1
                 
                 // 3. 바뀐 인덱스가 유효한 범위 이내에 있는지 확인
-                guard newIndex >= 0 && newIndex < keysCount else { return }
+                guard newIndex >= 0 && newIndex < keys.count else { return }
                 
-                // 4. 바뀐 인덱스에 따라 캘린더 업데이트
-                self.updateCalendar(newIndex: newIndex)
+                // 4. currentKeyIndex에 새로운 인덱스 넣어주기
+                self.currentKeyIndex = newIndex
                 
-                // 5. 왼쪽 오른쪽 화살표 활성화시킬지/비활성화 시킬지 상태 업데이트
-                self.updateArrowButtons()
+                // 5. 현재 보고 있는 년월 넣어주기
+                self.currentYearMonth = keys[newIndex]
+                
+                // 6. 현재 보고 있는 년월 기준으로 하루 날짜 데이터 생성
+                self.currentMonthDays = generateDaysFor(date: keys[newIndex])
+                
+                // 7. 캘린더 업데이트
+                self.updateCalendar()
+                
             }.store(in: &cancellables)
         
         calendarView.rightArrowButton.publisher
             .sink { [weak self] _ in
                 guard let self = self else { return }
                 // 1. 년/월의 정보가 들어있는 키가 들어있는 배열의 크기를 가져온다.
-                let keysCount = self.viewModel.output.sortedKeys.value.count
+                let keys = self.viewModel.output.sortedKeys.value
                 
                 // 2. 현재 인덱스에 - 1
                 let newIndex = self.currentKeyIndex - 1
                 
                 // 3. 바뀐 인덱스가 유효한 범위 이내에 있는지 확인
-                guard newIndex >= 0 && newIndex < keysCount else { return }
+                guard newIndex >= 0 && newIndex < keys.count else { return }
                 
-                // 4. 바뀐 인덱스에 따라 캘린더 업데이트
-                self.updateCalendar(newIndex: newIndex)
+                // 4. currentKeyIndex에 새로운 인덱스 넣어주기
+                self.currentKeyIndex = newIndex
                 
-                // 5. 왼쪽 오른쪽 화살표 활성화시킬지/비활성화 시킬지 상태 업데이트
-                self.updateArrowButtons()
+                // 5. 현재 보고 있는 년월 넣어주기
+                self.currentYearMonth = keys[newIndex]
+                
+                // 6. 현재 보고 있는 년월 기준으로 하루 날짜 데이터 생성
+                self.currentMonthDays = generateDaysFor(date: keys[newIndex])
+                
+                // 7. 캘린더 업데이트
+                self.updateCalendar()
             }.store(in: &cancellables)
     }
     
@@ -121,21 +136,13 @@ final class CalendarViewController: UIViewController {
             .sink { [weak self] keys in
                 guard let self = self else { return }
                 // 1. 년/월 정보가 들어있는 키값들의 첫번째 요소(가장 최근일자) 가져오기, 데이터가 아예 없다면 캘린더 표시를 위해 현재 월
-                let month = viewModel.output.sortedKeys.value.first ?? Date()
+                self.currentYearMonth = viewModel.output.sortedKeys.value.first ?? Date()
                 
                 // 2. currentMonthDays에 가장 최근일자 데이터 기준으로 해당 월의 하루하루 데이터 생성
-                self.currentMonthDays = generateDaysFor(date: month)
+                self.currentMonthDays = generateDaysFor(date: self.currentYearMonth)
                 
-                // 3. 캘린더의 타이틀 업데이트
-                calendarView.calendarTitleLabel.text = month.formattedString(
-                    .yearMonthShort
-                )
-                
-                // 4. 컬렉션뷰 reload
-                self.calendarView.collectionView.reloadData()
-                
-                // 5. 왼쪽 오른쪽 화살표 활성화시킬지/비활성화 시킬지 상태 업데이트
-                self.updateArrowButtons()
+                // 3. 캘린더 업데이트
+                self.updateCalendar()
                 
             }.store(in: &cancellables)
     }
@@ -143,16 +150,13 @@ final class CalendarViewController: UIViewController {
 
 extension CalendarViewController {
     // 캘린더 업데이트 함수
-    private func updateCalendar(newIndex: Int) {
-        let keys = viewModel.output.sortedKeys.value
-        currentKeyIndex = newIndex
-        currentMonthDays = generateDaysFor(date: keys[newIndex])
-        calendarView.calendarTitleLabel.text = keys[newIndex].formattedString(.yearMonthShort)
+    private func updateCalendar() {
+        calendarView.calendarTitleLabel.text = self.currentYearMonth.formattedString(.yearMonthShort)
+        updateArrowButtons()
         calendarView.collectionView.reloadData()
     }
 
     // 버튼 상태 업데이트 함수
-    // TODO: 리팩토링~
     private func updateArrowButtons() {
         let sortedKeysCount = viewModel.output.sortedKeys.value.count
         let isLeftEnabled = currentKeyIndex + 1 < sortedKeysCount
