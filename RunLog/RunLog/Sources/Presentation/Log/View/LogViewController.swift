@@ -16,8 +16,11 @@ final class LogViewController: UIViewController {
     private let logView = LogView()
     private let logViewModel = LogViewModel()
     
+    // PageController에서 표시할 ViewController를 담는 배열
     private var dataViewControllers: [UIViewController] = []
+    // 현재 화면에 표시되고 있는 페이지
     private var currentPage: Int = 0
+    
     private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Lifecycle
