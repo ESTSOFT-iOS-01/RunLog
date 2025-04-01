@@ -90,7 +90,7 @@ final class CalendarViewController: UIViewController {
                 self.currentYearMonth = keys[newIndex]
                 
                 // 6. 현재 보고 있는 년월 기준으로 하루 날짜 데이터 생성
-                self.currentMonthDays = generateDaysFor(date: keys[newIndex])
+                self.currentMonthDays = generateCalendarDaysFor(date: keys[newIndex])
                 
                 // 7. 캘린더 업데이트
                 self.updateCalendar()
@@ -116,7 +116,7 @@ final class CalendarViewController: UIViewController {
                 self.currentYearMonth = keys[newIndex]
                 
                 // 6. 현재 보고 있는 년월 기준으로 하루 날짜 데이터 생성
-                self.currentMonthDays = generateDaysFor(date: keys[newIndex])
+                self.currentMonthDays = generateCalendarDaysFor(date: keys[newIndex])
                 
                 // 7. 캘린더 업데이트
                 self.updateCalendar()
@@ -139,7 +139,7 @@ final class CalendarViewController: UIViewController {
                 self.currentYearMonth = viewModel.output.sortedKeys.value.first ?? Date()
                 
                 // 2. currentMonthDays에 가장 최근일자 데이터 기준으로 해당 월의 하루하루 데이터 생성
-                self.currentMonthDays = generateDaysFor(date: self.currentYearMonth)
+                self.currentMonthDays = generateCalendarDaysFor(date: self.currentYearMonth)
                 
                 // 3. 캘린더 업데이트
                 self.updateCalendar()
@@ -170,52 +170,63 @@ extension CalendarViewController {
     }
     
     // date를 기반으로 그 달의 days를 만들어내는 함수
-    // TODO: 리팩토링~
-    private func generateDaysFor(date: Date) -> [CalendarDay] {
+    private func generateCalendarDaysFor(date: Date) -> [CalendarDay] {
+        
         let calendar = Calendar.current
-        let components = calendar.dateComponents([.year, .month], from: date)
         
-        guard let firstDayOfMonth = calendar.date(from: components),
-              let totalDays = calendar.range(of: .day, in: .month, for: firstDayOfMonth)?.count else {
-            return []
-        }
+        // 1. 월의 시작일자 가져오기(date가 11월 12일이라면, 11월 1일)
+        guard let firstDayOfMonth = date.startOfMonth else { return [] }
         
+        // 2. 해당 월의 총 일 수 가져오기
+        let totalDays = date.numberOfDaysInMonth
+        
+        // 3. 해당 월의 첫 번째 요일을 반환(1 = 일요일, 2 = 월요일)
         let firstWeekday = calendar.component(.weekday, from: firstDayOfMonth)
+        
+        // 4. calendarDays를 채울 빈 배열 생성
         var calendarDays: [CalendarDay] = []
         
-        // 현재 month에 해당하는 log 가져오기
+        // 5. 해당 월에 해당하는 log 데이터들 가져오기
         let dayLogs = viewModel.output.groupedDayLogs.value[date] ?? []
-        let unit = viewModel.output.distanceUnit.value
         
-        // 비어있는 날짜 채우기
+        // 6. 앞에 비어있는 날짜 채우기(월요일이 1일 이면 앞에 일요일은 공백 넣어야하므로)
         for _ in 0..<(firstWeekday - 1) {
             calendarDays.append(CalendarDay(day: 0, heartBeatCount: 0))
         }
         
-        // 날짜 채우기 + heartBeatCount 계산
+        // 7. 날짜 채우기 + heartBeatCount 계산
         for day in 1...totalDays {
-            let matchingLogs = dayLogs.filter {
-                calendar.component(.day, from: $0.date) == day
-            }
             
-            var heartBeatCount = 0
-            if let log = matchingLogs.first {
-                let distance = log.totalDistance
-                if distance == 0 {
-                    heartBeatCount = 0
-                } else if distance < unit * (1.0 / 3.0) {
-                    heartBeatCount = 1
-                } else if distance < unit * (2.0 / 3.0) {
-                    heartBeatCount = 2
-                } else {
-                    heartBeatCount = 3
-                }
-            }
-            
+            // 7-1. 현재 day와 매칭되는 Log가 있으면 distance에 값추가, 없다면 0.0
+            let distance = dayLogs.first(where: {
+                 calendar.component(.day, from: $0.date) == day
+            })?.totalDistance ?? 0.0
+             
+            // 7-2. 거리에 따라 하트비트 수 계산
+            let heartBeatCount = self.calHeartBeatCount(distance: distance)
+             
+            // 7-3. calendarDays 배열에 넣어주기
             calendarDays.append(CalendarDay(day: day, heartBeatCount: heartBeatCount))
         }
         
         return calendarDays
+    }
+    
+    private func calHeartBeatCount(distance: Double) -> Int {
+        // 1. 설정된 기준 단위(목표 거리) 가져오기
+        let unit = viewModel.output.distanceUnit.value
+        
+        // 2. 기준에 따라 하트비트 수 return
+        switch distance {
+        case 0:
+            return 0
+        case let distance where distance < unit * (1.0 / 3.0):
+            return 1
+        case let distance where distance < unit * (2.0 / 3.0):
+            return 2
+        default:
+            return 3
+        }
     }
 }
 
@@ -287,5 +298,26 @@ extension CalendarViewController: UICollectionViewDelegate, UICollectionViewData
         minimumInteritemSpacingForSectionAt section: Int
     ) -> CGFloat {
         return 0
+    }
+}
+
+// 캘린더에서만 쓰이는 Date Extension
+extension Date {
+    
+    /// 해당 날짜가 속한 달의 첫 번째 날짜
+    /// 예: 2025-03-15 → 2025-03-01
+    var startOfMonth: Date? {
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.year, .month], from: self)
+        return calendar.date(from: components)
+    }
+    
+    /// 해당 날짜가 속한 달의 총 일 수
+    /// 예: 2025-03-15 → 31
+    var numberOfDaysInMonth: Int {
+        let calendar = Calendar.current
+        guard let start = self.startOfMonth,
+              let range = calendar.range(of: .day, in: .month, for: start) else { return 0 }
+        return range.count
     }
 }
