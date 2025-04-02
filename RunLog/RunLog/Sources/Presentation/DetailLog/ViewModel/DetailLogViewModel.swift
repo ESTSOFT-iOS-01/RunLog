@@ -103,14 +103,32 @@ final class DetailLogViewModel {
     // MARK: - private Functions
     private func loadTargetDayLog(date: Date) {
         Task {
-            guard let dayLog = try await dayLogUseCase.getDayLogByDate(date)
-            else { return }
-            dayLogSubject.send(dayLog)
-            output.send(.loadedDayLog(dayLog))
+            guard let dayLog = try await dayLogUseCase.getDayLogByDate(date) else { return }
+            
+            // 각 Section의 첫 지점 timestamp를 기준으로 내림차순(최신순) 정렬
+            let sortedSections = dayLog.sections.sorted { lhs, rhs in
+                let lhsStartTime = lhs.route.sorted { $0.timestamp < $1.timestamp }
+                    .first?.timestamp ?? Date.distantPast
+                let rhsStartTime = rhs.route.sorted { $0.timestamp < $1.timestamp }
+                    .first?.timestamp ?? Date.distantPast
+                return lhsStartTime > rhsStartTime
+            }
+            
+            // 정렬된 섹션을 기반으로 새 DayLog 생성
+            var sortedDayLog = dayLog
+            sortedDayLog.sections = sortedSections
+            
+            dayLogSubject.send(sortedDayLog)
+            output.send(.loadedDayLog(sortedDayLog))
         }
     }
+
     
     func deleteDayLog() async throws {
             try await dayLogUseCase.deleteDayLogByDate(date)
+        }
+    
+    func refreshDayLog() {
+            loadTargetDayLog(date: date)
         }
 }

@@ -18,7 +18,7 @@ final class CalendarViewController: UIViewController {
     
     // 화면에 표시되고 있는 달력을 관리하는 변수
     private var currentKeyIndex = 0
-    private var currentMonthDays:[CalendarDay] = []
+    private var currentMonthDays: [CalendarDay] = []
     
     private var cancellables = Set<AnyCancellable>()
     
@@ -109,14 +109,9 @@ final class CalendarViewController: UIViewController {
                 calendarView.calendarTitleLabel.text = month.formattedString(
                     .yearMonthShort
                 )
+                self.calendarView.collectionView.reloadData()
                 self.updateArrowButtons()
                 
-            }.store(in: &cancellables)
-        
-        viewModel.output.groupedDayLogs
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.calendarView.collectionView.reloadData()
             }.store(in: &cancellables)
     }
 }
