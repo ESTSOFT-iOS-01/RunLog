@@ -25,35 +25,35 @@ final class AppConfigUseCaseImpl: AppConfigUseCase {
     }
     
     func getUnitDistance() async throws -> Double {
-        print("Impl:", #function)
+//        print("Impl:", #function)
         
         let config = try await appConfigRepository.readAppConfig()
         return config.unitDistance
     }
     
     func getNickname() async throws -> String {
-        print("Impl:", #function)
+//        print("Impl:", #function)
         
         let config = try await appConfigRepository.readAppConfig()
         return config.nickname
     }
     
     func getUserIndicators() async throws -> (streakDays: Int, totalDays: Int) {
-        print("Impl:", #function)
+//        print("Impl:", #function)
         
         let config = try await appConfigRepository.readAppConfig()
         return (config.streakDays, config.totalDays)
     }
     
     func getTotalDistance() async throws -> Double {
-        print("Impl:", #function)
+//        print("Impl:", #function)
         
         let config = try await appConfigRepository.readAppConfig()
         return config.totalDistance
     }
     
     func getDistanceIndicators() async throws -> (roadName: String, count : Double) {
-        print("Impl:", #function)
+//        print("Impl:", #function)
         
         let totalDistance = try await appConfigRepository.readAppConfig().totalDistance
         
@@ -69,7 +69,7 @@ final class AppConfigUseCaseImpl: AppConfigUseCase {
     }
     
     func updateUnitDistance(_ unitDistance: Double) async throws {
-        print("Impl:", #function)
+//        print("Impl:", #function)
         
         var config = try await appConfigRepository.readAppConfig()
         config.unitDistance = unitDistance
@@ -78,7 +78,7 @@ final class AppConfigUseCaseImpl: AppConfigUseCase {
     }
     
     func updateNickname(_ nickname: String) async throws {
-        print("Impl:", #function)
+//        print("Impl:", #function)
         
         var config = try await appConfigRepository.readAppConfig()
         config.nickname = nickname

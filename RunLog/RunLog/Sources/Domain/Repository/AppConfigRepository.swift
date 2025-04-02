@@ -7,34 +7,22 @@
 
 import Foundation
 
-protocol AppConfigRepository {    
+/// 앱 설정(AppConfig)에 대한 CRUD 기능을 정의하는 저장소 프로토콜입니다.
+/// 영속 저장소(UserDefaults, File, Database 등)와의 인터페이스를 추상화합니다.
+protocol AppConfigRepository {
+    
+    /// 앱 설정을 생성하여 저장소에 기록합니다.
+    /// - Parameter config: 저장할 앱 설정 값
     func createAppConfig(_ config: AppConfig) async throws
+
+    /// 저장소에 저장된 앱 설정을 읽어옵니다.
+    /// - Returns: 저장된 앱 설정 값
     func readAppConfig() async throws -> AppConfig
+
+    /// 기존 앱 설정을 업데이트합니다.
+    /// - Parameter config: 업데이트할 앱 설정 값
     func updateAppConfig(_ config: AppConfig) async throws
+
+    /// 저장된 앱 설정을 삭제합니다.
     func deleteAppConfig() async throws
-}
-
-
-/// 에러 
-enum AppConfigError: Error {
-    case duplicatedObject
-    case notFound
-    case dataConversionFailed
-    case saveFailed
-    case deleteFailed
-
-    var errorDescription: String? {
-        switch self {
-        case .notFound:
-            return "AppConfig 데이터를 찾을 수 없습니다."
-        case .dataConversionFailed:
-            return "데이터 변환 중 오류가 발생했습니다."
-        case .saveFailed:
-            return "데이터 저장에 실패했습니다."
-        case .deleteFailed:
-            return "데이터 삭제에 실패했습니다."
-        case .duplicatedObject:
-            return "한 개 이상의 AppConfig 데이터가 이미 존재합니다."
-        }
-    }
 }
