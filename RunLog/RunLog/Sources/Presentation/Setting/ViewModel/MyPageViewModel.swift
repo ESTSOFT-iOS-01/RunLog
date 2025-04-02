@@ -17,10 +17,15 @@ final class MyPageViewModel {
     }
     
     struct Output {
+        /// 로딩 상태 제어
         let stopLoading = CurrentValueSubject<Bool, Never>(false)
+        
+        /// 프로필 정보 업데이트
         let profileDataUpdated = CurrentValueSubject<UserInfoVO, Never>(
             UserInfoVO(nickname: "RunLogger", totalDistance: 0.0, streakCount: 0, logCount: 0)
         )
+        
+        /// 이동할 뷰컨트롤러 이벤트 전달
         let navigateToViewController = CurrentValueSubject<UIViewController?, Never>(nil)
     }
     
@@ -50,6 +55,8 @@ final class MyPageViewModel {
     }
     
     // MARK: - private Functions
+    
+    /// 유저 프로필 데이터를 불러와 Output에 전달합니다.
     private func fetchProfileData() {
         Task {
             output.stopLoading.send(false)
@@ -71,13 +78,18 @@ final class MyPageViewModel {
         }
     }
     
+    /// 선택된 메뉴 인덱스에 따라 화면 전환 요청을 보냅니다.
+    /// - Parameter index: 선택된 메뉴의 인덱스
     private func handleMenuSelection(_ index: Int) {
         guard menuItems.indices.contains(index) else { return }
         let selectedItem = menuItems[index]
         let viewController = createViewController(for: selectedItem)
         output.navigateToViewController.send(viewController)
     }
-
+    
+    /// Setting 메뉴 타입에 따라 ViewController를 생성합니다.
+    /// - Parameter selectedItem: 선택된 메뉴 타입
+    /// - Returns: 해당 메뉴에 대응되는 ViewController
     private func createViewController(for selectedItem: SettingMenuType) -> UIViewController {
         switch selectedItem {
         case .changeCalendarUnit:

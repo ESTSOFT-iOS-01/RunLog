@@ -12,24 +12,25 @@ final class CalUnitViewModel {
     
     // MARK: - Input & Output
     enum Input {
-        case loadData // 유저 데이터 호출
-        case saveButtonTapped
+        case loadData             // 저장된 단위 거리 불러오기
+        case saveButtonTapped     // 저장 버튼 클릭
     }
     
     struct Output {
+        /// 현재 입력된 거리 단위 문자열
         let unitUpdated = CurrentValueSubject<String, Never>("10.0")
+        
+        /// 저장 성공 여부
         let saveSuccess = CurrentValueSubject<Bool, Never>(false)
     }
 
     @Dependency private var appConfigUseCase: AppConfigUseCase
     
     private var cancellables = Set<AnyCancellable>()
-    private let inputSubject = PassthroughSubject<Input, Never>() // Input 스트림
+    private let inputSubject = PassthroughSubject<Input, Never>()
     
     var input: PassthroughSubject<Input, Never> { inputSubject }
     private(set) var output: Output = .init()
-    
-    // MARK: - Init
     
     // MARK: - Bind (Input -> Output)
     func bind() {
@@ -46,6 +47,8 @@ final class CalUnitViewModel {
             .store(in: &cancellables)
     }
     
+    /// 텍스트 필드 입력을 받아 유효한 거리 단위 문자열로 정리합니다.
+    /// 소수 구분자는 현재 로케일에 맞춰 처리합니다.
     func bindTextField(_ textPublisher: AnyPublisher<String, Never>) {
         textPublisher
             .map { text in
@@ -64,6 +67,7 @@ final class CalUnitViewModel {
             .store(in: &cancellables)
     }
     
+    /// 입력된 거리 단위를 저장소에 저장합니다.
     private func saveUnit() {
         Task {
             do {
@@ -76,6 +80,7 @@ final class CalUnitViewModel {
         }
     }
     
+    /// 저장된 거리 단위를 불러와 출력 스트림에 반영합니다.
     private func fetchUnitDistance() {
         Task {
             do {
