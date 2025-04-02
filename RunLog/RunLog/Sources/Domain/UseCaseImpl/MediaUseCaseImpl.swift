@@ -11,9 +11,8 @@ import CoreLocation
 
 final class MediaUseCaseImpl: MediaUseCase {
 
-    init() {
-    }
-    
+    init() {}
+
     func convertSectionsToCoordinates(sections: [Section]) -> [[CLLocationCoordinate2D]] {
         var coordinates = [[CLLocationCoordinate2D]]()
 
@@ -25,23 +24,23 @@ final class MediaUseCaseImpl: MediaUseCase {
             }
             coordinates.append(coors)
         }
-        
+
         return coordinates
     }
     
     func setRouteImage(route coordinates: [[CLLocationCoordinate2D]]) async throws -> UIImage {
-        let centerCoordinate = try getRouteCenterCoordinate(coordinates.flatMap { $0 })
-        let region = makeRouteSizeRegion(center: centerCoordinate, coordinates: coordinates.flatMap { $0 })
-        
-        /// 스냅샷 옵션 설정
-        let option = setSnapshotOption(coordinates.flatMap { $0 }, region: region)
+        let flatCoordinates = coordinates.flatMap { $0 }
+        let centerCoordinate = try getRouteCenterCoordinate(flatCoordinates)
+        let region = makeRouteSizeRegion(center: centerCoordinate, coordinates: flatCoordinates)
+
+        // 스냅샷 옵션 설정
+        let option = setSnapshotOption(region: region)
         let snapShotter = MKMapSnapshotter(options: option)
 
-        /// 스냅샷 생성
-        let snapshot : MKMapSnapshotter.Snapshot? = await withCheckedContinuation { continuation in
+        // 스냅샷 생성 (비동기 처리)
+        let snapshot: MKMapSnapshotter.Snapshot? = await withCheckedContinuation { continuation in
             snapShotter.start { snapshot, error in
                 guard let snapshot = snapshot, error == nil else {
-                    print("Error: \(String(describing: error))")
                     continuation.resume(returning: nil)
                     return
                 }
@@ -52,157 +51,95 @@ final class MediaUseCaseImpl: MediaUseCase {
         guard let snapshot = snapshot else {
             throw MediaUseCaseError.snapshotFailed
         }
-        
+
         let mapImage = snapshot.image
+
+        // 이미지 위에 경로 그리기
         let overlayImage = UIGraphicsImageRenderer(size: mapImage.size).image { context in
             mapImage.draw(at: .zero)
-            
+
             for route in coordinates {
                 let points = route.map { snapshot.point(for: $0) }
                 let path = UIBezierPath()
-                path.move(to: points.first ?? CGPoint(x: 0, y: 0))
-                
+                path.move(to: points.first ?? .zero)
+
                 for point in points.dropFirst() {
                     path.addLine(to: point)
                 }
-                
+
                 path.lineWidth = 2
                 UIColor.LightGreen.setStroke()
                 path.stroke()
             }
         }
-        
+
         return overlayImage
     }
     
-    
-//    func convertSectionsToCoordinates(sections: [Section]) -> [CLLocationCoordinate2D] {
-//        var coordinates: [CLLocationCoordinate2D] = []
-//
-//        for section in sections {
-//            for point in section.route.sorted(by: { $0.timestamp < $1.timestamp }) {
-//                let coordinate = CLLocationCoordinate2D(latitude: point.latitude, longitude: point.longitude)
-//                coordinates.append(coordinate)
-//            }
-//        }
-//        
-//        return coordinates
-//    }
-    
+    func saveImageToDocuments(image: UIImage, imageName: String) throws {
+        guard let imageData = image.pngData() else {
+            throw NSError(domain: "com.estsoft.runlog", code: -1, userInfo: [NSLocalizedDescriptionKey: "이미지 변환 실패"])
+        }
 
-//    func setRouteImage(route coordinates: [CLLocationCoordinate2D]) -> UIImage? {
-//        guard let centerCoordinate = getRouteCenterCoordinate(coordinates) else { return nil }
-//        let region = makeRouteSizeRegion(center: centerCoordinate, coordinates: coordinates)
-//        
-//        let option = setSnapshotOption(coordinates, region: region)
-//        let snapShotter = MKMapSnapshotter(options: option)
-//        
-//        snapShotter.start { snapshot, error in
-//            guard let snapshot = snapshot, error == nil else {
-//                print("Error: \(String(describing: error))")
-//                return
-//            }
-//            
-//            let mapImage = snapshot.image
-//            let overlayImage = UIGraphicsImageRenderer(size: mapImage.size).image { context in
-//                mapImage.draw(at: .zero)
-//                let points = coordinates.map { snapshot.point(for: $0) }
-//                let path = UIBezierPath()
-//                path.move(to: points.first ?? CGPoint(x: 0, y: 0))
-//                
-//                for point in points.dropFirst() {
-//                    path.addLine(to: point)
-//                }
-//                
-//                path.lineWidth = 1
-//                UIColor.LightGreen.setStroke()
-//                path.stroke()
-//            }
-//            
-//            // 임시 저장: 생성된 이미지 처리 후 저장
-////            do {
-////                try self.saveImageToDocuments(image: overlayImage, imageName: "route_image.png")
-////            } catch {
-////                print("Error saving image: \(error)")
-////            }
-//            return overlayImage
-//        }
-//    }
+        let fileManager = FileManager.default
+        let documentDirectory = try fileManager.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
+        let fileURL = documentDirectory.appendingPathComponent(imageName)
+
+        try imageData.write(to: fileURL)
+    }
     
-    private func setSnapshotOption(_ coordinates: [CLLocationCoordinate2D], region: MKCoordinateRegion) -> MKMapSnapshotter.Options {
+    // MARK: - private funcs
+    
+    // 스냅샷 옵션 설정
+    private func setSnapshotOption(region: MKCoordinateRegion) -> MKMapSnapshotter.Options {
         let option = MKMapSnapshotter.Options()
         option.region = region
-        option.size = CGSize(width: 500, height: 500) // 원하는 이미지 크기 설정
-        
+        option.size = CGSize(width: 500, height: 500)
+
         let configuration = MKStandardMapConfiguration(emphasisStyle: .muted)
         configuration.pointOfInterestFilter = .excludingAll
         option.preferredConfiguration = configuration
+
         return option
     }
-    
-    // 옵션 설정
-    private func setSnapshotOption(_ coordinates: [CLLocationCoordinate2D]) -> MKMapSnapshotter.Options {
-        let option = MKMapSnapshotter.Options()
-        
-        let configuration = MKStandardMapConfiguration(emphasisStyle: .muted)
-        configuration.pointOfInterestFilter = .excludingAll
-        option.preferredConfiguration = configuration
-        
-        return option
-    }
-    
-    // 지도 중점 구하기
+
+    // 경로의 중심 좌표 계산
     private func getRouteCenterCoordinate(_ coordinates: [CLLocationCoordinate2D]) throws -> CLLocationCoordinate2D {
-        guard coordinates.isEmpty == false || coordinates.count > 1 else {
+        guard !coordinates.isEmpty else {
             throw MediaUseCaseError.noCenterPos
         }
-        
-        var centerLat : CLLocationDegrees = 0
-        var centerLon : CLLocationDegrees = 0
-        
+
+        var centerLat: CLLocationDegrees = 0
+        var centerLon: CLLocationDegrees = 0
+
         for coordinate in coordinates {
             centerLat += coordinate.latitude
             centerLon += coordinate.longitude
         }
-        
+
         centerLat /= Double(coordinates.count)
         centerLon /= Double(coordinates.count)
-        
-//        print("중점 x: \(centerLat)")
-//        print("중점 y: \(centerLon)")
-        
+
         return CLLocationCoordinate2D(latitude: centerLat, longitude: centerLon)
     }
-    
+
+    // 경로 전체를 포함하는 지도 영역 계산
     private func makeRouteSizeRegion(center: CLLocationCoordinate2D, coordinates: [CLLocationCoordinate2D]) -> MKCoordinateRegion {
-        
-        let minLat = coordinates.min { $0.latitude < $1.latitude }?.latitude ?? 0
-        let maxLat = coordinates.max { $0.latitude < $1.latitude }?.latitude ?? 0
-        let minLon = coordinates.min { $0.longitude < $1.longitude }?.longitude ?? 0
-        let maxLon = coordinates.max { $0.longitude < $1.longitude }?.longitude ?? 0
-        
-        let span = MKCoordinateSpan(latitudeDelta: (maxLat - minLat)*1.7, longitudeDelta: (maxLon - minLon)*1.7)
+        // 지도의 확대 비율 계수 (값이 클수록 더 넓은 범위를 포함함)
+        // - 이 부분을 바꿔서 이미지를 생성하면 경로와 이미지 사이의 패딩이 생김
+        let mapPaddingScale: CLLocationDegrees = 1.7
+
+        let minLat = coordinates.min(by: { $0.latitude < $1.latitude })?.latitude ?? 0
+        let maxLat = coordinates.max(by: { $0.latitude < $1.latitude })?.latitude ?? 0
+        let minLon = coordinates.min(by: { $0.longitude < $1.longitude })?.longitude ?? 0
+        let maxLon = coordinates.max(by: { $0.longitude < $1.longitude })?.longitude ?? 0
+
+        let span = MKCoordinateSpan(
+            latitudeDelta: (maxLat - minLat) * mapPaddingScale,
+            longitudeDelta: (maxLon - minLon) * mapPaddingScale
+        )
         
         return MKCoordinateRegion(center: center, span: span)
     }
-    
-    func saveImageToDocuments(image: UIImage, imageName: String) throws {
-    print("이미지 크기: \(image.size)")
-    guard let imageData = image.pngData() else {
-        print("이미지 데이터를 PNG로 변환할 수 없습니다.")
-        throw NSError(domain: "com.estsoft.runlog", code: -1, userInfo: [NSLocalizedDescriptionKey: "이미지 변환 실패"])
-    }
-    
-    // 2. 도큐먼트 디렉토리 경로 가져오기
-    let fileManager = FileManager.default
-    let documentDirectory = try fileManager.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
-    
-    // 3. 이미지 파일 경로
-    let fileURL = documentDirectory.appendingPathComponent(imageName)
-    
-    // 4. 이미지 파일 저장
-    try imageData.write(to: fileURL)
-    print("이미지 저장 완료: \(fileURL.path)")
-}
     
 }
