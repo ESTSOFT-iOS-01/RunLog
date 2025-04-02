@@ -31,8 +31,8 @@ final class MypageProfileView: UIView {
     private let streakCard = ProfileCardView()
 
     /// 카드 2개를 나란히 담는 StackView
-    private let cardStackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [ProfileCardView(), ProfileCardView()])
+    private lazy var cardStackView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [logCard, streakCard])
         stackView.axis = .horizontal
         stackView.spacing = 16
         stackView.alignment = .fill
@@ -41,7 +41,7 @@ final class MypageProfileView: UIView {
     }()
     
     /// 설정 메뉴를 표시할 테이블뷰
-    public let tableView = UITableView(frame: .zero, style: .plain).then {
+    public lazy var tableView = UITableView(frame: .zero, style: .plain).then {
         $0.backgroundColor = .clear
         $0.separatorStyle = .none
         $0.sectionHeaderTopPadding = 4
@@ -114,5 +114,3 @@ final class MypageProfileView: UIView {
         streakCard.configure(property: .streak, value: config.streakCount)
     }
 }
-
-
