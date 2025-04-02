@@ -9,12 +9,14 @@ import UIKit
 import SnapKit
 import Then
 
+/// 닉네임 변경 화면의 UI 구성 뷰
 final class ChangeNicknameView: UIView {
     
     // MARK: - Properties
-    private let placeHolderString = "최대 10자까지 입력 가능합니다"
+    private let nicknamePlaceholder = "최대 10자까지 입력 가능합니다"
     
-    lazy var nameField = RLTextField(placeholder: placeHolderString).then {
+    /// 닉네임 입력 필드
+    lazy var nameField = RLTextField(placeholder: nicknamePlaceholder).then {
         $0.keyboardType = .default
     }
     
@@ -42,5 +44,4 @@ final class ChangeNicknameView: UIView {
             $0.top.equalTo(safeAreaLayoutGuide).offset(DynamicSize.scaledSize(24))
         }
     }
-    
 }
