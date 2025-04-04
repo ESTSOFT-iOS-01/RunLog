@@ -16,8 +16,11 @@ final class CalendarViewController: UIViewController {
     private let calendarView = CalendarView()
     private let viewModel: LogViewModel
     
-    // 화면에 표시되고 있는 달력을 관리하는 변수
+    // 화면에 표시되고 있는 달력의 년, 월이 들어간 딕셔너리의 키 인덱스
     private var currentKeyIndex = 0
+    // 캘린더에 표시되고 있는 달력 년,월
+    private var currentYearMonth: Date = Date()
+    // 캘린더에 표시되고 있는 하루하루의 데이터
     private var currentMonthDays: [CalendarDay] = []
     
     private var cancellables = Set<AnyCancellable>()
@@ -45,7 +48,7 @@ final class CalendarViewController: UIViewController {
     
     // MARK: - Setup UI
     private func setupUI() {
-        // UI 요소 추가
+
         view.addSubview(calendarView)
         calendarView.snp.makeConstraints {
             $0.edges.equalToSuperview()
@@ -70,25 +73,53 @@ final class CalendarViewController: UIViewController {
         calendarView.leftArrowButton.publisher
             .sink { [weak self] _ in
                 guard let self = self else { return }
+                
+                // 1. 년/월의 정보가 들어있는 키가 들어있는 배열의 크기를 가져온다.
                 let keys = self.viewModel.output.sortedKeys.value
+                
+                // 2. 현재 인덱스에 + 1
                 let newIndex = self.currentKeyIndex + 1
                 
+                // 3. 바뀐 인덱스가 유효한 범위 이내에 있는지 확인
                 guard newIndex >= 0 && newIndex < keys.count else { return }
                 
-                self.updateCalendar(newIndex: newIndex)
-                self.updateArrowButtons()
+                // 4. currentKeyIndex에 새로운 인덱스 넣어주기
+                self.currentKeyIndex = newIndex
+                
+                // 5. 현재 보고 있는 년월 넣어주기
+                self.currentYearMonth = keys[newIndex]
+                
+                // 6. 현재 보고 있는 년월 기준으로 하루 날짜 데이터 생성
+                self.currentMonthDays = generateCalendarDaysFor(date: keys[newIndex])
+                
+                // 7. 캘린더 업데이트
+                self.updateCalendar()
+                
             }.store(in: &cancellables)
         
         calendarView.rightArrowButton.publisher
             .sink { [weak self] _ in
                 guard let self = self else { return }
+                // 1. 년/월의 정보가 들어있는 키가 들어있는 배열의 크기를 가져온다.
                 let keys = self.viewModel.output.sortedKeys.value
+                
+                // 2. 현재 인덱스에 - 1
                 let newIndex = self.currentKeyIndex - 1
                 
+                // 3. 바뀐 인덱스가 유효한 범위 이내에 있는지 확인
                 guard newIndex >= 0 && newIndex < keys.count else { return }
                 
-                self.updateCalendar(newIndex: newIndex)
-                self.updateArrowButtons()
+                // 4. currentKeyIndex에 새로운 인덱스 넣어주기
+                self.currentKeyIndex = newIndex
+                
+                // 5. 현재 보고 있는 년월 넣어주기
+                self.currentYearMonth = keys[newIndex]
+                
+                // 6. 현재 보고 있는 년월 기준으로 하루 날짜 데이터 생성
+                self.currentMonthDays = generateCalendarDaysFor(date: keys[newIndex])
+                
+                // 7. 캘린더 업데이트
+                self.updateCalendar()
             }.store(in: &cancellables)
     }
     
@@ -104,13 +135,14 @@ final class CalendarViewController: UIViewController {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] keys in
                 guard let self = self else { return }
-                let month = viewModel.output.sortedKeys.value.first ?? Date()
-                self.currentMonthDays = generateDaysFor(date: month)
-                calendarView.calendarTitleLabel.text = month.formattedString(
-                    .yearMonthShort
-                )
-                self.calendarView.collectionView.reloadData()
-                self.updateArrowButtons()
+                // 1. 년/월 정보가 들어있는 키값들의 첫번째 요소(가장 최근일자) 가져오기, 데이터가 아예 없다면 캘린더 표시를 위해 현재 월
+                self.currentYearMonth = viewModel.output.sortedKeys.value.first ?? Date()
+                
+                // 2. currentMonthDays에 가장 최근일자 데이터 기준으로 해당 월의 하루하루 데이터 생성
+                self.currentMonthDays = generateCalendarDaysFor(date: self.currentYearMonth)
+                
+                // 3. 캘린더 업데이트
+                self.updateCalendar()
                 
             }.store(in: &cancellables)
     }
@@ -118,16 +150,13 @@ final class CalendarViewController: UIViewController {
 
 extension CalendarViewController {
     // 캘린더 업데이트 함수
-    private func updateCalendar(newIndex: Int) {
-        let keys = viewModel.output.sortedKeys.value
-        currentKeyIndex = newIndex
-        currentMonthDays = generateDaysFor(date: keys[newIndex])
-        calendarView.calendarTitleLabel.text = keys[newIndex].formattedString(.yearMonthShort)
+    private func updateCalendar() {
+        calendarView.calendarTitleLabel.text = self.currentYearMonth.formattedString(.yearMonthShort)
+        updateArrowButtons()
         calendarView.collectionView.reloadData()
     }
 
     // 버튼 상태 업데이트 함수
-    // TODO: 리팩토링~
     private func updateArrowButtons() {
         let sortedKeysCount = viewModel.output.sortedKeys.value.count
         let isLeftEnabled = currentKeyIndex + 1 < sortedKeysCount
@@ -141,52 +170,63 @@ extension CalendarViewController {
     }
     
     // date를 기반으로 그 달의 days를 만들어내는 함수
-    // TODO: 리팩토링~
-    private func generateDaysFor(date: Date) -> [CalendarDay] {
+    private func generateCalendarDaysFor(date: Date) -> [CalendarDay] {
+        
         let calendar = Calendar.current
-        let components = calendar.dateComponents([.year, .month], from: date)
         
-        guard let firstDayOfMonth = calendar.date(from: components),
-              let totalDays = calendar.range(of: .day, in: .month, for: firstDayOfMonth)?.count else {
-            return []
-        }
+        // 1. 월의 시작일자 가져오기(date가 11월 12일이라면, 11월 1일)
+        guard let firstDayOfMonth = date.startOfMonth else { return [] }
         
+        // 2. 해당 월의 총 일 수 가져오기
+        let totalDays = date.numberOfDaysInMonth
+        
+        // 3. 해당 월의 첫 번째 요일을 반환(1 = 일요일, 2 = 월요일)
         let firstWeekday = calendar.component(.weekday, from: firstDayOfMonth)
+        
+        // 4. calendarDays를 채울 빈 배열 생성
         var calendarDays: [CalendarDay] = []
         
-        // 현재 month에 해당하는 log 가져오기
+        // 5. 해당 월에 해당하는 log 데이터들 가져오기
         let dayLogs = viewModel.output.groupedDayLogs.value[date] ?? []
-        let unit = viewModel.output.distanceUnit.value
         
-        // 비어있는 날짜 채우기
+        // 6. 앞에 비어있는 날짜 채우기(월요일이 1일 이면 앞에 일요일은 공백 넣어야하므로)
         for _ in 0..<(firstWeekday - 1) {
             calendarDays.append(CalendarDay(day: 0, heartBeatCount: 0))
         }
         
-        // 날짜 채우기 + heartBeatCount 계산
+        // 7. 날짜 채우기 + heartBeatCount 계산
         for day in 1...totalDays {
-            let matchingLogs = dayLogs.filter {
-                calendar.component(.day, from: $0.date) == day
-            }
             
-            var heartBeatCount = 0
-            if let log = matchingLogs.first {
-                let distance = log.totalDistance
-                if distance == 0 {
-                    heartBeatCount = 0
-                } else if distance < unit * (1.0 / 3.0) {
-                    heartBeatCount = 1
-                } else if distance < unit * (2.0 / 3.0) {
-                    heartBeatCount = 2
-                } else {
-                    heartBeatCount = 3
-                }
-            }
-            
+            // 7-1. 현재 day와 매칭되는 Log가 있으면 distance에 값추가, 없다면 0.0
+            let distance = dayLogs.first(where: {
+                 calendar.component(.day, from: $0.date) == day
+            })?.totalDistance ?? 0.0
+             
+            // 7-2. 거리에 따라 하트비트 수 계산
+            let heartBeatCount = self.calHeartBeatCount(distance: distance)
+             
+            // 7-3. calendarDays 배열에 넣어주기
             calendarDays.append(CalendarDay(day: day, heartBeatCount: heartBeatCount))
         }
         
         return calendarDays
+    }
+    
+    private func calHeartBeatCount(distance: Double) -> Int {
+        // 1. 설정된 기준 단위(목표 거리) 가져오기
+        let unit = viewModel.output.distanceUnit.value
+        
+        // 2. 기준에 따라 하트비트 수 return
+        switch distance {
+        case 0:
+            return 0
+        case let distance where distance < unit * (1.0 / 3.0):
+            return 1
+        case let distance where distance < unit * (2.0 / 3.0):
+            return 2
+        default:
+            return 3
+        }
     }
 }
 
@@ -229,7 +269,7 @@ extension CalendarViewController: UICollectionViewDelegate, UICollectionViewData
 
         // 3. 최종 Date 만들기
         if let date = calendar.date(from: finalComponents) {
-            viewModel.send(.cellTapped(date: date))
+            viewModel.input.send(.cellTapped(date: date))
         }
     }
     
@@ -258,5 +298,26 @@ extension CalendarViewController: UICollectionViewDelegate, UICollectionViewData
         minimumInteritemSpacingForSectionAt section: Int
     ) -> CGFloat {
         return 0
+    }
+}
+
+// 캘린더에서만 쓰이는 Date Extension
+extension Date {
+    
+    /// 해당 날짜가 속한 달의 첫 번째 날짜
+    /// 예: 2025-03-15 → 2025-03-01
+    var startOfMonth: Date? {
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.year, .month], from: self)
+        return calendar.date(from: components)
+    }
+    
+    /// 해당 날짜가 속한 달의 총 일 수
+    /// 예: 2025-03-15 → 31
+    var numberOfDaysInMonth: Int {
+        let calendar = Calendar.current
+        guard let start = self.startOfMonth,
+              let range = calendar.range(of: .day, in: .month, for: start) else { return 0 }
+        return range.count
     }
 }

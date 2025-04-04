@@ -27,7 +27,7 @@ final class LogViewModel {
     }
     
     private(set) var output: Output = .init()
-    private let input = PassthroughSubject<Input, Never>()
+    let input = PassthroughSubject<Input, Never>()
     private var cancellables = Set<AnyCancellable>()
     
     @Dependency private var dayLogUseCase: DayLogUseCase
@@ -50,11 +50,6 @@ final class LogViewModel {
                 }
             }
             .store(in: &cancellables)
-    }
-    
-    // MARK: - 이벤트를 send
-    func send(_ event: Input) {
-        input.send(event)
     }
 }
 
