@@ -16,7 +16,7 @@ final class AppConfigRepositoryImpl: AppConfigRepository {
     }
     
     func createAppConfig(_ config: AppConfig) async throws {
-        print("Impl: ", #function)
+//        print("Impl: ", #function)
         
             try await context.perform { [weak self] in
                 guard let self = self else {
@@ -42,7 +42,7 @@ final class AppConfigRepositoryImpl: AppConfigRepository {
     }
     
     func readAppConfig() async throws -> AppConfig {
-        print("Impl: ", #function)
+//        print("Impl: ", #function)
         
         return try await context.perform { [weak self] in
             guard let self = self else {
@@ -66,7 +66,7 @@ final class AppConfigRepositoryImpl: AppConfigRepository {
     }
     
     func updateAppConfig(_ config: AppConfig) async throws {
-        print("Impl: ", #function)
+//        print("Impl: ", #function)
         
         return try await context.perform { [weak self] in
             guard let self = self else {
@@ -97,7 +97,7 @@ final class AppConfigRepositoryImpl: AppConfigRepository {
     }
     
     func deleteAppConfig() async throws {
-        print("Impl: ", #function)
+//        print("Impl: ", #function)
         
         return try await context.perform { [weak self] in
             guard let self = self else {

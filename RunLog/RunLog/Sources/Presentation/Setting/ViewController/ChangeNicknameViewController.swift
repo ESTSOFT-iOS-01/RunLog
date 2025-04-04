@@ -10,6 +10,7 @@ import SnapKit
 import Then
 import Combine
 
+/// 닉네임을 변경하는 화면을 담당하는 ViewController
 final class ChangeNicknameViewController: UIViewController {
     
     // MARK: - Properties
@@ -32,19 +33,19 @@ final class ChangeNicknameViewController: UIViewController {
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupUI()
-        setupNavigationBar()
-        setupGesture()
-        setupTextField()
         
-        viewModel.bind()
-        bindViewModel()
+        setupUI()              // 화면 구성
+        setupNavigationBar()   // 네비게이션 바 설정
+        setupGesture()         // 키보드 닫기 제스처
+        setupTextField()       // 텍스트필드 설정
         
+        viewModel.bind()       // ViewModel 입력 바인딩
+        bindViewModel()        // ViewModel 출력 바인딩
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        setupData()
+        setupData() // 데이터 초기화
         self.navigationController?.setNavigationBarHidden(false, animated: animated)
     }
     
@@ -66,9 +67,10 @@ final class ChangeNicknameViewController: UIViewController {
     
     // MARK: - Setup Navigation Bar
     private func setupNavigationBar() {
-        // 네비게이션바 디테일 설정
         navigationItem.title = "닉네임 수정"
         self.navigationController?.setupAppearance()
+        
+        // 네비게이션바 우측 완료 버튼 바인딩
         navigationController?
             .addRightButton(title: "완료")
             .sink { [weak self] in
@@ -88,12 +90,13 @@ final class ChangeNicknameViewController: UIViewController {
     
     // MARK: - Setup Data
     private func setupData() {
-        // 초기 데이터 로드
+        // 초기 데이터 요청
         viewModel.input.send(.loadData)
     }
 
-    // MARK: - Bind ViewModel
+    // MARK: - ViewModel Output Binding
     private func bindViewModel() {
+        // 닉네임 값 반영
         viewModel.output.nicknameUpdated
             .receive(on: DispatchQueue.main)
             .sink { [weak self] text in
@@ -101,20 +104,23 @@ final class ChangeNicknameViewController: UIViewController {
             }
             .store(in: &cancellables)
         
+        // 저장 성공 시 화면 닫기
         viewModel.output.saveSuccess
             .receive(on: DispatchQueue.main)
             .sink { [weak self] success in
                 if success {
                     self?.navigationController?.popViewController(animated: true)
                 } else {
-                    // 저장 실패 시 처리
+                    // 저장 실패 시 처리 로직 필요 시 여기에
                 }
             }
             .store(in: &cancellables)
         
+        // 텍스트 필드 입력값을 ViewModel로 전달
         viewModel.bindTextField(nicknameView.nameField.publisher)
     }
     
+    /// 유효성 검사 후 닉네임 저장 요청
     private func validateAndSaveNickname() {
         guard let text = nicknameView.nameField.text, !text.isEmpty else {
             showAlert(message: "닉네임을 입력해주세요.")
@@ -125,14 +131,17 @@ final class ChangeNicknameViewController: UIViewController {
 
 }
 
+// MARK: - UITextFieldDelegate
 extension ChangeNicknameViewController: UITextFieldDelegate {
+    
+    /// 닉네임은 최대 10자까지 허용
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         let currentText = textField.text ?? ""
         let newText = (currentText as NSString).replacingCharacters(in: range, with: string)
-        
         return newText.count <= 10
     }
     
+    /// Return 키로 키보드 내리기
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true

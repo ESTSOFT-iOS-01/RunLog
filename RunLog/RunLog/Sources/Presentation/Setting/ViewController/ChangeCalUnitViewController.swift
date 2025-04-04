@@ -10,6 +10,7 @@ import SnapKit
 import Then
 import Combine
 
+/// 기록 시각화 단위(거리)를 설정하는 화면의 ViewController
 final class ChangeCalUnitViewController: UIViewController {
     
     // MARK: - Properties
@@ -32,18 +33,19 @@ final class ChangeCalUnitViewController: UIViewController {
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupUI()
-        setupNavigationBar()
-        setupGesture()
-        setupTextField()
         
-        viewModel.bind()
-        bindViewModel()
+        setupUI()              // 화면 구성
+        setupNavigationBar()   // 네비게이션 바 설정
+        setupGesture()         // 키보드 닫기 제스처
+        setupTextField()       // 텍스트 필드 설정
+        
+        viewModel.bind()       // ViewModel 입력 바인딩
+        bindViewModel()        // ViewModel 출력 바인딩
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        setupData()
+        setupData() // 초기 데이터 요청
         self.navigationController?.setNavigationBarHidden(false, animated: animated)
     }
     
@@ -54,7 +56,6 @@ final class ChangeCalUnitViewController: UIViewController {
     
     // MARK: - Setup UI
     private func setupUI() {
-        // UI 요소 추가
         view.backgroundColor = .Gray900
         view.addSubview(calUnitView)
         
@@ -66,10 +67,10 @@ final class ChangeCalUnitViewController: UIViewController {
     
     // MARK: - Setup Navigation Bar
     private func setupNavigationBar() {
-        // 네비게이션바 디테일 설정
         navigationItem.title = "기록 시각화 단위 설정"
         self.navigationController?.setupAppearance()
         
+        // 우측 '완료' 버튼 설정 및 동작 바인딩
         navigationController?
             .addRightButton(title: "완료")
             .sink { [weak self] in
@@ -80,7 +81,6 @@ final class ChangeCalUnitViewController: UIViewController {
     
     // MARK: - Setup Gesture
     private func setupGesture() {
-        // 제스처 추가
         setupTapGestureToDismissKeyboard()
     }
     
@@ -93,10 +93,12 @@ final class ChangeCalUnitViewController: UIViewController {
         viewModel.input.send(.loadData)
     }
 
-    // MARK: - Bind ViewModel
+    // MARK: - ViewModel Output Binding
     private func bindViewModel() {
+        // 텍스트필드 실시간 값 전달
         viewModel.bindTextField(calUnitView.unitField.publisher)
         
+        // 거리 값 변경 시 UI 갱신
         viewModel.output.unitUpdated
             .receive(on: DispatchQueue.main)
             .sink { [weak self] value in
@@ -105,29 +107,35 @@ final class ChangeCalUnitViewController: UIViewController {
             }
             .store(in: &cancellables)
         
+        // 저장 성공 시 뒤로 이동
         viewModel.output.saveSuccess
             .receive(on: DispatchQueue.main)
             .sink { [weak self] success in
                 if success {
                     self?.navigationController?.popViewController(animated: true)
                 } else {
-                    // 저장 실패 시 처리
+                    // 저장 실패 시 처리 가능
                 }
             }
             .store(in: &cancellables)
     }
     
+    /// 입력값 유효성 검사 후 저장 요청
     private func validateAndSaveUnit() {
-        guard let text = calUnitView.unitField.text, let value = Double(text), value > 0 else {
+        guard let text = calUnitView.unitField.text,
+              let value = Double(text),
+              value > 0 else {
             showAlert(message: "올바른 값을 입력해주세요.")
             return
         }
         viewModel.input.send(.saveButtonTapped)
     }
-
 }
 
+// MARK: - UITextFieldDelegate
 extension ChangeCalUnitViewController: UITextFieldDelegate {
+    
+    /// 허용된 값(숫자, 소수점 포함) 및 최대 자릿수 제한
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         if string.isEmpty { return true }
         
@@ -149,16 +157,15 @@ extension ChangeCalUnitViewController: UITextFieldDelegate {
             return false
         }
         
-        if let currentText = textField.text {
-            let newLength = currentText.count + string.count - range.length
-            if newLength > 8 {
-                return false
-            }
+        let newLength = currentText.count + string.count - range.length
+        if newLength > 8 {
+            return false
         }
 
         return true
     }
     
+    /// Return 키로 키보드 내리기
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true

@@ -9,28 +9,28 @@ import UIKit
 import SnapKit
 import Then
 
-enum ProfileCardType {
-    case logCount
-    case streak
-}
-
+/// 마이페이지에서 사용되는 카드 스타일 정보 뷰 (운동 기록, 스트릭 등)
 final class ProfileCardView: UIView {
     // MARK: - UI Components 선언
-    var propertyView = UIView().then {
+    /// 제목 및 값 라벨을 포함하는 뷰
+    private var propertyView = UIView().then {
         $0.backgroundColor = .clear
     }
-    
-    lazy var propertyTitle = UILabel().then {
+
+    /// 카드 타이틀 (예: 운동 기록, 연속 스트릭)
+    private lazy var propertyTitle = UILabel().then {
         $0.textAlignment = .left
         $0.numberOfLines = 1
     }
-    
-    lazy var iconImg = UIImageView().then {
+
+    /// 카드 오른쪽 아이콘 이미지
+    private lazy var iconImg = UIImageView().then {
         $0.contentMode = .scaleAspectFit
         $0.tintColor = .Gray900
     }
-    
-    lazy var propertyValue = UILabel().then {
+
+    /// 수치 값 라벨
+    private lazy var propertyValue = UILabel().then {
         $0.textAlignment = .left
         $0.numberOfLines = 1
     }
@@ -83,19 +83,26 @@ final class ProfileCardView: UIView {
     }
     
     // MARK: - Configure
+    /// 카드 타입 및 값을 이용해 뷰 내용을 구성합니다.
+    /// - Parameters:
+    ///   - property: 카드 유형
+    ///   - value: 수치 값
     func configure(property: ProfileCardType, value: Int) {
         let valueStr = value.formattedString
-        switch property {
-        case .logCount:
-            propertyTitle.attributedText = .RLAttributedString(text: "운동 기록", font: .Label1, color: .Gray900)
-            iconImg.image = UIImage(systemName: RLIcon.document.name)?
-                .applyingSymbolConfiguration(UIImage.SymbolConfiguration(pointSize: 32, weight: .medium))
-            propertyValue.attributedText = .RLAttributedString(text: "\(valueStr)건", font: .Headline1, color: .Gray900)
-        case .streak:
-            propertyTitle.attributedText = .RLAttributedString(text: "연속 스트릭", font: .Label1, color: .Gray900)
-            iconImg.image = UIImage(systemName: RLIcon.streak.name)?
-                .applyingSymbolConfiguration(UIImage.SymbolConfiguration(pointSize: 32, weight: .medium))
-            propertyValue.attributedText = .RLAttributedString(text: "\(valueStr)일", font: .Headline1, color: .Gray900)
-        }
+
+        propertyTitle.attributedText = .RLAttributedString(
+            text: property.title,
+            font: .Label1,
+            color: .Gray900
+        )
+
+        propertyValue.attributedText = .RLAttributedString(
+            text: "\(valueStr)\(property.unit)",
+            font: .Headline1,
+            color: .Gray900
+        )
+
+        iconImg.image = UIImage(systemName: property.iconName)?
+            .applyingSymbolConfiguration(UIImage.SymbolConfiguration(pointSize: 32, weight: .medium))
     }
 }

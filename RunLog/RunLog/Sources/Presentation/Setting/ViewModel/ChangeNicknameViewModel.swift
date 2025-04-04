@@ -12,24 +12,25 @@ final class ChangeNicknameViewModel {
     
     // MARK: - Input & Output
     enum Input {
-        case loadData // 유저 데이터 호출
-        case saveButtonTapped // 저장 버튼 클릭
+        case loadData            // 저장된 닉네임 불러오기
+        case saveButtonTapped    // 저장 버튼 클릭
     }
     
     struct Output {
+        /// 현재 입력된 닉네임 상태
         let nicknameUpdated = CurrentValueSubject<String, Never>("RunLogger")
+        
+        /// 저장 성공 여부
         let saveSuccess = CurrentValueSubject<Bool, Never>(false)
     }
     
     @Dependency private var appConfigUseCase: AppConfigUseCase
     
     private var cancellables = Set<AnyCancellable>()
-    private let inputSubject = PassthroughSubject<Input, Never>() // Input 스트림
+    private let inputSubject = PassthroughSubject<Input, Never>()
     
     var input: PassthroughSubject<Input, Never> { inputSubject }
     private(set) var output: Output = .init()
-    
-    // MARK: - Init
     
     // MARK: - Bind (Input -> Output)
     func bind() {
@@ -46,6 +47,7 @@ final class ChangeNicknameViewModel {
             .store(in: &cancellables)
     }
     
+    /// 텍스트 필드 입력값을 nicknameUpdated에 실시간 반영합니다.
     func bindTextField(_ textPublisher: AnyPublisher<String, Never>) {
         textPublisher
             .sink { [weak self] text in
@@ -54,24 +56,25 @@ final class ChangeNicknameViewModel {
             .store(in: &cancellables)
     }
     
+    /// 현재 입력된 닉네임을 저장소에 업데이트합니다.
     private func saveNickname() {
         Task {
             do {
                 try await appConfigUseCase.updateNickname(output.nicknameUpdated.value)
-
-                self.output.saveSuccess.send(true)
+                output.saveSuccess.send(true)
             } catch {
                 print("Error saving nickname: \(error)")
-                self.output.saveSuccess.send(false)
+                output.saveSuccess.send(false)
             }
         }
     }
     
+    /// 저장된 닉네임을 불러와 nicknameUpdated에 반영합니다.
     private func fetchNickname() {
         Task {
             do {
                 let savedNickname = try await appConfigUseCase.getNickname()
-                self.output.nicknameUpdated.send(savedNickname)
+                output.nicknameUpdated.send(savedNickname)
             } catch {
                 print("Error fetching nickname: \(error)")
             }

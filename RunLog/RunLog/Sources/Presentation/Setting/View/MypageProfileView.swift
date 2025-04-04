@@ -9,22 +9,29 @@ import UIKit
 import SnapKit
 import Then
 
+/// 마이페이지 메인 프로필 영역을 구성하는 뷰
 final class MypageProfileView: UIView {
     
     // MARK: - UI Components 선언
-    lazy var nameLabel = UILabel().then {
+    /// 사용자 닉네임 라벨
+    private let nameLabel = UILabel().then {
         $0.numberOfLines = 1
     }
-    
-    lazy var despLabel = UILabel().then {
+
+    /// 총 거리 설명 라벨
+    private let despLabel = UILabel().then {
         $0.numberOfLines = 1
         $0.textAlignment = .left
     }
-    
-    lazy var logCard = ProfileCardView()
-    lazy var streakCard = ProfileCardView()
-    
-    lazy var cardStackView: UIStackView = {
+
+    /// 운동 기록 카드
+    private let logCard = ProfileCardView()
+
+    /// 스트릭 카드
+    private let streakCard = ProfileCardView()
+
+    /// 카드 2개를 나란히 담는 StackView
+    private lazy var cardStackView: UIStackView = {
         let stackView = UIStackView(arrangedSubviews: [logCard, streakCard])
         stackView.axis = .horizontal
         stackView.spacing = 16
@@ -33,6 +40,7 @@ final class MypageProfileView: UIView {
         return stackView
     }()
     
+    /// 설정 메뉴를 표시할 테이블뷰
     public lazy var tableView = UITableView(frame: .zero, style: .plain).then {
         $0.backgroundColor = .clear
         $0.separatorStyle = .none
@@ -85,23 +93,24 @@ final class MypageProfileView: UIView {
     }
     
     // MARK: - Configure
+    /// 유저 정보를 기반으로 프로필 UI를 구성합니다.
+    /// - Parameter config: 유저 정보 모델
     func configure(with config: UserInfoVO) {
-            nameLabel.attributedText = .RLAttributedString(text: "\(config.nickname) 님", font: .Title, color: .Gray000)
-            
-            let totalDistanceString = config.totalDistance.toString(withDecimal: 1) + "km"
-            let fullText = "지금까지 총 \(totalDistanceString)를 걸으셨어요!"
-            
-            despLabel.attributedText = fullText.styledText(
-                highlightText: totalDistanceString,
-                baseFont: .RLHeadline2,
-                baseColor: .Gray000,
-                highlightFont: .RLHeadline3,
-                highlightColor: .LightPink
-            )
+        nameLabel.attributedText = .RLAttributedString(
+            text: config.displayNickname,
+            font: .Title,
+            color: .Gray000
+        )
 
-            logCard.configure(property: .logCount, value: config.logCount)
-            streakCard.configure(property: .streak, value: config.streakCount)
+        despLabel.attributedText = config.summaryMessage.styledText(
+            highlightText: config.formattedTotalDistance,
+            baseFont: .RLHeadline2,
+            baseColor: .Gray000,
+            highlightFont: .RLHeadline3,
+            highlightColor: .LightPink
+        )
+
+        logCard.configure(property: .logCount, value: config.logCount)
+        streakCard.configure(property: .streak, value: config.streakCount)
     }
 }
-
-
