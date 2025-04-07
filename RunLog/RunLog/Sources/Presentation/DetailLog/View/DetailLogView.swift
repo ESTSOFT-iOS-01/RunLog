@@ -10,7 +10,6 @@ import MapKit
 import SnapKit
 import Then
 
-
 final class DetailLogView: UIView {
     
     // MARK: - UI Components 선언
@@ -26,32 +25,31 @@ final class DetailLogView: UIView {
     
     /// 지도 영역을 표시하는 MKMapView
     private let mapView = MKMapView().then {
-        // 추가 delegate 설정 및 커스터마이징 가능
+        // 지도 영역에 둥근 모서리 효과 적용 및 클리핑 활성화
         $0.layer.cornerRadius = DynamicSize.scaledSize(10)
         $0.clipsToBounds = true
     }
-    
-    
     
     /// 지도 위에 오버레이될 무빙트랙 버튼
     let movingTrackButton = UIButton(type: .system).then {
         $0.configuration = UIButton.Configuration.plain()
         
+        // 버튼의 타이틀 설정
         let attributedTitle = NSAttributedString.RLAttributedString(text: "무빙트랙", font: .Label2)
         $0.setAttributedTitle(attributedTitle, for: .normal)
         $0.backgroundColor = .Gray300
         $0.layer.cornerRadius = DynamicSize.scaledSize(10)
         
+        // 버튼 아이콘 설정 (시스템 이미지 사용)
         let config = UIImage.SymbolConfiguration(pointSize: DynamicSize.scaledSize(16), weight: .regular)
         let icon = UIImage(systemName: RLIcon.play.name)?.withConfiguration(config)
         $0.setImage(icon, for: .normal)
         $0.tintColor = .Gray000
         
+        // 이미지와 타이틀 간의 여백 설정
         $0.configuration?.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: DynamicSize.scaledSize(8), bottom: 0, trailing: DynamicSize.scaledSize(8))
         $0.configuration?.imagePadding = DynamicSize.scaledSize(8)
     }
-    
-    
     
     /// 타이틀 라벨
     private let titleLabel = RLLabel(
@@ -120,6 +118,7 @@ final class DetailLogView: UIView {
         font: .RLHeading1
     )
     
+    /// 소요시간 관련 정보를 담는 수직 스택뷰
     private lazy var timeStack: UIStackView = {
         let stack = UIStackView(arrangedSubviews: [timeTitleLabel, timeValueLabel])
         stack.axis = .vertical
@@ -144,6 +143,7 @@ final class DetailLogView: UIView {
         font: .RLHeading1
     )
     
+    /// 운동거리 관련 정보를 담는 수직 스택뷰
     private lazy var distanceStack: UIStackView = {
         let stack = UIStackView(arrangedSubviews: [distanceTitleLabel, distanceValueLabel])
         stack.axis = .vertical
@@ -168,6 +168,7 @@ final class DetailLogView: UIView {
         font: .RLHeading1
     )
     
+    /// 걸음수 관련 정보를 담는 수직 스택뷰
     private lazy var stepsStack: UIStackView = {
         let stack = UIStackView(arrangedSubviews: [stepsTitleLabel, stepsValueLabel])
         stack.axis = .vertical
@@ -176,6 +177,7 @@ final class DetailLogView: UIView {
         return stack
     }()
     
+    /// 소요시간, 운동거리, 걸음수 정보를 수평으로 나열하는 스택뷰
     lazy var statsStack: UIStackView = {
         let stack = UIStackView(arrangedSubviews: [timeStack, distanceStack, stepsStack])
         stack.axis = .horizontal
@@ -196,10 +198,10 @@ final class DetailLogView: UIView {
     // MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: frame)
-        setupUI()
-        setupLayout()
+        setupUI()      // UI 요소들을 추가
+        setupLayout()  // SnapKit을 통한 레이아웃 설정
         
-        print("LogView initialized")
+        //print("LogView initialized")
     }
     
     required init?(coder: NSCoder) {
@@ -207,19 +209,22 @@ final class DetailLogView: UIView {
     }
     
     // MARK: - Setup UI
+    /// 하위 뷰들을 계층 구조에 추가하는 메서드
     private func setupUI() {
-        // UI 요소 추가
         backgroundColor = .Gray900
         
+        // 스크롤뷰와 내부 콘텐츠 뷰 추가
         addSubview(scrollView)
         scrollView.addSubview(contentView)
         
+        // 콘텐츠 뷰에 지도, 타이틀, 날씨, 구분선, 통계, 기록 상세 관련 뷰 추가
         contentView.addSubviews(mapView, titleLabel, weatherStack, separatorView, statsStack, recordTitleLabel, recordDetailView)
+        // 지도 위에 무빙트랙 버튼 추가
         mapView.addSubview(movingTrackButton)
-        
     }
     
     // MARK: - Setup Layout
+    /// SnapKit을 활용하여 각 UI 요소들의 레이아웃 제약 조건을 설정하는 메서드
     private func setupLayout() {
         scrollView.snp.makeConstraints { make in
             make.edges.equalTo(self)
@@ -230,43 +235,46 @@ final class DetailLogView: UIView {
             make.width.equalTo(self.safeAreaLayoutGuide.snp.width)
         }
         
+        // 지도 영역 설정: 상단 인셋과 좌우 인셋, 높이는 너비와 동일하게 설정
         mapView.snp.makeConstraints { make in
             make.top.equalToSuperview().inset(DynamicSize.scaledSize(16))
             make.leading.trailing.equalToSuperview().inset(DynamicSize.scaledSize(24))
             make.height.equalTo(mapView.snp.width)
         }
         
+        // 무빙트랙 버튼 위치 설정: 지도 뷰의 우측 하단
         movingTrackButton.snp.makeConstraints { make in
             make.bottom.trailing.equalToSuperview().inset(DynamicSize.scaledSize(8))
             make.width.equalTo(DynamicSize.scaledSize(95))
             make.height.equalTo(DynamicSize.scaledSize(40))
         }
         
-        // 타이틀 라벨: 맵뷰 아래
+        // 타이틀 라벨 배치: 지도 하단에 위치
         titleLabel.snp.makeConstraints { make in
             make.top.equalTo(mapView.snp.bottom).offset(DynamicSize.scaledSize(24))
             make.leading.trailing.equalToSuperview().inset(DynamicSize.scaledSize(24))
         }
         
-        // 날씨 스택: 타이틀 아래
+        // 날씨 스택 배치: 타이틀 라벨 아래에 위치
         weatherStack.snp.makeConstraints { make in
             make.top.equalTo(titleLabel.snp.bottom).offset(DynamicSize.scaledSize(8))
             make.leading.equalToSuperview().inset(DynamicSize.scaledSize(24))
         }
         
-        // 구분선:날씨 스택 아래
+        // 구분선 배치: 날씨 스택 아래, 좌우 인셋과 높이 설정
         separatorView.snp.makeConstraints { make in
             make.top.equalTo(weatherStack.snp.bottom).offset(DynamicSize.scaledSize(8))
             make.leading.trailing.equalToSuperview().inset(DynamicSize.scaledSize(24))
             make.height.equalTo(DynamicSize.scaledSize(1))
         }
         
-        // 통계 스택: 구분선 아래
+        // 통계 스택 배치: 구분선 아래에 위치
         statsStack.snp.makeConstraints { make in
             make.top.equalTo(separatorView.snp.bottom).offset(DynamicSize.scaledSize(8))
             make.leading.trailing.equalToSuperview().inset(DynamicSize.scaledSize(24))
         }
         
+        // 각 정보 스택의 너비 비율 설정
         timeStack.snp.makeConstraints { make in
             make.width.equalTo(statsStack.snp.width).multipliedBy(0.334)
         }
@@ -277,17 +285,17 @@ final class DetailLogView: UIView {
             make.width.equalTo(statsStack.snp.width).multipliedBy(0.333)
         }
         
-        // 기록상세
+        // 기록 상세 타이틀 배치
         recordTitleLabel.snp.makeConstraints { make in
             make.top.equalTo(statsStack.snp.bottom).offset(DynamicSize.scaledSize(24))
             make.leading.equalToSuperview().inset(DynamicSize.scaledSize(24))
         }
         
-        // “기록 상세” 테이블뷰
+        // “기록 상세” 테이블뷰 배치
         recordDetailView.snp.makeConstraints { make in
-            make.top.equalTo(recordTitleLabel.snp.bottom).offset(DynamicSize.scaledSize(16))
+            make.top.equalTo(recordTitleLabel.snp.bottom).offset(DynamicSize.scaledSize(8))
             make.leading.trailing.equalToSuperview().inset(DynamicSize.scaledSize(16))
-            make.bottom.equalToSuperview().offset(DynamicSize.scaledSize(-20))
+            make.bottom.lessThanOrEqualToSuperview().offset(DynamicSize.scaledSize(-20))
         }
     }
     
@@ -338,9 +346,8 @@ extension DetailLogView {
         mapView.setRegion(region, animated: animated)
     }
     
+    /// 맵뷰에 추가된 모든 오버레이 제거
     func removeAllMapOverlays() {
         mapView.removeOverlays(mapView.overlays)
     }
 }
-
-

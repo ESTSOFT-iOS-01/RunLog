@@ -48,19 +48,23 @@ final class DetailLogViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        print("디버그: viewDidLoad 호출됨, 시각: \(Date())")
+        //print("디버그: viewDidLoad 호출됨, 시각: \(Date())")
+        
+        // 테이블뷰의 데이터소스와 delegate 설정
         let tableView = detailLogView.recordDetailView.tableView
         tableView.dataSource = self
         tableView.delegate = self
+        
         setupUI()
         setupNavigationBar()
         bindGesture()
         bindViewModel()
-        // setupMapView()
+        // setupMapView() // 초기 맵뷰 설정은 뷰모델 바인딩 내에서 처리
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        // 뷰모델을 통해 DayLog 데이터를 새로고침하고 UI 업데이트
         viewModel.refreshDayLog()
         refreshUI()
     }
@@ -70,15 +74,17 @@ final class DetailLogViewController: UIViewController {
     }
     
     // MARK: - Setup UI
+    /// 추가적인 UI 설정이 필요할 경우 여기에 구현 (현재는 기본 설정만 적용)
     private func setupUI() {
-        // UI 요소 추가
+        // UI 요소 추가 시 필요한 설정을 여기에 작성
     }
     
     // MARK: - Setup Navigation Bar
+    /// 네비게이션 바 스타일 및 오른쪽 메뉴 버튼 추가 설정
     private func setupNavigationBar() {
-        // 네비게이션바 디테일 설정
-        navigationController?.setupAppearance() // 스타일 설정
+        navigationController?.setupAppearance() // 네비게이션 바 스타일 적용
         navigationController?.navigationItem.backButtonTitle = "chevron.left"
+        
         navigationController?
             .addRightMenuButton(menuItems: [
                 ("수정하기", .init()),
@@ -92,8 +98,9 @@ final class DetailLogViewController: UIViewController {
     }
     
     // MARK: - Setup Gesture
+    /// 무빙트랙 버튼 및 통계 스택의 제스처를 바인딩하는 메서드
     private func bindGesture() {
-        // 제스처 추가
+        // 무빙트랙 버튼 터치 시 시트형태의 화면 표시
         detailLogView.movingTrackButton.controlPublisher(for: .touchUpInside)
             .sink { [weak self] _ in
                 guard let self = self else { return }
@@ -107,37 +114,33 @@ final class DetailLogViewController: UIViewController {
                     sheet.detents = [customDetent]
                     sheet.selectedDetentIdentifier = customDetent.identifier
                     
-                    // Grabber 제거
+                    // Grabber 비표시 설정 및 기타 시트 옵션 적용
                     sheet.prefersGrabberVisible = false
-                    
                     sheet.prefersScrollingExpandsWhenScrolledToEdge = false
                     sheet.prefersEdgeAttachedInCompactHeight = true
                     sheet.widthFollowsPreferredContentSizeWhenEdgeAttached = true
                     sheet.preferredCornerRadius = DynamicSize.scaledSize(16)
                 }
                 
-                
                 self.present(sheetVC, animated: true)
             }
             .store(in: &cancellables)
         
-        // 통계 스택 탭 시 전체 경로 줌아웃 처리
+        // 통계 스택 탭 시 전체 경로를 보여주기 위해 맵 뷰를 줌 아웃
         let statsTapGesture = UITapGestureRecognizer()
         detailLogView.statsStack.addGestureRecognizer(statsTapGesture)
         
         statsTapGesture.tapPublisher
             .sink { [weak self] _ in
                 guard let self = self, let dayLog = self.currentDayLog else { return }
-                self.zoomToAllPoints(dayLog: dayLog) // 전체 경로로 줌아웃
+                self.zoomToAllPoints(dayLog: dayLog)
             }
             .store(in: &cancellables)
-        
     }
     
-    
     // MARK: - Bind ViewModel
+    /// 뷰모델의 output 이벤트를 수신하여 UI를 업데이트하고 필요한 액션을 수행하는 메서드
     private func bindViewModel() {
-        
         viewModel.output
             .receive(on: DispatchQueue.main)
             .sink { [weak self] output in
@@ -146,28 +149,27 @@ final class DetailLogViewController: UIViewController {
                 case .loadedDayLog(let dayLog):
                     self.currentDayLog = dayLog
                     
-                    // 첫 지점의 timestamp 기준으로 각 섹션 정렬 (최신순: 내림차순)
+                    // 각 섹션의 첫 timestamp 기준으로 내림차순 정렬
                     let sortedSections = dayLog.sections.sorted { lhsSection, rhsSection in
                         let lhsStartTime = lhsSection.route.sorted { $0.timestamp < $1.timestamp }
                             .first?.timestamp ?? Date.distantPast
                         let rhsStartTime = rhsSection.route.sorted { $0.timestamp < $1.timestamp }
                             .first?.timestamp ?? Date.distantPast
-                        
                         return lhsStartTime > rhsStartTime
                     }
                     
                     self.recordDetails = sortedSections.map { RecordDetail(from: $0) }
                     
-                    
+                    // DayLog 데이터를 기반으로 뷰 업데이트
                     self.detailLogView.configure(with: DisplayDayLog(from: dayLog))
-                    self.recordDetails = dayLog.sections.map {
-                        RecordDetail(from: $0)
-                    }
+                    self.recordDetails = dayLog.sections.map { RecordDetail(from: $0) }
                     self.detailLogView.recordDetailView.tableView.reloadData()
                     self.setupMapView(with: dayLog)
+                    
                 case .edit:
                     let editViewModel = EditLogInfoViewModel(date: viewModel.date)
                     self.navigationController?.pushViewController(EditLogInfoViewController(viewModel: editViewModel), animated: true)
+                    
                 case .share:
                     self.handleShare()
                     
@@ -182,6 +184,7 @@ final class DetailLogViewController: UIViewController {
     }
     
     // MARK: - Action Handlers (함수 분리)
+    /// 공유 액션 처리: 현재 DayLog의 트랙 이미지를 공유
     private func handleShare() {
         guard let data = currentDayLog?.trackImage else { return }
         let shareItems: [Any] = [UIImage(data: data)!]
@@ -189,6 +192,7 @@ final class DetailLogViewController: UIViewController {
         self.present(activityVC, animated: true)
     }
     
+    /// 삭제 액션 처리: 삭제 확인 Alert 후 삭제 처리
     private func handleDelete(in targetVC: UIViewController, dateString: String) {
         let alert = UIAlertController(
             title: "기록 삭제하기",
@@ -200,7 +204,7 @@ final class DetailLogViewController: UIViewController {
             Task {
                 do {
                     try await self.viewModel.deleteDayLog()
-                    // 삭제 성공 후 이전 화면으로 돌아가거나 추가 작업 수행
+                    // 삭제 성공 후 이전 화면으로 이동
                     DispatchQueue.main.async {
                         self.navigationController?.popViewController(animated: true)
                     }
@@ -225,11 +229,12 @@ final class DetailLogViewController: UIViewController {
         targetVC.present(alert, animated: true)
     }
     
-    
+    /// 네비게이션 타이틀을 날짜 정보로 업데이트
     private func updateNavigationTitle(with date: Date) {
         self.title = date.formattedString(.monthDay)
     }
     
+    /// 현재 DayLog 데이터를 기반으로 전체 UI를 새로고침
     private func refreshUI() {
         guard let dayLog = currentDayLog else { return }
         detailLogView.configure(with: DisplayDayLog(from: dayLog))
@@ -246,55 +251,48 @@ extension DetailLogViewController: UITableViewDataSource, UITableViewDelegate {
         return 1
     }
     
-    // 헤더 행 1개 + 실제 데이터 수
+    // 실제 데이터 행 수만 반환
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return recordDetails.count + 1
+        return recordDetails.count
+    }
+    
+    // 섹션 헤더 뷰 반환
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        guard let header = tableView.dequeueReusableHeaderFooterView(
+            withIdentifier: RecordDetailHeaderView.identifier
+        ) as? RecordDetailHeaderView else {
+            return nil
+        }
+        return header
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
-        if indexPath.row == 0 {
-            // 헤더 셀
-            guard let cell = tableView.dequeueReusableCell(
-                withIdentifier: RecordDetailViewCell.identifier,
-                for: indexPath
-            ) as? RecordDetailViewCell else {
-                return UITableViewCell()
-            }
-            cell.configureAsHeader()
-            //print("디버그: 헤더 셀 생성됨, 시각: \(Date())")
-            return cell
-        } else {
-            let record = recordDetails[indexPath.row - 1]
-            guard let cell = tableView.dequeueReusableCell(
-                withIdentifier: RecordDetailViewCell.identifier,
-                for: indexPath
-            ) as? RecordDetailViewCell else {
-                return UITableViewCell()
-            }
-            // 선택된 셀이면 폰트를 RLHeadline1, 아니면 RLHeadline2로 설정
-            if indexPath.row - 1 == selectedSectionIndex {
-                cell.configure(with: record, font: .RLHeadline1)
-            } else {
-                cell.configure(with: record, font: .RLHeadline2)
-            }
-            return cell
+        let record = recordDetails[indexPath.row]
+        guard let cell = tableView.dequeueReusableCell(
+            withIdentifier: RecordDetailViewCell.identifier,
+            for: indexPath
+        ) as? RecordDetailViewCell else {
+            return UITableViewCell()
         }
+        // 선택된 셀은 폰트를 RLHeadline1, 그 외는 RLHeadline2로 설정
+        if indexPath.row == selectedSectionIndex {
+            cell.configure(with: record, font: .RLHeadline1)
+        } else {
+            cell.configure(with: record, font: .RLHeadline2)
+        }
+        return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        // 헤더 셀은 무시 (indexPath.row == 0)
-        guard indexPath.row > 0 else { return }
-        
-        let newSelectionIndex = indexPath.row - 1
+        let newSelectionIndex = indexPath.row
         let previousSelection = selectedSectionIndex
         
         if let previous = previousSelection, previous != newSelectionIndex {
-            // 다른 셀을 선택한 경우: 기존 선택 해제 후 전체 경로 줌 (줌 아웃)
+            // 다른 셀 선택 시: 이전 선택 해제 후 전체 경로 줌(줌 아웃)
             selectedSectionIndex = nil
             tableView.reloadData()
             
-            // 줌 아웃 전에 오버레이 업데이트
+            // 줌 아웃 전 오버레이 업데이트
             detailLogView.removeAllMapOverlays()
             for polyline in polylineOverlays {
                 detailLogView.addMapOverlay(polyline)
@@ -304,13 +302,13 @@ extension DetailLogViewController: UITableViewDataSource, UITableViewDelegate {
                 zoomToAllPoints(dayLog: dayLog)
             }
             
-            // 약간의 딜레이 후 새 선택 셀 줌 (줌 인)
+            // 약간의 딜레이 후 새 선택 셀 줌(줌 인)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
                 guard let self = self else { return }
                 self.selectedSectionIndex = newSelectionIndex
                 tableView.reloadData()
                 
-                // 줌 인 전에 오버레이 업데이트
+                // 줌 인 전 오버레이 업데이트
                 self.detailLogView.removeAllMapOverlays()
                 for polyline in self.polylineOverlays {
                     self.detailLogView.addMapOverlay(polyline)
@@ -323,11 +321,11 @@ extension DetailLogViewController: UITableViewDataSource, UITableViewDelegate {
                 }
             }
         } else {
-            // 동일한 셀을 선택한 경우 즉시 줌 처리
+            // 동일 셀 선택 시: 즉시 줌 처리
             selectedSectionIndex = newSelectionIndex
             tableView.reloadData()
             
-            // 줌 처리 전에 오버레이 업데이트
+            // 줌 처리 전 오버레이 업데이트
             detailLogView.removeAllMapOverlays()
             for polyline in polylineOverlays {
                 detailLogView.addMapOverlay(polyline)
@@ -342,29 +340,27 @@ extension DetailLogViewController: UITableViewDataSource, UITableViewDelegate {
     }
 }
 
-
 // MARK: - Setup MapView & 폴리라인
 extension DetailLogViewController {
     
-    /// DayLog를 파라미터로 받아 맵뷰 초기설정 및 폴리라인 그리기
+    /// DayLog를 기반으로 맵뷰 초기 설정 및 폴리라인 그리기
     private func setupMapView(with dayLog: DayLog) {
         // 1) 맵뷰 델리게이트 설정
         detailLogView.setMapViewDelegate(self)
-        // 2) 데이터 세팅 (DisplayDayLog 생성 대신, dayLog 데이터 활용)
+        // 2) DayLog 데이터를 기반으로 뷰 업데이트
         detailLogView.configure(with: DisplayDayLog(from: dayLog))
         // 3) 폴리라인 그리기
         drawPolyline(from: dayLog)
     }
     
-    /// dummyDayLog의 모든 Section을 순회하여 폴리라인을 그리고, 적절히 확대
+    /// 모든 섹션의 좌표를 순회하여 폴리라인을 그리고 전체 영역으로 줌 아웃 처리
     private func drawPolyline(from dayLog: DayLog) {
         // 기존 오버레이 제거
         detailLogView.removeAllMapOverlays()
         polylineOverlays.removeAll()
         
-        // 각 section 별로 폴리라인 생성
+        // 각 섹션별 폴리라인 생성
         for (index, section) in dayLog.sections.enumerated() {
-            // timestamp 기준으로 정렬한 후 좌표 배열 생성
             let sortedCoordinates = section.route
                 .sorted(by: { $0.timestamp < $1.timestamp })
                 .map { CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude) }
@@ -377,18 +373,16 @@ extension DetailLogViewController {
             detailLogView.addMapOverlay(polyline)
         }
         
-        // 전체 영역이 보이도록 확대
+        // 전체 경로가 보이도록 맵 뷰 줌 아웃 처리
         zoomToAllPoints(dayLog: dayLog)
-        
     }
     
-    /// 모든 경로 점들을 순회하여 바운딩 박스(최소·최대 위도/경도) 구하기
+    /// 모든 좌표를 순회하여 바운딩 박스를 계산하고, 전체 영역으로 줌 아웃
     private func zoomToAllPoints(dayLog: DayLog) {
-        // 1) 모든 Point 추출
         let allPoints = dayLog.sections.flatMap { $0.route }
         guard !allPoints.isEmpty else { return }
         
-        // 2) min/max lat, lon 구하기
+        // 최소/최대 위도 및 경도 계산
         var minLat = Double.greatestFiniteMagnitude
         var maxLat = -Double.greatestFiniteMagnitude
         var minLon = Double.greatestFiniteMagnitude
@@ -401,25 +395,18 @@ extension DetailLogViewController {
             maxLon = max(maxLon, point.longitude)
         }
         
-        // 3) 중심좌표 = (minLat ~ maxLat)의 중앙, (minLon ~ maxLon)의 중앙
+        // 중심 좌표 계산
         let centerLat = (minLat + maxLat) / 2
         let centerLon = (minLon + maxLon) / 2
         let center = CLLocationCoordinate2D(latitude: centerLat, longitude: centerLon)
         
-        // 4) 가장 멀리 떨어진 두 점 = (minLat, minLon) vs (maxLat, maxLon) 라고 가정
+        // 두 모서리 좌표 사이의 거리 계산 (여유 1.2배 적용)
         let corner1 = CLLocation(latitude: minLat, longitude: minLon)
         let corner2 = CLLocation(latitude: maxLat, longitude: maxLon)
-        
-        // 5) 두 지점 사이의 거리(미터)
         var distance = corner1.distance(from: corner2)
-        // 거리에 여유를 주고 싶다면 1.2배 등 곱해주기
-        if distance == 0 {
-            distance = 5000
-        } else {
-            distance *= 1.2
-        }
+        distance = (distance == 0) ? 5000 : distance * 1.2
         
-        // 6) region 설정
+        // MKCoordinateRegion 생성 후 맵 영역 설정
         let region = MKCoordinateRegion(
             center: center,
             latitudinalMeters: distance,
@@ -429,8 +416,8 @@ extension DetailLogViewController {
         detailLogView.setMapRegion(region, animated: true)
     }
     
+    /// 선택된 섹션의 좌표를 기반으로 지도 영역을 줌 인
     private func zoomToRoute(route: [Point]) {
-        // 경로가 비어있으면 아무 작업도 하지 않음
         guard !route.isEmpty else { return }
         
         var minLat = Double.greatestFiniteMagnitude
@@ -438,7 +425,7 @@ extension DetailLogViewController {
         var minLon = Double.greatestFiniteMagnitude
         var maxLon = -Double.greatestFiniteMagnitude
         
-        // 각 좌표의 최소, 최대 위도/경도 계산
+        // 각 좌표의 최소, 최대 위도 및 경도 계산
         for point in route {
             minLat = min(minLat, point.latitude)
             maxLat = max(maxLat, point.latitude)
@@ -451,22 +438,19 @@ extension DetailLogViewController {
         let centerLon = (minLon + maxLon) / 2
         let center = CLLocationCoordinate2D(latitude: centerLat, longitude: centerLon)
         
-        // 두 모서리 좌표 사이의 거리 계산 (여유를 위해 1.2배)
+        // 두 모서리 좌표 사이의 거리 계산 (여유 1.2배 적용)
         let corner1 = CLLocation(latitude: minLat, longitude: minLon)
         let corner2 = CLLocation(latitude: maxLat, longitude: maxLon)
         var distance = corner1.distance(from: corner2)
         distance = (distance == 0) ? 5000 : distance * 1.2
         
-        // MKCoordinateRegion 생성 후 맵뷰 영역 설정
+        // MKCoordinateRegion 생성 후 맵 영역 설정
         let region = MKCoordinateRegion(center: center,
                                         latitudinalMeters: distance,
                                         longitudinalMeters: distance)
         detailLogView.setMapRegion(region, animated: true)
     }
-    
 }
-
-
 
 // MARK: - MKMapViewDelegate
 extension DetailLogViewController: MKMapViewDelegate {
@@ -477,7 +461,7 @@ extension DetailLogViewController: MKMapViewDelegate {
         
         let renderer = MKPolylineRenderer(polyline: polyline)
         if let title = polyline.title, let index = Int(title), index == selectedSectionIndex {
-            renderer.strokeColor = .NormalGreen  // 선택된 section이면 NormalGreen색으로 표시
+            renderer.strokeColor = .NormalGreen  // 선택된 섹션이면 NormalGreen 색상 적용
             renderer.lineWidth = 6
         } else {
             renderer.strokeColor = .LightGreen
@@ -486,5 +470,3 @@ extension DetailLogViewController: MKMapViewDelegate {
         return renderer
     }
 }
-
-
