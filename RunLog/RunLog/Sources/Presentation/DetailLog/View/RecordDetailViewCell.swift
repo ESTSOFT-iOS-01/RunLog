@@ -14,23 +14,28 @@ final class RecordDetailViewCell: UITableViewCell {
     static let identifier = "RecordDetailCell"
     
     // MARK: - UI Components 선언
+    /// 시간 정보를 표시하는 라벨
     private let timeLabel = UILabel().then {
         $0.font = .RLHeadline2
         $0.textColor = .LightOrange
         $0.textAlignment = .left
     }
+    
+    /// 운동거리 정보를 표시하는 라벨
     private let distanceLabel = UILabel().then {
         $0.font = .RLHeadline2
         $0.textColor = .LightPink
         $0.textAlignment = .left
     }
+    
+    /// 걸음수 정보를 표시하는 라벨
     private let stepsLabel = UILabel().then {
         $0.font = .RLHeadline2
         $0.textColor = .LightBlue
         $0.textAlignment = .left
     }
     
-    // 수평 스택뷰로 3개 라벨 배치
+    /// 3개 라벨을 수평으로 배치하는 스택뷰
     private lazy var horizontalStack = UIStackView(arrangedSubviews: [timeLabel, distanceLabel, stepsLabel]).then {
         $0.axis = .horizontal
         $0.alignment = .leading
@@ -41,8 +46,8 @@ final class RecordDetailViewCell: UITableViewCell {
     // MARK: - Init
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        setupUI()
-        setupLayout()
+        setupUI()      // UI 요소들을 contentView에 추가
+        setupLayout()  // SnapKit 레이아웃 제약조건 설정
     }
     
     required init?(coder: NSCoder) {
@@ -50,23 +55,23 @@ final class RecordDetailViewCell: UITableViewCell {
     }
     
     // MARK: - Setup UI
+    /// contentView의 배경색을 설정하고, 수평 스택뷰를 추가하는 메서드
     private func setupUI() {
-        // UI 요소 추가
         contentView.backgroundColor = .Gray900
         contentView.addSubview(horizontalStack)
         
-        // 선택 스타일 제거
+        // 셀 선택 시 배경색 변화 없도록 설정
         selectionStyle = .none
     }
     
     // MARK: - Setup Layout
+    /// 수평 스택뷰와 각 라벨의 제약조건을 SnapKit을 이용해 설정하는 메서드
     private func setupLayout() {
-        // 레이아웃 설정
         horizontalStack.snp.makeConstraints { make in
             make.edges.equalToSuperview().inset(DynamicSize.scaledSize(8))
         }
         
-        // 라벨별로 width 비율 고정 (예: 0.4 : 0.3 : 0.3)
+        // 각 라벨의 너비를 전체 스택뷰 너비의 비율로 고정 (0.334, 0.333, 0.333)
         timeLabel.snp.makeConstraints { make in
             make.width.equalTo(horizontalStack.snp.width).multipliedBy(0.334)
         }
@@ -79,26 +84,7 @@ final class RecordDetailViewCell: UITableViewCell {
     }
     
     // MARK: - Configure
-    func configureAsHeader() {
-        print("헤더 셀 구성 호출됨")
-        // 뷰 설정
-        timeLabel.font = .RLBody1
-        timeLabel.textColor = .Gray000
-        timeLabel.textAlignment = .left
-        timeLabel.text = "시간대"
-        
-        distanceLabel.font = .RLBody1
-        distanceLabel.textColor = .Gray000
-        distanceLabel.textAlignment = .left
-        distanceLabel.text = "운동거리"
-        
-        stepsLabel.font = .RLBody1
-        stepsLabel.textColor = .Gray000
-        stepsLabel.textAlignment = .left
-        stepsLabel.text = "걸음수"
-    }
-    
-    /// 폰트를 외부에서 지정할 수 있도록 수정한 configure 메서드
+    /// 레코드 데이터를 받아서 라벨에 설정하고, 폰트를 외부에서 지정할 수 있도록 한 메서드
     func configure(with record: RecordDetail, font: UIFont) {
         timeLabel.font = font
         timeLabel.textColor = .LightOrange
@@ -116,10 +102,8 @@ final class RecordDetailViewCell: UITableViewCell {
         stepsLabel.text = record.steps
     }
     
-    // 기존 메서드 유지 (디폴트로 headline2 적용)
+    /// 기본적으로 RLHeadline2 폰트를 적용하여 레코드 데이터를 설정하는 메서드
     func configure(with record: RecordDetail) {
         configure(with: record, font: .RLHeadline2)
     }
 }
-
-
