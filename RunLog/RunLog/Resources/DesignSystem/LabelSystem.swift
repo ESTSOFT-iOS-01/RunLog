@@ -15,16 +15,18 @@ final class RLLabel: UIView {
     var icon = UIImageView()
     var label = UILabel()
     
+    /// Label의 attributedText 설정
     var attributedText: NSAttributedString? {
         get {
             return label.attributedText
         }
         set {
-            label.text = nil
+            label.text = nil // 기존의 text가 있으면 삭제 후 지정
             label.attributedText = newValue
         }
     }
     
+    /// text와 icon의 색상 변경
     override var tintColor: UIColor! {
         get {
             return label.tintColor
@@ -35,7 +37,14 @@ final class RLLabel: UIView {
         }
     }
     
-    /// 레이블 생성
+    /// 아이콘을 내포한 레이블을 생성합니다.
+    /// - Parameters:
+    ///   - text: 레이블의 텍스트
+    ///   - textColor: 텍스트 색상 (기본값: `.Gray000`)
+    ///   - icon: 레이블에 들어갈 아이콘 이미지 (기본값: `nil`)
+    ///   - align: 레이블 정렬 상태 (기본값: `.left`)
+    ///   - font: 레이블의 폰트 (기본값: `.RLLabel2`)
+    ///   - tintColor: 레이블의 틴트 색상 (기본값: `.Gray000`)
     public init(
         text: String = "Custom Label",
         textColor: UIColor = .Gray000,
@@ -61,8 +70,10 @@ final class RLLabel: UIView {
     
     // MARK: - Setup UI
     private func setupUI() {
-        // UI 요소 추가
+        // subview
         self.addSubviews(icon, label)
+        
+        // autoLayout
         if icon.image == nil {
             label.snp.makeConstraints {
                 $0.top.bottom.leading.trailing.equalToSuperview()

@@ -114,7 +114,7 @@ extension UIFont {
         case thin = "Pretendard-Thin"
     }
     
-    // 다이나믹 폰트 사이즈 설정
+    /// 다이나믹 폰트 사이즈 설정
     private static func dynamicFont(
         name: String,
         baseSize: CGFloat,
