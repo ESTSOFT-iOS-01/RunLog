@@ -9,7 +9,7 @@ import Foundation
 import MapKit
 import Combine
 
-// MARK: - 운동 정보에 대한 각종 정보를 가지고 있고 전달해주는 객체
+/// 운동관련 각종 정보를 가지고 있고 전달해주는 객체
 final class RunningDataProvider {
     
     // MARK: - Singleton
@@ -177,9 +177,6 @@ extension RunningDataProvider {
                 switch output {
                 case .responsePolyline(let polyline):
                     self.runningOutput.send(.responseLineDraw(polyline))
-                case .responseFullRoutePolyline(let mapView):
-                    // 사진을 만드는 매니저? 랜더러?에 해당 맵뷰를 send
-                    print("")
                 }
             }
             .store(in: &cancellables)
