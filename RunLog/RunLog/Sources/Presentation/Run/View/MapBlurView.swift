@@ -38,6 +38,7 @@ final class MapBlurView: UIView {
     // MARK: - AutoLayout 적용 후 Gradient 추가
     override func didMoveToSuperview() {
         super.didMoveToSuperview()
+        
         DispatchQueue.main.async {
             self.setupLayout()
         }
