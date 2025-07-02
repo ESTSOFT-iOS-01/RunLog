@@ -9,6 +9,8 @@ import Foundation
 import Combine
 import CoreLocation
 
+
+/// 사용자가 움직인 거리를 측정하는 매니저
 final class DistanceManager {
     
     // MARK: - Singleton
@@ -49,7 +51,7 @@ final class DistanceManager {
             .store(in: &cancellables)
     }
     
-    // MARK: - 이동 거리를 계산해서 output으로 send
+    /// 이전위치와 현재위치를 전달받아 움직인거리를 output으로 send
     private func calculateDistance(previous: CLLocation, current: CLLocation) {
         let distance = current.distance(from: previous)
         if distance >= 1 {

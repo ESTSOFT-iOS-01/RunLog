@@ -10,6 +10,7 @@ import UIKit
 
 // MARK: - Hex -> UIColor
 extension UIColor {
+    /// hex값과 alpha값을 전달 받아 hex값에 맞는 색상으로 초기화합니다.
     convenience init(hex: String, alpha: CGFloat = 1.0) {
         var hexFormatted: String = hex.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines).uppercased()
         if hexFormatted.hasPrefix("#") {

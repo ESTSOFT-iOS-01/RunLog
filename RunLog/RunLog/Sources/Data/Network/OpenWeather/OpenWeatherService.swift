@@ -43,8 +43,10 @@ final class OpenWeatherService: NetworkService {
         self.input
             .sink { [weak self] input in
                 guard let self = self else { return }
+                
                 switch input {
                 case .requestWeather(let location):
+                    // 두 데이터가 모두 도착하면 전달
                     Publishers.Zip(
                         self.fetchWeatherData(location: location),
                         self.fetchAqiData(location: location)
@@ -55,6 +57,7 @@ final class OpenWeatherService: NetworkService {
                         }
                     } receiveValue: { [weak self] weather, aqi in
                         guard let self = self else { return }
+                        
                         self.output.send(.responseWeather(weather: weather, aqi: aqi))
                     }
                     .store(in: &self.cancellables)
@@ -66,10 +69,13 @@ final class OpenWeatherService: NetworkService {
 
 // MARK: - 날씨정보 요청
 extension OpenWeatherService {
+    
+    /// 위치를 전달하면 날씨 정보(WeatherResonse)를 반환하는 Publisher를 반환
     private func fetchWeather(lat: Double, lon: Double) -> AnyPublisher<WeatherResponse, NetworkError> {
         return request(.weather(lat: lat, lon: lon), responseType: WeatherResponse.self)
     }
     
+    /// 날씨정보를 반환하는 Publisher에서 온도와 날씨 상태 데이터를 뽑아서 반환하는 Publisher를 반환
     private func fetchWeatherData(location: CLLocation) -> AnyPublisher<(Int, Double), Never> {
         return self.fetchWeather(
             lat: location.coordinate.latitude,
@@ -90,10 +96,13 @@ extension OpenWeatherService {
 
 // MARK: - 대기질정보 요청
 extension OpenWeatherService {
+    
+    /// 위치를 전달하면 대기질 정보(AQIResonse)를 반환하는 Publisher를 반환
     private func fetchAqi(lat: Double, lon: Double) -> AnyPublisher<AQIResponse, NetworkError> {
         return request(.airQuality(lat: lat, lon: lon), responseType: AQIResponse.self)
     }
     
+    /// 대기질 정보를 반환하는 Publisher에서 대기질 상태 데이터를 뽑아서 반환하는 Publisher를 반환
     private func fetchAqiData(location: CLLocation) -> AnyPublisher<Int, Never> {
         return self.fetchAqi(
             lat: location.coordinate.latitude,

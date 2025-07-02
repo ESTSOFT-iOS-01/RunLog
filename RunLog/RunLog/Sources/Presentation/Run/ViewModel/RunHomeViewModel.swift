@@ -46,13 +46,21 @@ final class RunHomeViewModel {
         self.input
             .sink { [weak self] input in
                 guard let self = self else { return }
+                
                 switch input {
+                // 운동시작
                 case .requestRunningStart:
                     self.provider.input.send(.requestRunningStart)
+                    
+                // 사용자의 위치 요청
                 case .requestCurrentLocation:
                     self.provider.input.send(.requestCurrentLocation)
+                    
+                // 사용자의 위치에 대한 날씨 요청
                 case .requestCurrentWeahter:
                     self.provider.input.send(.requestCurrentWeather)
+                    
+                // RoadRecord 정보 요청
                 case .requestRoadRecord:
                     self.getDistanceIndicator()
                 }
@@ -64,13 +72,20 @@ final class RunHomeViewModel {
             .sink { [weak self] output in
                 guard let self = self else { return }
                 switch output {
+                // 운동시작
                 case .responseRunningStart:
                     self.output.send(.responseRunningStart)
+                    
+                // 사용자의 위치 요청
                 case .responseCurrentLocation(let location):
                     self.output.send(.locationUpdate(location))
+                    
+                // 사용자의 위치에 대한 도시명 요청
                 case .responseCurrentCityName(let name):
                     let updateName = name.hasSuffix("...") ? name : "\(name)에서"
                     self.output.send(.locationNameUpdate(updateName))
+                    
+                // 사용자의 위치에 대한 날씨 요청
                 case .responseCurrentWeather(let weahter, let aqi):
                     let weatherString = self.toWeatherString(weahter, aqi)
                     self.output.send(.weatherUpdate(weatherString))
@@ -83,7 +98,9 @@ final class RunHomeViewModel {
 // MARK: - 날씨 레이블 형태로 변경
 extension RunHomeViewModel {
     private func toWeatherString(_ weather: (Int, Double), _ aqi: Int) -> String {
+        
         var formattedString = ""
+        
         if weather.0 == -1 { formattedString = "알 수 없음" }
         else {
             let condition = Constants.WeatherCondition.from(weather.0).description
@@ -102,16 +119,19 @@ extension RunHomeViewModel {
             let nickname = try await appConfigUseCase.getNickname()
             let (roadName, countData) = try await appConfigUseCase.getDistanceIndicators()
             let count = countData.toString(withDecimal: 2)
+            
             let string = """
                          \(nickname) 님은
                          지금까지 \(roadName) \(count)회
                          거리만큼 걸었습니다!
                          """
+            
             let attributedString = string.styledText(
                 highlightText: "\(roadName) \(count)회",
                 baseFont: .RLMainTitle,
                 highlightFont: .RLMainTitle
             )
+            
             self.output.send(.responseRoadRecord(attributedString))
         }
     }

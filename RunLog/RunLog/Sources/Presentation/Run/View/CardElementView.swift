@@ -10,6 +10,7 @@ import SnapKit
 import Then
 
 final class CardElementView: UIView {
+    
     enum ElementType: String {
         case time = "시간"
         case distance = "거리"
@@ -22,6 +23,7 @@ final class CardElementView: UIView {
             case .steps: return .Headline1
             }
         }
+        
         var valueFont: RLFont {
             switch self {
             case .time: return .Heading4
@@ -29,6 +31,7 @@ final class CardElementView: UIView {
             case .steps: return .Title
             }
         }
+        
         var color: UIColor {
             switch self {
             case .time: return .LightOrange
@@ -37,14 +40,17 @@ final class CardElementView: UIView {
             }
         }
     }
+    
     // MARK: - UI Components 선언
     private var type: ElementType
     private var title = UILabel()
     private var value = UILabel()
+    
     // MARK: - Init
     init(type: ElementType) {
         self.type = type
         super.init(frame: .zero)
+        
         setupUI()
         setupLayout()
     }
@@ -57,7 +63,11 @@ final class CardElementView: UIView {
     private func setupUI() {
         // UI 요소 추가
         self.addSubviews(title, value)
-        title.attributedText = .RLAttributedString(text: type.rawValue, font: type.titleFont)
+        
+        title.attributedText = .RLAttributedString(
+            text: type.rawValue,
+            font: type.titleFont
+        )
     }
     
     // MARK: - Setup Layout
@@ -66,6 +76,7 @@ final class CardElementView: UIView {
         title.snp.makeConstraints {
             $0.top.leading.trailing.equalToSuperview()
         }
+        
         value.snp.makeConstraints {
             $0.bottom.leading.trailing.equalToSuperview()
             $0.top.equalTo(title.snp.bottom)

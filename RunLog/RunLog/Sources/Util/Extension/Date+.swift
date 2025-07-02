@@ -32,8 +32,8 @@ enum DateFormatStyle {
     case yearMonth      // "2025년 3월"
     case yearMonthShort // "25년 3월"
     case fullTime       // "12:23:34:456"
-    case detailedFull  // "2025년 3월 3일 수요일"
-    case weekDay      // "월요일"
+    case detailedFull   // "2025년 3월 3일 수요일"
+    case weekDay        // "월요일"
         
     var format: String {
         switch self {

@@ -20,18 +20,25 @@ final class RunHomeViewController: UIViewController {
     // MARK: - UI
     private var mapView = MKMapView().then {
         $0.showsUserLocation = true
+        // 최대 줌아웃 거리 제한
         let zoomRange = MKMapView.CameraZoomRange(maxCenterCoordinateDistance: 20000)
         $0.setCameraZoomRange(zoomRange, animated: false)
         $0.initZoomLevel()
     }
-    private var totalLabel = UILabel().then {
+    
+    // 지금까지 운동한 거리에 대한 레이블
+    private var RoadRecordLabel = UILabel().then {
         $0.numberOfLines = 3
     }
+    
     private var weatherLabel = RLLabel().then {
         $0.setImage(image: UIImage(systemName: RLIcon.weather.name))
         $0.attributedText = .RLAttributedString(text: "Roading", font: .Label2)
     }
+    
     private var blurView = MapBlurView()
+    
+    // 사용자의 현재위치 레이블
     private var locationLabel = UILabel().then {
         $0.attributedText = .RLAttributedString(
             text: Constants.LocationMessage.random.message,
@@ -39,6 +46,7 @@ final class RunHomeViewController: UIViewController {
             align: .center
         )
     }
+    
     private var startButton = RLButton(
         title: "운동 시작하기",
         titleColor: .Gray900
@@ -67,19 +75,24 @@ final class RunHomeViewController: UIViewController {
         bindViewModel()
         bindGesture()
     }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         setupData()
-    }
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
     }
     
     // MARK: - Setup UI
     private func setupUI() {
         // UI 요소 추가
         view.backgroundColor = .systemBackground
-        view.addSubviews(mapView, blurView, totalLabel, weatherLabel, locationLabel, startButton)
+        view.addSubviews(
+            mapView,
+            blurView,
+            RoadRecordLabel,
+            weatherLabel,
+            locationLabel,
+            startButton
+        )
         
         // 맵뷰
         mapView.snp.makeConstraints {
@@ -88,15 +101,15 @@ final class RunHomeViewController: UIViewController {
         }
         
         // Road 정보
-        totalLabel.snp.makeConstraints {
+        RoadRecordLabel.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide).offset(DynamicSize.scaledSize(36))
             $0.leading.equalTo(view.safeAreaLayoutGuide).offset(DynamicSize.scaledSize(36))
         }
         
         // 날씨 정보
         weatherLabel.snp.makeConstraints {
-            $0.top.equalTo(totalLabel.snp.bottom).offset(DynamicSize.scaledSize(8))
-            $0.leading.equalTo(totalLabel)
+            $0.top.equalTo(RoadRecordLabel.snp.bottom).offset(DynamicSize.scaledSize(8))
+            $0.leading.equalTo(RoadRecordLabel)
         }
         
         // 운동 시작 버튼
@@ -133,9 +146,9 @@ final class RunHomeViewController: UIViewController {
     
     // MARK: - Setup Data
     private func setupData() {
-        // 처음 위치를 지도에 표현
+        // 사용자의 위치 정보를 요청
         viewModel.input.send(.requestCurrentLocation)
-        // 로드(기록)정보 표현
+        // RoadRecord 정보를 요청
         viewModel.input.send(.requestRoadRecord)
     }
     
@@ -145,13 +158,19 @@ final class RunHomeViewController: UIViewController {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] output in
                 guard let self = self else { return }
+                
                 switch output {
+                // 운동시작하면 운동화면으로 넘어감
                 case .responseRunningStart:
                     let vc = RunningViewController()
                     vc.modalPresentationStyle = .fullScreen
                     self.present(vc, animated: false)
+                    
+                // 사용자의 변경된 위치 반영
                 case .locationUpdate(let location):
                     self.mapView.centerToLocation(location, region: self.mapView.region)
+                    
+                // 사용자의 변경된 위치명 반영
                 case .locationNameUpdate(let text):
                     self.locationLabel.attributedText =
                         .RLAttributedString(
@@ -159,18 +178,24 @@ final class RunHomeViewController: UIViewController {
                             font: .Label2,
                             align: .center
                         )
+                    
+                // 변경된 날씨 정보 반영
                 case .weatherUpdate(let text):
                     self.weatherLabel.attributedText =
                         .RLAttributedString(
                             text: text,
                             font: .Label2
                         )
+                
+                //  RoadRecord 정보 표시
                 case .responseRoadRecord(let text):
-                    self.totalLabel.attributedText = text
+                    self.RoadRecordLabel.attributedText = text
                 }
             }
             .store(in: &cancellables)
+        
     }
+    
     // MARK: - Bind Gesture
     private func bindGesture() {
         // 제스처 추가

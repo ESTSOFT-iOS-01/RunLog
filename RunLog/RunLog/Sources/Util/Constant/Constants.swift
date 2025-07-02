@@ -71,6 +71,7 @@ struct Constants {
             }
         }
         
+        /// 위치를 받아오는 과정에서 랜덤한 메시지를 띄웁니다.
         static var random: LocationMessage {
             [unknown, consultingWithMap, detectingFootsteps, connectingGPS].randomElement()!
         }

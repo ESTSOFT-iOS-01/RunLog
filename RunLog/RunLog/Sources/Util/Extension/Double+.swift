@@ -12,6 +12,8 @@ extension Double {
     func toString(withDecimal decimal: Int = 2) -> String {
         return String(format: "%.\(decimal)f", self)
     }
+    
+    /// mm : ss 의 형태로 반환
     var asTimeString: String {
         let minutes = Int(self) / 60
         let seconds = Int(self) % 60

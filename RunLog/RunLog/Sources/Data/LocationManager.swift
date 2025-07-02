@@ -10,6 +10,7 @@ import MapKit
 import CoreLocation
 import Combine
 
+/// 사용자의 위치 정보를 받아오는 매니저
 final class LocationManager: NSObject, CLLocationManagerDelegate {
     
     // MARK: - Singleton
@@ -19,6 +20,7 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
         setupLocationManager()
         bind()
     }
+    
     deinit {
         locationManager.stopUpdatingLocation()
     }
@@ -53,49 +55,63 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
                 case .requestCurrentLocation:
                     guard let location = self.locationManager.location else { return }
                     self.output.send(.locationUpdate(location))
+                    
                 case .requestCityName(let location):
                     self.fetchCityName(location: location)
                 }
             }
             .store(in: &cancellables)
     }
-}
-
-// MARK: - CLLocationManager 설정
-extension LocationManager {
+    
+    /// CLLocationManager 기본 설정
     private func setupLocationManager() {
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
-        // Q) 지피티 피셜 걷기+달리기면 5m가 적당하다 - 실제로 3, 5로 해서 측정해보고 결정
-        locationManager.distanceFilter = 3
+        // 4미터 이동 시 사용자의 위치를 받아옴
+        locationManager.distanceFilter = 4
         // 백그라운드 상태에서도 위치 업데이트
         locationManager.allowsBackgroundLocationUpdates = true
         // 사용자가 멈춰있으면 업데이트 일시정지
         locationManager.pausesLocationUpdatesAutomatically = true
+        // 사용자의 위치 정보 권한 확인
         getLocationUsagePermission()
-    }
-    
-    // MARK: - 사용자가 위치를 이동하면 output으로 send를 보냄
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        guard let location = locations.last else { return }
-        // GPS 신호가 불안정한 경우 필터링
-        if previousLocation != nil && (location.horizontalAccuracy < 0 || location.horizontalAccuracy > 10) {
-            print("GPS 신호 불안정 - 위치 무시")
-            return
-        }
-        // 이전 위치와 비교하여 1m 이하 이동 시 무시
-        if let previous = previousLocation, location.distance(from: previous) < 1 {
-            print("이동 거리 1m 이하 - 위치 업데이트 안함")
-            return
-        }
-        self.output.send(.locationUpdate(location))
-        previousLocation = location
     }
 }
 
-// MARK: - 도시명 가져오기
+// MARK: - 사용자 위치 데이터
 extension LocationManager {
-    // MARK: - 도시명 가져오기
+    
+    /// 사용자의 위치를 받아오는 Delegate 함수
+    func locationManager(
+        _ manager: CLLocationManager,
+        didUpdateLocations locations: [CLLocation]
+    ) {
+        guard let location = locations.last else { return }
+        
+        // GPS 신호가 불안정한 경우 필터링
+        if previousLocation != nil &&
+            (location.horizontalAccuracy < 0 ||
+             location.horizontalAccuracy > 10)
+        {
+            print("GPS 신호 불안정 - 위치 무시")
+            return
+        }
+        
+        // 이전 위치와 비교하여 1m 이하 이동 시 무시 - 위치가 튀는것을 방지
+        if let previous = previousLocation,
+           location.distance(from: previous) < 1
+        {
+            print("이동 거리 1m 이하 - 위치 업데이트 안함")
+            return
+        }
+        
+        // 사용자의 위치를 output으로 send
+        self.output.send(.locationUpdate(location))
+        // 현재위치를 이전위치로 기억
+        previousLocation = location
+    }
+    
+    /// 사용자 위치의 도시명 받아오기
     private func fetchCityName(location: CLLocation) {
         let geocoder = CLGeocoder()
         geocoder.reverseGeocodeLocation(location) {
@@ -112,23 +128,33 @@ extension LocationManager {
 
 // MARK: - 위치 정보 권한 요청
 extension LocationManager {
+    
     // MARK: - 권한 정보가 바뀌면 실행
-    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+    func locationManager(
+        _ manager: CLLocationManager,
+        didChangeAuthorization status: CLAuthorizationStatus
+    ) {
         getLocationUsagePermission()
     }
+    
     // MARK: - 권한 정보에 따른 분기 처리
     private func getLocationUsagePermission() {
         let status = locationManager.authorizationStatus
+        
         switch status {
         case .notDetermined: // 허용 안한 상태
             locationManager.requestWhenInUseAuthorization()
+            
         case .authorizedWhenInUse: // 앱을 사용동안 허용
             locationManager.requestAlwaysAuthorization()
+            
         case .restricted, .denied: // 거부 상태
             print("위치 권한이 거부됨 - 설정에서 변경 필요")
             openAppSettings()
+            
         case .authorizedAlways: // 항상 허용
             locationManager.startUpdatingLocation()
+            
         @unknown default:
             return
         }
@@ -136,6 +162,7 @@ extension LocationManager {
     // MARK: - 앱 설정 열기
     private func openAppSettings() {
         guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+        
         if UIApplication.shared.canOpenURL(url) {
             UIApplication.shared.open(url, options: [:], completionHandler: nil)
         }

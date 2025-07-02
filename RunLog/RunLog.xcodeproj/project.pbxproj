@@ -15,6 +15,8 @@
 		16F688CA2D82974E00C2163F /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = 16F688C92D82974E00C2163F /* Moya */; };
 		595FD80C2D90474C0073F561 /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 595FD80B2D90474C0073F561 /* Secrets.xcconfig */; };
 		595FD80D2D90474C0073F561 /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 595FD80B2D90474C0073F561 /* Secrets.xcconfig */; };
+		5EF1F5D62DA6266900C34BCB /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 5EF1F5D52DA6266900C34BCB /* Secrets.xcconfig */; };
+		5EF1F5D72DA6266900C34BCB /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 5EF1F5D52DA6266900C34BCB /* Secrets.xcconfig */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -31,6 +33,7 @@
 		16811EF62D8A9E520013461D /* RpTest.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RpTest.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		16F686B72D827D6C00C2163F /* RunLog.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RunLog.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		595FD80B2D90474C0073F561 /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
+		5EF1F5D52DA6266900C34BCB /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -90,6 +93,7 @@
 		16F686AE2D827D6C00C2163F = {
 			isa = PBXGroup;
 			children = (
+				5EF1F5D52DA6266900C34BCB /* Secrets.xcconfig */,
 				595FD80B2D90474C0073F561 /* Secrets.xcconfig */,
 				16F686B92D827D6C00C2163F /* RunLog */,
 				16811EF72D8A9E520013461D /* RpTest */,
@@ -212,6 +216,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5EF1F5D62DA6266900C34BCB /* Secrets.xcconfig in Resources */,
 				595FD80C2D90474C0073F561 /* Secrets.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -220,6 +225,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5EF1F5D72DA6266900C34BCB /* Secrets.xcconfig in Resources */,
 				595FD80D2D90474C0073F561 /* Secrets.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

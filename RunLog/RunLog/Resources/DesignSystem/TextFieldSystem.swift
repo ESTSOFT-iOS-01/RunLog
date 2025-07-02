@@ -19,7 +19,6 @@ open class RLTextField: UITextField {
     
     // MARK: - Init
     public init(
-        // Q) 패딩 디폴트값에는 어떻게 다이나믹 패딩을 적용하나요!?
         padding: UIEdgeInsets = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16),
         placeholder: String? = nil
     ) {

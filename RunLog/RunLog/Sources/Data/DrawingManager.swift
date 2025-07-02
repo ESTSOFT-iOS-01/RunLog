@@ -28,7 +28,6 @@ final class DrawingManager: NSObject, MKMapViewDelegate {
     // MARK: - Output
     enum Output {
         case responsePolyline(MKPolyline)
-        case responseFullRoutePolyline(MKMapView)
     }
     let output = PassthroughSubject<Output, Never>()
     
@@ -50,7 +49,6 @@ final class DrawingManager: NSObject, MKMapViewDelegate {
                     mapView.delegate = self
                     let polyline = createFullRoutePolylines(route)
                     mapView.addOverlay(polyline)
-                    self.output.send(.responseFullRoutePolyline(mapView))
                     mapView.delegate = nil
                 }
             }

@@ -31,6 +31,7 @@ final class RunningViewModel {
         case responseCurrentSteps(String) // 운동 걸음 수 데이터
         case lineDraw(MKPolyline) // 지도에 라인을 그림
     }
+    
     let output = PassthroughSubject<Output, Never>()
     
     // MARK: - Properties
@@ -44,8 +45,10 @@ final class RunningViewModel {
             .sink { [weak self] input in
                 guard let self = self else { return }
                 switch input {
+                // 운동 종료
                 case .requestRunningStop:
                     self.provider.input.send(.requestRunningStop)
+                // 사용자의 위치를 받아서 업데이트
                 case .requestCurrentLocation:
                     self.provider.input.send(.requestCurrentLocation)
                 }
@@ -59,17 +62,22 @@ final class RunningViewModel {
                 switch output {
                 case .responseRunningStop:
                     self.output.send(.responseRunningStop)
+                    
                 case .responseCurrentLocation(let location):
                     self.output.send(.locationUpdate(location))
+                    
                 case .responseCurrentTimes(let times):
                     let timeString = times.asTimeString
                     self.output.send(.responseCurrentTimes(timeString))
+                    
                 case .responseCurrentDistances(let distances):
                     let distanceString = "\(distances.toString(withDecimal: 2))km"
                     self.output.send(.responseCurrentDistances(distanceString))
+                    
                 case .responseCurrentSteps(let steps):
                     let stepString = "\(steps)"
                     self.output.send(.responseCurrentSteps(stepString))
+                    
                 case .responseLineDraw(let polyline):
                     self.output.send(.lineDraw(polyline))
                 }
