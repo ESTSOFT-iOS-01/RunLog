@@ -1,0 +1,27 @@
+blank_issues_enabled: false
+contact_links: []
+
+issue_templates:
+  - name: ✨ feature
+    description: 새로운 기능 개발을 위한 이슈
+    file: feature-task.yml
+
+  - name: 🐞 bug
+    description: 버그 수정 작업을 위한 이슈
+    file: Bug-Report.yml
+
+  - name: 🔨 refactor
+    description: 코드 리팩토링 작업 이슈
+    file: refactor-task.yml
+
+  - name: 📃 docs
+    description: 문서 작성 및 수정 작업 이슈
+    file: docs-task.yml
+
+  - name: ⚙️ chore
+    description: 개발 환경 설정 관련 이슈
+    file: setting-task.yml
+
+  - name: ✅ test
+    description: 테스트 코드 작성 및 테스트 환경 구축
+    file: test-task.yml
