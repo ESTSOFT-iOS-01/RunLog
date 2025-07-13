@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "09FC71BD02640F3C2C5492AA"
-               BuildableName = "RunLog.app"
-               BlueprintName = "RunLog"
+               BlueprintIdentifier = "4C96BD4885D25C0EC8B75A59"
+               BuildableName = "RpTest.xctest"
+               BlueprintName = "RpTest"
                ReferencedContainer = "container:RunLog.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -26,9 +26,19 @@
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      shouldUseLaunchSchemeArgsEnv = "YES"
-      disableMainThreadChecker = "YES">
+      shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "4C96BD4885D25C0EC8B75A59"
+               BuildableName = "RpTest.xctest"
+               BlueprintName = "RpTest"
+               ReferencedContainer = "container:RunLog.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
@@ -41,16 +51,15 @@
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
+      <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "09FC71BD02640F3C2C5492AA"
-            BuildableName = "RunLog.app"
-            BlueprintName = "RunLog"
+            BlueprintIdentifier = "4C96BD4885D25C0EC8B75A59"
+            BuildableName = "RpTest.xctest"
+            BlueprintName = "RpTest"
             ReferencedContainer = "container:RunLog.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -58,16 +67,15 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
+      <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "09FC71BD02640F3C2C5492AA"
-            BuildableName = "RunLog.app"
-            BlueprintName = "RunLog"
+            BlueprintIdentifier = "4C96BD4885D25C0EC8B75A59"
+            BuildableName = "RpTest.xctest"
+            BlueprintName = "RpTest"
             ReferencedContainer = "container:RunLog.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">
