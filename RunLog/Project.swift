@@ -3,12 +3,6 @@ import ProjectDescription
 let project = Project(
   name: "RunLog",
   organizationName: "ESTSOFTiOSTEAM1",
-  packages: [
-    .package(url: "https://github.com/SnapKit/SnapKit", from: "5.7.1"),
-    .package(url: "https://github.com/devxoul/Then", from: "3.0.0"),
-    .package(url: "https://github.com/Moya/Moya.git", from: "15.0.3"),
-    .package(url: "https://github.com/ninjaprox/NVActivityIndicatorView", from: "5.2.0"),
-  ],
   targets: [
     .target(
       name: "RunLog",
@@ -57,12 +51,12 @@ let project = Project(
       sources: ["RunLog/Sources/**"],
       resources: ["RunLog/Resources/**"],
       dependencies: [
-        .package(product: "SnapKit"),
-        .package(product: "Then"),
-        .package(product: "Moya"),
-        .package(product: "CombineMoya"),
-        .package(product: "NVActivityIndicatorView"),
-        .package(product: "NVActivityIndicatorViewExtended"),
+        .external(name: "SnapKit"),
+        .external(name: "Then"),
+        .external(name: "Moya"),
+        .external(name: "CombineMoya"),
+        .external(name: "NVActivityIndicatorView"),
+        .external(name: "NVActivityIndicatorViewExtended"),
       ],
       coreDataModels: [
         .coreDataModel("RunLog/Sources/Data/DTO/DTOs.xcdatamodeld")
