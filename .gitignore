@@ -95,9 +95,10 @@ RunLog/Secrets.xcconfig
 
 # Tuist
 Derived
-.idea
-.xcodeproj
-.xcworkspace
+*.idea
+*.xcodeproj
+*.xcworkspace
+*.package.resolved
 *.xcuserstate
 *.xcuserdatad
 *.xcscmblueprint
