@@ -10,44 +10,7 @@ let project = Project(
       product: .app,
       bundleId: "com.ESTSOFTiOSTEAM1.IEEE.RunLog",
       deploymentTargets: .iOS("17.0"),
-      infoPlist: .extendingDefault(
-        with: [
-          "API_KEY": "$(API_KEY)",
-          "NSRemoteNotificationUsageDescription": "푸시 알림을 통해 개인화된 최신 소식을 받아보세요.",
-          "UIAppFonts": [
-            "NanumMyeongjo-Regular.ttf",
-            "RacingSansOne-Regular.ttf",
-            "Pretendard-Black.otf",
-            "Pretendard-Bold.otf",
-            "Pretendard-ExtraBold.otf",
-            "Pretendard-ExtraLight.otf",
-            "Pretendard-Light.otf",
-            "Pretendard-Medium.otf",
-            "Pretendard-Regular.otf",
-            "Pretendard-SemiBold.otf",
-            "Pretendard-Thin.otf",
-          ],
-          "UIBackgroundModes": ["location"],
-          "UIApplicationSceneManifest": [
-            "UIApplicationSupportsMultipleScenes": false,
-            "UISceneConfigurations": [
-              "UIWindowSceneSessionRoleApplication": [
-                [
-                  "UISceneConfigurationName": "Default Configuration",
-                  "UISceneDelegateClassName": "$(PRODUCT_MODULE_NAME).SceneDelegate"
-                ]
-              ]
-            ]
-          ],
-          "NSAppTransportSecurity": [
-            "NSAllowsArbitraryLoads": true
-          ],
-          "UILaunchScreen": [
-            "UIColorName": "",
-            "UIImageName": "",
-          ],
-        ]
-      ),
+      infoPlist: .file(path: "RunLog/InfoPlists/RunLog-info.plist"),
       sources: ["RunLog/Sources/**"],
       resources: ["RunLog/Resources/**"],
       dependencies: [
@@ -68,8 +31,8 @@ let project = Project(
       product: .unitTests,
       bundleId: "com.ESTSOFTiOSTEAM1.IEEE.RpTest",
       deploymentTargets: .iOS("17.0"),
-      infoPlist: .default,
-      sources: ["RpTest/**"],
+      infoPlist: .file(path: "RpTest/InfoPlists/RpTest-info.plist"),
+      sources: ["RpTest/Sources/**"],
       dependencies: [
         .target(name: "RunLog")
       ]
