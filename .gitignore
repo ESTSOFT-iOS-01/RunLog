@@ -92,3 +92,12 @@ fastlane/test_output
 
 iOSInjectionProject/
 RunLog/Secrets.xcconfig
+
+# Tuist
+Derived
+.idea
+.xcodeproj
+.xcworkspace
+*.xcuserstate
+*.xcuserdatad
+*.xcscmblueprint
