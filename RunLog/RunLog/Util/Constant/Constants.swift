@@ -7,6 +7,12 @@
 
 import Foundation
 
+struct Road {
+    let name: String
+    let distance: Double
+    let icon: String
+}
+
 struct Constants {
     static let levels = ["매우 쉬움", "쉬움", "보통", "어려움", "매우 어려움"]
     
