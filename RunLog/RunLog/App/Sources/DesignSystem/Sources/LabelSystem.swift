@@ -71,7 +71,8 @@ final class RLLabel: UIView {
     // MARK: - Setup UI
     private func setupUI() {
         // subview
-        self.addSubviews(icon, label)
+        self.addSubview(icon)
+        self.addSubview(label)
         
         // autoLayout
         if icon.image == nil {

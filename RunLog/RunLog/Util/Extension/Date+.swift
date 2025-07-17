@@ -7,7 +7,7 @@ import Foundation
 extension Date {
     
     // 저장하기 위해 연 월만 남기기
-    var toYearMonthDay: Date {
+    public var toYearMonthDay: Date {
         var calendar = Calendar.current
         calendar.timeZone = TimeZone(identifier: "Asia/Seoul")!
         let components = calendar.dateComponents(
@@ -17,7 +17,7 @@ extension Date {
         return calendar.date(from: components)!
     }
     
-    func formattedString(_ style: DateFormatStyle) -> String {
+    public func formattedString(_ style: DateFormatStyle) -> String {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "ko_KR")
         formatter.timeZone = TimeZone(identifier: "Asia/Seoul")!
@@ -26,7 +26,7 @@ extension Date {
     }
 }
 
-enum DateFormatStyle {
+public enum DateFormatStyle {
     case fullDate       // "2025. 02. 13."
     case monthDay       // "0월 0일 (수)"
     case yearMonth      // "2025년 3월"

@@ -9,19 +9,19 @@ import Foundation
 
 extension Double {
     /// 소수점 자리수를 지정하여 문자열로 변환
-    func toString(withDecimal decimal: Int = 2) -> String {
+    public func toString(withDecimal decimal: Int = 2) -> String {
         return String(format: "%.\(decimal)f", self)
     }
     
     /// mm : ss 의 형태로 반환
-    var asTimeString: String {
+    public var asTimeString: String {
         let minutes = Int(self) / 60
         let seconds = Int(self) % 60
         return String(format: "%02d : %02d", minutes, seconds)
     }
     
     // 소숫점 뒤에 0을 없애주는 애들
-    var formattedString: String {
+    public var formattedString: String {
         let formattedString = String(self)
         if let dotIndex = formattedString.firstIndex(of: ".") {
             let afterDot = formattedString[dotIndex...]
@@ -34,8 +34,8 @@ extension Double {
     }
     
     /// 각도를 라디안으로 변환
-    var deg2rad: Double { self * .pi / 180 }
+    public var deg2rad: Double { self * .pi / 180 }
     
     /// 라디안을 각도로 변환
-    var rad2deg: Double { self * 180 / .pi }
+    public var rad2deg: Double { self * 180 / .pi }
 }

@@ -21,3 +21,11 @@ struct DayLog: Equatable {
     var totalSteps: Int
     var sections: [Section]
 }
+
+
+extension DayLog {
+    /// DayLog의 각 section을 RecordDetail 배열로 변환
+    func toRecordDetails() -> [RecordDetail] {
+        return self.sections.map { RecordDetail(from: $0) }
+    }
+}

@@ -9,14 +9,14 @@ import Foundation
 
 extension Int {
     /// 3자리마다 콤마(,)를 추가하여 문자열로 변환
-    var formattedString: String {
+    public var formattedString: String {
       let numberFormatter = NumberFormatter()
       numberFormatter.numberStyle = .decimal
       return numberFormatter.string(from: NSNumber(value: self)) ?? "\(self)"
     }
     
     /// 오픈웨더에서 제공받은 날씨 정보를 한글화하여 반환
-    func toWeatherDescription() -> String {
+    public func toWeatherDescription() -> String {
         switch self {
         case 1: return "맑음"
         case 2: return "흐림"
@@ -26,7 +26,7 @@ extension Int {
         }
     }
         
-    func toLevelDescription() -> String {
+    public func toLevelDescription() -> String {
         switch self {
         case 0: return "매우 쉬움"
         case 1: return "쉬움"
