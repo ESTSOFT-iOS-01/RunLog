@@ -7,42 +7,42 @@
 
 import Foundation
 
-struct Road {
-    let name: String
-    let distance: Double
-    let icon: String
+public struct Road {
+    public let name: String
+    public let distance: Double
+    public let iconName: String
 }
 
-struct Constants {
-    static let levels = ["매우 쉬움", "쉬움", "보통", "어려움", "매우 어려움"]
+public struct Constants {
+    public static let levels = ["매우 쉬움", "쉬움", "보통", "어려움", "매우 어려움"]
     
-    static let allRoads: [Road] = [
-        Road(name: "마라톤", distance: 42.195, icon: RLIcon.medal.name),
-        Road(name: "서울둘레길", distance: 156.5, icon: RLIcon.flag.name),
-        Road(name: "제주올레길", distance: 437.0, icon: RLIcon.mandarin.name),
-        Road(name: "국토대장정", distance: 580.0, icon: RLIcon.korea.name),
-        Road(name: "산티아고 순례길", distance: 800.0, icon: RLIcon.church.name),
-        Road(name: "지구 둘레길", distance: 40075, icon: RLIcon.earth.name),
-        Road(name: "지구에서 달까지", distance: 385000, icon: RLIcon.rocket.name)
+    public static let allRoads: [Road] = [
+        Road(name: "마라톤", distance: 42.195, iconName: "Medal"),
+        Road(name: "서울둘레길", distance: 156.5, iconName: "Flag"),
+        Road(name: "제주올레길", distance: 437.0, iconName: "Mandarin"),
+        Road(name: "국토대장정", distance: 580.0, iconName: "Korea"),
+        Road(name: "산티아고 순례길", distance: 800.0, iconName: "Church"),
+        Road(name: "지구 둘레길", distance: 40075, iconName: "Earth"),
+        Road(name: "지구에서 달까지", distance: 385000, iconName: "Rocket")
     ]
     
-    enum MotivationMessage {
+    public enum MotivationMessage {
         case goodWeather
         case keepGoing
         case dogWalk
         
-        var icon: RLIcon {
+        public var iconName: String {
             switch self {
             case .goodWeather:
-                return .walkMan
+                return "walkMan"
             case .keepGoing:
-                return .walkGirl
+                return "walkGirl"
             case .dogWalk:
-                return .walkDog
+                return "walkDog"
             }
         }
         
-        var message: String {
+        public var message: String {
             switch self {
             case .goodWeather:
                 return "날씨 좋은 날에 산뜻한 러닝 어때요?"
@@ -53,18 +53,18 @@ struct Constants {
             }
         }
         
-        static var random: MotivationMessage {
+        public static var random: MotivationMessage {
             [goodWeather, keepGoing, dogWalk].randomElement()!
         }
     }
     
-    enum LocationMessage {
+    public enum LocationMessage {
         case unknown
         case consultingWithMap
         case detectingFootsteps
         case connectingGPS
         
-        var message: String {
+        public var message: String {
             switch self {
             case .unknown:
                 return "지구 어딘가에서..."
@@ -78,13 +78,13 @@ struct Constants {
         }
         
         /// 위치를 받아오는 과정에서 랜덤한 메시지를 띄웁니다.
-        static var random: LocationMessage {
+        public static var random: LocationMessage {
             [unknown, consultingWithMap, detectingFootsteps, connectingGPS].randomElement()!
         }
     }
     
     // MARK: - 날씨 정보
-    enum WeatherCondition {
+    public enum WeatherCondition {
         case thunderstorm // 뇌우
         case drizzle      // 이슬비
         case rain         // 비
@@ -94,7 +94,7 @@ struct Constants {
         case clouds       // 흐림 / 구름 많음
         case unknown      // 알 수 없음
         
-        static func from(_ id: Int) -> WeatherCondition {
+        public static func from(_ id: Int) -> WeatherCondition {
             switch id {
             case 200...232: return .thunderstorm
             case 300...321: return .drizzle
@@ -107,7 +107,7 @@ struct Constants {
             }
         }
         
-        var description: String {
+        public var description: String {
             switch self {
             case .thunderstorm: return "뇌우"
             case .drizzle: return "이슬비"
@@ -122,7 +122,7 @@ struct Constants {
     }
     
     // MARK: - 대기질 정보
-    enum AqiLevel: Int, CaseIterable {
+    public enum AqiLevel: Int, CaseIterable {
         case good = 1 // 좋음
         case fair = 2 // 보통
         case moderate = 3 // 나쁨
@@ -130,11 +130,11 @@ struct Constants {
         case veryPoor = 5 // 위험
         case unknown = -1 // 알 수 없음
         
-        static func from(_ value: Int) -> AqiLevel {
+        public static func from(_ value: Int) -> AqiLevel {
             return AqiLevel(rawValue: value) ?? .unknown
         }
         
-        var description: String {
+        public var description: String {
             switch self {
             case .good: return "좋음"
             case .fair: return "보통"

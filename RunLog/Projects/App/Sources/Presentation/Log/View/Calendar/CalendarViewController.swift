@@ -4,6 +4,7 @@
 //
 //  Created by 신승재 on 3/16/25.
 //
+import RLUtil
 
 import UIKit
 import SnapKit
@@ -57,7 +58,7 @@ final class CalendarViewController: UIViewController {
         // 랜덤 멘트 설정
         let randomMotivation = Constants.MotivationMessage.random
         calendarView.walkImage.image = UIImage(
-            named: randomMotivation.icon.name
+            named: randomMotivation.iconName
         )
         calendarView.bottomLabel.text = randomMotivation.message
     }

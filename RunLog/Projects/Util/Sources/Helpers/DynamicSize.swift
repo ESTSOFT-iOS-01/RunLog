@@ -1,10 +1,11 @@
 //
-//  ScreenSizeManager.swift
+//  DynamicSize.swift
 //  RunLog
 //
 //  Created by 심근웅 on 3/23/25.
 //
 
+import UIKit
 import Foundation
 
 /// 화면 크기에 맞춰 동적으로 사이즈를 조정하는 구조체
@@ -12,7 +13,7 @@ import Foundation
 /// - Note:
 ///   - 기준 사이즈는 **iPone 16 Pro Max** (440 x 956)
 ///- `SceneDelegate`에서 `setScreenSize(_:)`를 호출하여 초기 화면 크기를 설정해야 함
-struct DynamicSize {
+public struct DynamicSize {
     
     /// 기준 너비 (16 Pro Max)
     private static let baseWidth: CGFloat = 440
@@ -29,7 +30,7 @@ struct DynamicSize {
     /// 현재 화면 크기 설정
     ///
     /// - Parameter newBounds: 새롭게 설정할 화면의 `CGRect` 크기
-    static func setScreenSize(_ newBounds: CGRect) {
+    public static func setScreenSize(_ newBounds: CGRect) {
         self.bounds = newBounds
     }
     
@@ -59,7 +60,7 @@ extension DynamicSize {
     }
     
     /// 주어진 값에 스케일 비율을 적용
-    static func scaledSize(_ size: CGFloat) -> CGFloat {
+    public static func scaledSize(_ size: CGFloat) -> CGFloat {
         return size * scaleFactor
     }
 }
