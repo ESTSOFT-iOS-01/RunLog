@@ -11,7 +11,7 @@ import SnapKit
 import Then
 
 
-final class DetailLogView: UIView {
+  final class DetailLogView: UIView {
     
     // MARK: - UI Components 선언
     

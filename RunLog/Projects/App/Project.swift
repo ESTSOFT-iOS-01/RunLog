@@ -10,11 +10,11 @@ let project = Project(
       product: .app,
       bundleId: "com.ESTSOFTiOSTEAM1.IEEE.RunLog",
       deploymentTargets: .iOS("17.0"),
-      infoPlist: .file(path: "../../RunLog/App/InfoPlists/RunLog-info.plist"),
-      sources: ["../../RunLog/App/Sources/**"],
+      infoPlist: .file(path: "InfoPlists/RunLog-info.plist"),
+      sources: ["Sources/**"],
       resources: [
-        "../../RunLog/App/Resources/**",
-        "../../RunLog/App/DesignSystem/Resources/**"
+        "Resources/**",
+        "Sources/DesignSystem/Resources/**"
       ],
       dependencies: [
         .external(name: "SnapKit"),
@@ -26,21 +26,9 @@ let project = Project(
         .project(target: "RLUtil", path: "../Util")
       ],
       coreDataModels: [
-        .coreDataModel("../../RunLog/App/Sources/Data/DTO/DTOs.xcdatamodeld")
+        .coreDataModel("Sources/Data/DTO/DTOs.xcdatamodeld")
       ]
     ),
-    .target(
-      name: "RpTest",
-      destinations: [.iPhone],
-      product: .unitTests,
-      bundleId: "com.ESTSOFTiOSTEAM1.IEEE.RpTest",
-      deploymentTargets: .iOS("17.0"),
-      infoPlist: .file(path: "../../RpTest/InfoPlists/RpTest-info.plist"),
-      sources: ["../../RpTest/Sources/**"],
-      dependencies: [
-        .target(name: "RLApp")
-      ]
-    )
   ]
 )
 

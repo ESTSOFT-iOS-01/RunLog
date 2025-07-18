@@ -10,7 +10,7 @@ let project1 = Project(
       product: .staticFramework,
       bundleId: "com.ESTSOFTiOSTEAM1.IEEE.RLUtil",
       deploymentTargets: .iOS("17.0"),
-      sources: ["../../RunLog/Util/**"],
+      sources: ["Sources/**"],
       resources: []
     )
   ]
