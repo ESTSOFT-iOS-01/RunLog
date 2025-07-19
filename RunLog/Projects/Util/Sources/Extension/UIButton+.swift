@@ -9,7 +9,7 @@ import UIKit
 import Combine
 
 extension UIButton {
-    var publisher: AnyPublisher<Void, Never> {
+    public var publisher: AnyPublisher<Void, Never> {
         controlPublisher(for: .touchUpInside)
             .map { _ in }
             .eraseToAnyPublisher()

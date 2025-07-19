@@ -78,18 +78,24 @@ final class DetailLogViewController: UIViewController {
     // MARK: - Setup Navigation Bar
     private func setupNavigationBar() {
         // 네비게이션바 디테일 설정
-        navigationController?.setupAppearance() // 스타일 설정
+        navigationController?.setupAppearance(
+            backgroundColor: .Gray900,
+            foregroundColor: .Gray000,
+            font: .RLHeadline1,
+            tintColor: .LightGreen
+        )
+        
         navigationController?.navigationItem.backButtonTitle = "chevron.left"
-        navigationController?
-            .addRightMenuButton(menuItems: [
-                ("수정하기", .init()),
-                ("공유하기", .init()),
-                ("삭제하기", .destructive)
-            ])
-            .sink { [weak self] selectedTitle in
-                self?.viewModel.input.send(.menuSelected(selectedTitle))
-            }
-            .store(in: &cancellables)
+//        navigationController?
+//            .addRightMenuButton(menuItems: [
+//                ("수정하기", .init()),
+//                ("공유하기", .init()),
+//                ("삭제하기", .destructive)
+//            ])
+//            .sink { [weak self] selectedTitle in
+//                self?.viewModel.input.send(.menuSelected(selectedTitle))
+//            }
+//            .store(in: &cancellables)
     }
     
     // MARK: - Setup Gesture

@@ -69,15 +69,29 @@ final class ChangeCalUnitViewController: UIViewController {
     // MARK: - Setup Navigation Bar
     private func setupNavigationBar() {
         navigationItem.title = "기록 시각화 단위 설정"
-        self.navigationController?.setupAppearance()
+        self.navigationController?.setupAppearance(
+            backgroundColor: .Gray900,
+            foregroundColor: .Gray000,
+            font: .RLHeadline1,
+            tintColor: .LightGreen
+        )
         
-        // 우측 '완료' 버튼 설정 및 동작 바인딩
-        navigationController?
-            .addRightButton(title: "완료")
+        let navigationButton = UIButton()
+        navigationButton.setTitleColor(.label, for: .normal)
+        navigationButton.titleLabel?.attributedText = .RLAttributedString(
+            text: "완료",
+            font: .Label1,
+            color: .LightGreen,
+            align: .center
+        )
+        
+        navigationButton.publisher
             .sink { [weak self] in
                 self?.validateAndSaveUnit()
             }
             .store(in: &cancellables)
+        
+        navigationController?.setupRightButton(navigationButton)
     }
     
     // MARK: - Setup Gesture

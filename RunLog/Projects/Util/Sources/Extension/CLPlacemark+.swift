@@ -4,8 +4,6 @@
 //
 //  Created by 심근웅 on 3/21/25.
 //
-import RLUtil
-
 import Foundation
 import MapKit
 
@@ -13,7 +11,7 @@ import MapKit
 extension CLPlacemark {
     
     /// CLPlacemark 정보를 "도(광역시) 시(군,구) 동(읍,면)"의 형태로 변경하여 반환합니다.
-    func placemarksToString() -> String {
+    public func placemarksToString() -> String {
         
         var state: String = "" // 도, 광역시
         var city: String = "" // 시, 군, 구

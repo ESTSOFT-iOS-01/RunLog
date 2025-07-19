@@ -15,14 +15,14 @@ extension UIViewController {
     }
     
     /// 로딩 인디케이터 시작
-    func startLoading() {
+    public func startLoading() {
         print(#function)
         guard LoadingIndicator.activityIndicator == nil else { return } // 이미 있으면 중복 생성 방지
         
         let indicator = NVActivityIndicatorView(
             frame: .zero,
             type: .pacman,
-            color: .LightGreen,
+            color: .green, //.LightGreen
             padding: 44
         )
         
@@ -37,7 +37,7 @@ extension UIViewController {
     }
     
     /// 로딩 인디케이터 종료
-    func stopLoading() {
+    public func stopLoading() {
         print(#function)
         LoadingIndicator.activityIndicator?.stopAnimating()
         LoadingIndicator.activityIndicator?.removeFromSuperview()
@@ -45,15 +45,15 @@ extension UIViewController {
     }
     
     /// 네비게이션 바의 스타일 설정
-    func setupNavigationBarAppearance() {
+    public func setupNavigationBarAppearance(titleFont: UIFont, titleColor: UIColor) {
         
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = .black
         appearance.shadowColor = .clear
         appearance.titleTextAttributes = [
-            .foregroundColor: UIColor.Gray000,
-            .font: UIFont.RLHeadline1
+            .foregroundColor: titleColor,
+            .font: titleFont
         ]
         self.navigationController?.navigationBar.standardAppearance = appearance
         self.navigationController?.navigationBar.scrollEdgeAppearance = appearance
@@ -61,7 +61,7 @@ extension UIViewController {
     }
     
     /// 탭 바의 스타일 설정
-    func setupTabBarAppearance() {
+    public func setupTabBarAppearance(tintColor: UIColor) {
         let appearance = UITabBarAppearance()
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = UIColor(hex: "#1C1C1C")
@@ -69,11 +69,11 @@ extension UIViewController {
         
         self.tabBarController?.tabBar.standardAppearance = appearance
         self.tabBarController?.tabBar.scrollEdgeAppearance = appearance
-        self.tabBarController?.tabBar.tintColor = .LightGreen
+        self.tabBarController?.tabBar.tintColor = tintColor // .LightGreen
     }
     
     /// 터치하면 키보드가 내려가는 기능 추가
-    func setupTapGestureToDismissKeyboard() {
+    public func setupTapGestureToDismissKeyboard() {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         tapGesture.cancelsTouchesInView = false
         view.addGestureRecognizer(tapGesture)
@@ -83,7 +83,7 @@ extension UIViewController {
         view.endEditing(true)
     }
     
-    func showAlert(message: String) {
+    public func showAlert(message: String) {
         let alert = UIAlertController(title: "알림", message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "확인", style: .default))
         present(alert, animated: true)

@@ -10,9 +10,9 @@ import Combine
 
 extension UITapGestureRecognizer {
     /// UITapGestureRecognizer를 Combine에서 Publisher로 사용하기 위한 커스텀 구현
-    struct TapPublisher: Publisher {
-        typealias Output = UITapGestureRecognizer
-        typealias Failure = Never
+    public struct TapPublisher: Publisher {
+        public typealias Output = UITapGestureRecognizer
+        public typealias Failure = Never
         
         private let gesture: UITapGestureRecognizer
         
@@ -20,7 +20,7 @@ extension UITapGestureRecognizer {
             self.gesture = gesture
         }
         
-        func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Failure, S.Input == Output {
+        public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Failure, S.Input == Output {
             // Subscription 생성 후 Subscriber에 전달
             let subscription = TapGestureSubscription(gesture: gesture, subscriber: subscriber)
             subscriber.receive(subscription: subscription)
@@ -60,7 +60,7 @@ extension UITapGestureRecognizer {
     }
     
     /// UITapGestureRecognizer에서 TapPublisher를 만들 수 있도록 하는 프로퍼티
-    var tapPublisher: TapPublisher {
+    public var tapPublisher: TapPublisher {
         TapPublisher(gesture: self)
     }
 }

@@ -130,7 +130,9 @@ extension RunHomeViewModel {
             let attributedString = string.styledText(
                 highlightText: "\(roadName) \(count)회",
                 baseFont: .RLMainTitle,
-                highlightFont: .RLMainTitle
+                baseColor: .Gray000,
+                highlightFont: .RLMainTitle,
+                highlightColor: .LightGreen
             )
             
             self.output.send(.responseRoadRecord(attributedString))

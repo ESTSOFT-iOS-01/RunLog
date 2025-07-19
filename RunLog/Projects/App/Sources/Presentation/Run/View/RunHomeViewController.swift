@@ -135,14 +135,21 @@ final class RunHomeViewController: UIViewController {
     // MARK: - Setup Navigation Bar
     private func setupNavigationBar() {
         // 네비게이션바 디테일 설정
-        self.setupNavigationBarAppearance()
+        self.setupNavigationBarAppearance(titleFont: .RLHeadline1, titleColor: .Gray000)
     }
     
     // MARK: - Setup Tab Bar
     private func setupTabBar() {
-        // 탭바 디테일 설정
-        self.setupTabBarAppearance()
-        self.navigationController?.setupLogoTitle()
+        self.setupTabBarAppearance(tintColor: .LightGreen)
+        let titleLabel = UILabel().then {
+            $0.attributedText = .RLAttributedString(
+                text: "Runlog",
+                font: .Logo2,
+                color: .LightGreen
+            )
+            $0.textAlignment = .center
+        }
+        self.navigationController?.setupTitle(label: titleLabel)
     }
     
     // MARK: - Setup Data

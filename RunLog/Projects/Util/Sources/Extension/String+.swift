@@ -9,11 +9,13 @@ import UIKit
 
 extension String {
     /// 특정 부분의 텍스트 스타일을 변경하는 AttributedString 반환
-    func styledText(highlightText: String,
-                    baseFont: UIFont = .RLHeadline2,
-                    baseColor: UIColor = .Gray000,
-                    highlightFont: UIFont = .RLHeadline2,
-                    highlightColor: UIColor = .LightGreen) -> NSMutableAttributedString {
+    public func styledText(
+        highlightText: String,
+        baseFont: UIFont,
+        baseColor: UIColor,
+        highlightFont: UIFont,
+        highlightColor: UIColor
+    ) -> NSMutableAttributedString {
         
         let attributedString = NSMutableAttributedString(string: self, attributes: [
             .font: baseFont,
@@ -29,3 +31,10 @@ extension String {
         return attributedString
     }
 }
+
+
+//highlightText: String,
+//baseFont: UIFont = .RLHeadline2,
+//baseColor: UIColor = .Gray000,
+//highlightFont: UIFont = .RLHeadline2,
+//highlightColor: UIColor = .LightGreen

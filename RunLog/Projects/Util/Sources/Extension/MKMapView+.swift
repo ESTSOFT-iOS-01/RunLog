@@ -15,7 +15,7 @@ extension MKMapView {
     ///   - location: 표현하고자하는 위치
     ///   - regionRadius: 최대로 보여질 지도 거리
     ///   - region: 기존 카메라 상태
-    func centerToLocation(
+    public func centerToLocation(
         _ location: CLLocation,
         regionRadius: CLLocationDistance = 150, // 주변 거리(미터)
         region: MKCoordinateRegion? = nil
@@ -51,7 +51,7 @@ extension MKMapView {
     }
     
     // MARK: - 초기 카메라 위치 세팅 - 좌표: 서울
-    func initZoomLevel(_ meters: CLLocationDistance =  150) {
+    public func initZoomLevel(_ meters: CLLocationDistance =  150) {
         let newRegion = MKCoordinateRegion(
             center: CLLocationCoordinate2D(
                 latitude: 37.5665,

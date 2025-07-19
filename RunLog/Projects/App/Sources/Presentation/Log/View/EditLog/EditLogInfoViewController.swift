@@ -70,13 +70,29 @@ final class EditLogInfoViewController: UIViewController {
     // MARK: - Setup Navigation Bar
     private func setupNavigationBar() {
         navigationItem.title = "기록 관리하기"
-        self.navigationController?.setupAppearance()
-        navigationController?
-            .addRightButton(title: "완료")
+        self.navigationController?.setupAppearance(
+            backgroundColor: .Gray900,
+            foregroundColor: .Gray000,
+            font: .RLHeadline1,
+            tintColor: .LightGreen
+        )
+        
+        let navigationButton = UIButton()
+        navigationButton.setTitleColor(.label, for: .normal)
+        navigationButton.titleLabel?.attributedText = .RLAttributedString(
+            text: "완료",
+            font: .Label1,
+            color: .LightGreen,
+            align: .center
+        )
+        
+        navigationButton.publisher
             .sink { [weak self] in
                 self?.validateAndSaveInfo()
             }
             .store(in: &cancellables)
+        
+        navigationController?.setupRightButton(navigationButton)
     }
     
     private func setupTableView() {

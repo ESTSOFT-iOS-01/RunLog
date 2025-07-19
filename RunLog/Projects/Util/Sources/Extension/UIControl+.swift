@@ -10,18 +10,18 @@ import Combine
 
 extension UIControl {
     
-    func controlPublisher(for event: UIControl.Event) -> UIControl.EventPublisher {
+    public func controlPublisher(for event: UIControl.Event) -> UIControl.EventPublisher {
         .init(control: self, event: event)
     }
     
-    struct EventPublisher: Publisher {
-        typealias Output = UIControl
-        typealias Failure = Never
+    public struct EventPublisher: Publisher {
+        public typealias Output = UIControl
+        public typealias Failure = Never
         
-        let control: UIControl
-        let event: UIControl.Event
+        public let control: UIControl
+        public let event: UIControl.Event
         
-        func receive<S>(subscriber: S) where S : Subscriber, Never == S.Failure, UIControl == S.Input {
+        public func receive<S>(subscriber: S) where S : Subscriber, Never == S.Failure, UIControl == S.Input {
             let subscription = EventSubscription(control: control, subscrier: subscriber, event: event)
             subscriber.receive(subscription: subscription)
         }

@@ -9,7 +9,7 @@ import UIKit
 import Combine
 
 extension UITextField {
-    var publisher: AnyPublisher<String, Never> {
+    public var publisher: AnyPublisher<String, Never> {
         controlPublisher(for: .editingChanged)
             .compactMap { $0 as? UITextField }
             .map { $0.text ?? "" }

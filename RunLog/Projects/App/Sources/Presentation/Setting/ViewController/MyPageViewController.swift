@@ -65,8 +65,23 @@ final class MyPageViewController: UIViewController {
     
     // MARK: - Setup Navigation Bar
     private func setupNavigationBar() {
-        self.navigationController?.setupAppearance()
-        self.navigationController?.setupLogoTitle()
+        self.navigationController?.setupAppearance(
+            backgroundColor: .Gray900,
+            foregroundColor: .Gray000,
+            font: .RLHeadline1,
+            tintColor: .LightGreen
+        )
+        
+        let titleLabel = UILabel().then {
+            $0.attributedText = .RLAttributedString(
+                text: "Runlog",
+                font: .Logo2,
+                color: .LightGreen
+            )
+            $0.textAlignment = .center
+        }
+        
+        self.navigationController?.setupTitle(label: titleLabel)
     }
     
     private func setupTableView() {
