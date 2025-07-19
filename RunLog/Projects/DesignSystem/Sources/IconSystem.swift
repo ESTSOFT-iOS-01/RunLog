@@ -8,7 +8,7 @@
 import Foundation
 
 // MARK: - 아이콘
-enum RLIcon {
+public enum RLIcon {
     case ellipsis
     case rightArrow
     case leftArrow
@@ -47,7 +47,7 @@ enum RLIcon {
 }
 
 extension RLIcon {
-    var name: String {
+    public var name: String {
         switch self {
         case .fold:
             return "xmark"

@@ -11,13 +11,13 @@ import SnapKit
 import Then
 
 /// 아이콘을 내포하는 레이블
-final class RLLabel: UIView {
+public final class RLLabel: UIView {
     // MARK: - 내부 Components
-    var icon = UIImageView()
-    var label = UILabel()
+    public var icon = UIImageView()
+    public var label = UILabel()
     
     /// Label의 attributedText 설정
-    var attributedText: NSAttributedString? {
+    public var attributedText: NSAttributedString? {
         get {
             return label.attributedText
         }
@@ -28,7 +28,7 @@ final class RLLabel: UIView {
     }
     
     /// text와 icon의 색상 변경
-    override var tintColor: UIColor! {
+    public override var tintColor: UIColor! {
         get {
             return label.tintColor
         }

@@ -4,6 +4,7 @@
 //
 //  Created by 김도연 on 3/13/25.
 //
+import RLDesignSystem
 
 import UIKit
 
@@ -13,7 +14,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         registerDependencies()
-        
+        UIFont.registerFonts()
         return true
     }
 

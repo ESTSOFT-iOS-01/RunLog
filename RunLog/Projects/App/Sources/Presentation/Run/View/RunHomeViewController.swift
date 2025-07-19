@@ -4,6 +4,7 @@
 //
 //  Created by 심근웅 on 3/14/25.
 //
+import RLDesignSystem
 import RLUtil
 
 import UIKit
@@ -168,17 +169,17 @@ final class RunHomeViewController: UIViewController {
                 guard let self = self else { return }
                 
                 switch output {
-                // 운동시작하면 운동화면으로 넘어감
+                    // 운동시작하면 운동화면으로 넘어감
                 case .responseRunningStart:
                     let vc = RunningViewController()
                     vc.modalPresentationStyle = .fullScreen
                     self.present(vc, animated: false)
                     
-                // 사용자의 변경된 위치 반영
+                    // 사용자의 변경된 위치 반영
                 case .locationUpdate(let location):
                     self.mapView.centerToLocation(location, region: self.mapView.region)
                     
-                // 사용자의 변경된 위치명 반영
+                    // 사용자의 변경된 위치명 반영
                 case .locationNameUpdate(let text):
                     self.locationLabel.attributedText =
                         .RLAttributedString(
@@ -187,15 +188,15 @@ final class RunHomeViewController: UIViewController {
                             align: .center
                         )
                     
-                // 변경된 날씨 정보 반영
+                    // 변경된 날씨 정보 반영
                 case .weatherUpdate(let text):
                     self.weatherLabel.attributedText =
                         .RLAttributedString(
                             text: text,
                             font: .Label2
                         )
-                
-                //  RoadRecord 정보 표시
+                    
+                    //  RoadRecord 정보 표시
                 case .responseRoadRecord(let text):
                     self.RoadRecordLabel.attributedText = text
                 }

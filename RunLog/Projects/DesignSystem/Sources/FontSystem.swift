@@ -34,7 +34,7 @@ public enum RLFont {
 }
 
 extension RLFont {
-    var value: UIFont {
+    public var value: UIFont {
         switch self {
         case .Logo1:
             return .RLLogo1
@@ -72,7 +72,7 @@ extension RLFont {
             return .RLSegment2
         }
     }
-    var lineHeightMultiple: CGFloat {
+    public var lineHeightMultiple: CGFloat {
         switch self {
         case .Logo1, .Logo2:
             return 1.10
@@ -95,16 +95,16 @@ extension RLFont {
 
 extension UIFont {
     // MARK: - Font Style
-    public enum RacingSansOne: String {
+    public enum RacingSansOne: String, CaseIterable {
         case regular = "RacingSansOne-Regular"
     }
     
-    public enum NanumMyeongjo: String {
+    public enum NanumMyeongjo: String, CaseIterable {
         case regular = "NanumMyeongjo-Regular"
     }
     
     // TODO: Pretendard로 네이밍 변경
-    public enum RLFont: String {
+    public enum Pretendard: String, CaseIterable {
         case black = "Pretendard-Black"
         case bold = "Pretendard-Bold"
         case extraBold = "Pretendard-ExtraBold"
@@ -147,54 +147,93 @@ extension UIFont {
     
     // MARK: - Heading
     public static var RLHeading1: UIFont {
-        dynamicFont(name: RLFont.semiBold.rawValue, baseSize: 22, weight: .semibold)
+        dynamicFont(name: Pretendard.semiBold.rawValue, baseSize: 22, weight: .semibold)
     }
     public static var RLHeading2: UIFont {
-        dynamicFont(name: RLFont.semiBold.rawValue, baseSize: 20, weight: .semibold)
+        dynamicFont(name: Pretendard.semiBold.rawValue, baseSize: 20, weight: .semibold)
     }
     public static var RLHeading4: UIFont {
-        dynamicFont(name: RLFont.semiBold.rawValue, baseSize: 36, weight: .semibold)
+        dynamicFont(name: Pretendard.semiBold.rawValue, baseSize: 36, weight: .semibold)
     }
     
     // MARK: - Headline
     public static var RLHeadline1: UIFont {
-        dynamicFont(name: RLFont.semiBold.rawValue, baseSize: 18, weight: .semibold)
+        dynamicFont(name: Pretendard.semiBold.rawValue, baseSize: 18, weight: .semibold)
     }
     public static var RLHeadline2: UIFont {
-        dynamicFont(name: RLFont.regular.rawValue, baseSize: 18, weight: .regular)
+        dynamicFont(name: Pretendard.regular.rawValue, baseSize: 18, weight: .regular)
     }
     public static var RLHeadline3: UIFont {
-        dynamicFont(name: RLFont.semiBold.rawValue, baseSize: 18, weight: .semibold)
+        dynamicFont(name: Pretendard.semiBold.rawValue, baseSize: 18, weight: .semibold)
     }
     
     // MARK: - Title
     public static var RLTitle: UIFont {
-        dynamicFont(name: RLFont.semiBold.rawValue, baseSize: 24, weight: .semibold)
+        dynamicFont(name: Pretendard.semiBold.rawValue, baseSize: 24, weight: .semibold)
     }
     public static var RLMainTitle: UIFont {
-        dynamicFont(name: RLFont.semiBold.rawValue, baseSize: 26, weight: .semibold)
+        dynamicFont(name: Pretendard.semiBold.rawValue, baseSize: 26, weight: .semibold)
     }
     public static var RLDetailTitle: UIFont {
-        dynamicFont(name: RLFont.semiBold.rawValue, baseSize: 32, weight: .semibold)
+        dynamicFont(name: Pretendard.semiBold.rawValue, baseSize: 32, weight: .semibold)
     }
     
     // MARK: - etc
     public static var RLBody1: UIFont {
-        dynamicFont(name: RLFont.regular.rawValue, baseSize: 16, weight: .regular)
+        dynamicFont(name: Pretendard.regular.rawValue, baseSize: 16, weight: .regular)
     }
     public static var RLLabel1: UIFont {
-        dynamicFont(name: RLFont.bold.rawValue, baseSize: 14, weight: .bold)
+        dynamicFont(name: Pretendard.bold.rawValue, baseSize: 14, weight: .bold)
     }
     public static var RLLabel2: UIFont {
-        dynamicFont(name: RLFont.regular.rawValue, baseSize: 14, weight: .regular)
+        dynamicFont(name: Pretendard.regular.rawValue, baseSize: 14, weight: .regular)
     }
     public static var RLButton: UIFont {
-        dynamicFont(name: RLFont.medium.rawValue, baseSize: 24, weight: .medium)
+        dynamicFont(name: Pretendard.medium.rawValue, baseSize: 24, weight: .medium)
     }
     public static var RLSegment1: UIFont {
-        dynamicFont(name: RLFont.semiBold.rawValue, baseSize: 16, weight: .semibold)
+        dynamicFont(name: Pretendard.semiBold.rawValue, baseSize: 16, weight: .semibold)
     }
     public static var RLSegment2: UIFont {
-        dynamicFont(name: RLFont.medium.rawValue, baseSize: 16, weight: .medium)
+        dynamicFont(name: Pretendard.medium.rawValue, baseSize: 16, weight: .medium)
+    }
+    
+    
+}
+
+
+extension UIFont {
+    public static func registerFonts() {
+        let fontEnums: [[any RawRepresentable<String>]] = [
+            RacingSansOne.allCases,
+            NanumMyeongjo.allCases,
+            Pretendard.allCases
+        ]
+        
+        let extensions = ["otf", "ttf"]
+        
+        for fontGroup in fontEnums {
+            for font in fontGroup {
+                let fontName = font.rawValue
+                
+                var found = false
+                for ext in extensions {
+                    if let url = Bundle.module.url(forResource: fontName, withExtension: ext) {
+                        var error: Unmanaged<CFError>?
+                        if CTFontManagerRegisterFontsForURL(url as CFURL, .process, &error) == false {
+                            let description = error?.takeRetainedValue().localizedDescription ?? "Unknown error"
+                            print("Font \(fontName).\(ext) failed to register: \(description)")
+                        }
+                        found = true
+                        break
+                    }
+                }
+                
+                if !found {
+                    print("Font file \(fontName).otf or .ttf not found.")
+                }
+            }
+        }
     }
 }
+
