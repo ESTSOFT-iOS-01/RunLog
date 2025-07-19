@@ -76,8 +76,9 @@ final class ChangeCalUnitViewController: UIViewController {
             tintColor: .LightGreen
         )
         
-        let navigationButton = UIButton()
-        navigationButton.setTitleColor(.label, for: .normal)
+        let navigationButton = UIButton(type: .system)
+        let buttonTitle = "완료"
+        navigationButton.setTitle(buttonTitle, for: .normal)
         navigationButton.titleLabel?.attributedText = .RLAttributedString(
             text: "완료",
             font: .Label1,

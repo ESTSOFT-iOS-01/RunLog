@@ -77,7 +77,7 @@ final class DetailLogViewController: UIViewController {
     
     // MARK: - Setup Navigation Bar
     private func setupNavigationBar() {
-        // 네비게이션바 디테일 설정
+        
         navigationController?.setupAppearance(
             backgroundColor: .Gray900,
             foregroundColor: .Gray000,
@@ -86,16 +86,27 @@ final class DetailLogViewController: UIViewController {
         )
         
         navigationController?.navigationItem.backButtonTitle = "chevron.left"
-//        navigationController?
-//            .addRightMenuButton(menuItems: [
-//                ("수정하기", .init()),
-//                ("공유하기", .init()),
-//                ("삭제하기", .destructive)
-//            ])
-//            .sink { [weak self] selectedTitle in
-//                self?.viewModel.input.send(.menuSelected(selectedTitle))
-//            }
-//            .store(in: &cancellables)
+        
+        let menuButton = UIButton()
+        menuButton.setImage(UIImage(systemName: RLIcon.ellipsis.name), for: .normal)
+
+        let menuItems: [UIMenuElement] = [
+            UIAction(title: "수정하기", handler: { [weak self] _ in
+                self?.viewModel.input.send(.menuSelected("수정하기"))
+            }),
+            UIAction(title: "공유하기", handler: { [weak self] _ in
+                self?.viewModel.input.send(.menuSelected("공유하기"))
+            }),
+            UIAction(title: "삭제하기", attributes: .destructive, handler: { [weak self] _ in
+                self?.viewModel.input.send(.menuSelected("삭제하기"))
+            })
+        ]
+
+        let menu = UIMenu(title: "", children: menuItems)
+        menuButton.showsMenuAsPrimaryAction = true
+        menuButton.menu = menu
+        
+        navigationController?.setupRightButton(menuButton)
     }
     
     // MARK: - Setup Gesture

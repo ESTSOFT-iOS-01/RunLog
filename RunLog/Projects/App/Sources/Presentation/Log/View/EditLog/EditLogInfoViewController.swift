@@ -77,10 +77,11 @@ final class EditLogInfoViewController: UIViewController {
             tintColor: .LightGreen
         )
         
-        let navigationButton = UIButton()
-        navigationButton.setTitleColor(.label, for: .normal)
+        let navigationButton = UIButton(type: .system)
+        let buttonTitle = "완료"
+        navigationButton.setTitle(buttonTitle, for: .normal)
         navigationButton.titleLabel?.attributedText = .RLAttributedString(
-            text: "완료",
+            text: buttonTitle,
             font: .Label1,
             color: .LightGreen,
             align: .center
@@ -92,7 +93,7 @@ final class EditLogInfoViewController: UIViewController {
             }
             .store(in: &cancellables)
         
-        navigationController?.setupRightButton(navigationButton)
+        self.navigationController?.setupRightButton(navigationButton)
     }
     
     private func setupTableView() {

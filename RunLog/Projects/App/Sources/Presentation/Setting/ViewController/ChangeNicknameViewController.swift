@@ -79,10 +79,11 @@ final class ChangeNicknameViewController: UIViewController {
         
         
         // 네비게이션바 우측 완료 버튼 바인딩
-        let navigationButton = UIButton()
-        navigationButton.setTitleColor(.label, for: .normal)
+        let navigationButton = UIButton(type: .system)
+        let buttonTitle = "완료"
+        navigationButton.setTitle(buttonTitle, for: .normal)
         navigationButton.titleLabel?.attributedText = .RLAttributedString(
-            text: "완료",
+            text: buttonTitle,
             font: .Label1,
             color: .LightGreen,
             align: .center
