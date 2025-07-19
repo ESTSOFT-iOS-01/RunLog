@@ -5,6 +5,7 @@
 //  Created by 심근웅 on 3/14/25.
 //
 
+import UIKit
 import Foundation
 
 // MARK: - 아이콘
@@ -115,5 +116,11 @@ extension RLIcon {
         case .myPage:
             return "person.fill"
         }
+    }
+}
+
+extension UIImage {
+    public static func designSystem(named name: String) -> UIImage? {
+        UIImage(named: name, in: .module, with: nil)
     }
 }

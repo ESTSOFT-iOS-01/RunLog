@@ -77,7 +77,7 @@ class CalendarViewCell: UICollectionViewCell {
             default:
                 imageName = RLIcon.noneBeat.name
             }
-            heartBeatImageView.image = UIImage(named: imageName)
+            heartBeatImageView.image = .designSystem(named: imageName)
         } else {
             self.dayLabel.text = ""
             heartBeatImageView.image = nil
