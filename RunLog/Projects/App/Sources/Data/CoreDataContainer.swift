@@ -24,26 +24,3 @@ final class CoreDataContainer {
     }
     
 }
-
-enum CoreDataError: LocalizedError {
-    case fetchError
-    case deleteError
-    case modelNotFound
-    case modelAlreadyExist
-    case conversionError
-    
-    var errorDescription: String {
-        switch self {
-        case .fetchError:
-            "Fetch Error"
-        case .deleteError:
-            "Delete Error"
-        case .modelNotFound:
-            "Model Not Found"
-        case .modelAlreadyExist:
-            "Model Already Exist"
-        case .conversionError:
-            "Conversion Error"
-        }
-    }
-}

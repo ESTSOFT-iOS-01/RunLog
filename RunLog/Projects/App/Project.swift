@@ -20,6 +20,7 @@ let project = Project(
                 .external(name: "CombineMoya"),
                 .external(name: "NVActivityIndicatorView"),
                 .external(name: "NVActivityIndicatorViewExtended"),
+                .project(target: "RLDomain", path: "../Domain"),
                 .project(target: "RLUtil", path: "../Util"),
                 .project(target: "RLDesignSystem", path: "../DesignSystem")
             ],

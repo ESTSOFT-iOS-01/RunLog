@@ -10,7 +10,7 @@ import MapKit
 
 /// 미디어 관련 유스케이스를 정의하는 프로토콜입니다.
 /// 주어진 경로 데이터를 이미지로 변환하거나 저장하는 기능을 제공합니다.
-protocol MediaUseCase {
+public protocol MediaUseCase {
     
     /// 주어진 섹션 데이터를 CLLocationCoordinate2D 좌표 배열로 변환합니다.
     /// - Parameter sections: 위치 정보를 포함하는 섹션 배열

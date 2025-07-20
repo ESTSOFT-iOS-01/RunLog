@@ -4,7 +4,7 @@
 //
 //  Created by 신승재 on 3/18/25.
 //
-
+import RLDomain
 
 import Foundation
 import CoreData
@@ -29,7 +29,7 @@ final class DayLogRepositoryImpl: DayLogRepository {
             
             let existing = try self.context.fetch(fetchRequest)
             if !existing.isEmpty {
-                throw CoreDataError.modelAlreadyExist
+                throw DataError.modelAlreadyExist
             }
             
             let data = DataMapper.toDTO(dayLog, context: self.context)
@@ -49,10 +49,10 @@ final class DayLogRepositoryImpl: DayLogRepository {
             )
             
             guard let data = try self.context.fetch(fetchRequest).first else {
-                throw CoreDataError.modelNotFound
+                throw DataError.modelNotFound
             }
             guard let model = DataMapper.toEntity(data) else {
-                throw CoreDataError.conversionError
+                throw DataError.conversionError
             }
             
             return model
@@ -83,7 +83,7 @@ final class DayLogRepositoryImpl: DayLogRepository {
             )
             
             guard let data = try self.context.fetch(fetchRequest).first else {
-                throw CoreDataError.modelNotFound
+                throw DataError.modelNotFound
             }
             
             data.trackImage = dayLog.trackImage
@@ -111,7 +111,7 @@ final class DayLogRepositoryImpl: DayLogRepository {
             )
             
             guard let data = try self.context.fetch(fetchRequest).first else {
-                throw CoreDataError.modelNotFound
+                throw DataError.modelNotFound
             }
             
             self.context.delete(data)

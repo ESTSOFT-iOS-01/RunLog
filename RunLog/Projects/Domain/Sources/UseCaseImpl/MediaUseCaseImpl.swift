@@ -10,11 +10,11 @@ import UIKit
 import MapKit
 import CoreLocation
 
-final class MediaUseCaseImpl: MediaUseCase {
+public final class MediaUseCaseImpl: MediaUseCase {
 
-    init() {}
+    public init() {}
 
-    func convertSectionsToCoordinates(sections: [Section]) -> [[CLLocationCoordinate2D]] {
+    public func convertSectionsToCoordinates(sections: [Section]) -> [[CLLocationCoordinate2D]] {
         var coordinates = [[CLLocationCoordinate2D]]()
 
         for section in sections {
@@ -29,7 +29,7 @@ final class MediaUseCaseImpl: MediaUseCase {
         return coordinates
     }
     
-    func setRouteImage(route coordinates: [[CLLocationCoordinate2D]]) async throws -> UIImage {
+    public func setRouteImage(route coordinates: [[CLLocationCoordinate2D]]) async throws -> UIImage {
         let flatCoordinates = coordinates.flatMap { $0 }
         let centerCoordinate = try getRouteCenterCoordinate(flatCoordinates)
         let region = makeRouteSizeRegion(center: centerCoordinate, coordinates: flatCoordinates)
@@ -77,7 +77,7 @@ final class MediaUseCaseImpl: MediaUseCase {
         return overlayImage
     }
     
-    func saveImageToDocuments(image: UIImage, imageName: String) throws {
+    public func saveImageToDocuments(image: UIImage, imageName: String) throws {
         guard let imageData = image.pngData() else {
             throw NSError(domain: "com.estsoft.runlog", code: -1, userInfo: [NSLocalizedDescriptionKey: "이미지 변환 실패"])
         }

@@ -8,11 +8,11 @@ import RLUtil
 
 import Foundation
 
-final class AppConfigUseCaseImpl: AppConfigUseCase {
+public final class AppConfigUseCaseImpl: AppConfigUseCase {
 
     private let appConfigRepository: AppConfigRepository
     
-    init(appConfigRepository: AppConfigRepository) {
+    public init(appConfigRepository: AppConfigRepository) {
         self.appConfigRepository = appConfigRepository
         
         Task {
@@ -25,35 +25,35 @@ final class AppConfigUseCaseImpl: AppConfigUseCase {
 
     }
     
-    func getUnitDistance() async throws -> Double {
+    public func getUnitDistance() async throws -> Double {
 //        print("Impl:", #function)
         
         let config = try await appConfigRepository.readAppConfig()
         return config.unitDistance
     }
     
-    func getNickname() async throws -> String {
+    public func getNickname() async throws -> String {
 //        print("Impl:", #function)
         
         let config = try await appConfigRepository.readAppConfig()
         return config.nickname
     }
     
-    func getUserIndicators() async throws -> (streakDays: Int, totalDays: Int) {
+    public func getUserIndicators() async throws -> (streakDays: Int, totalDays: Int) {
 //        print("Impl:", #function)
         
         let config = try await appConfigRepository.readAppConfig()
         return (config.streakDays, config.totalDays)
     }
     
-    func getTotalDistance() async throws -> Double {
+    public func getTotalDistance() async throws -> Double {
 //        print("Impl:", #function)
         
         let config = try await appConfigRepository.readAppConfig()
         return config.totalDistance
     }
     
-    func getDistanceIndicators() async throws -> (roadName: String, count : Double) {
+    public func getDistanceIndicators() async throws -> (roadName: String, count : Double) {
 //        print("Impl:", #function)
         
         let totalDistance = try await appConfigRepository.readAppConfig().totalDistance
@@ -69,7 +69,7 @@ final class AppConfigUseCaseImpl: AppConfigUseCase {
         return (selectedRoad.name, totalDistance / selectedRoad.distance)
     }
     
-    func updateUnitDistance(_ unitDistance: Double) async throws {
+    public func updateUnitDistance(_ unitDistance: Double) async throws {
 //        print("Impl:", #function)
         
         var config = try await appConfigRepository.readAppConfig()
@@ -78,7 +78,7 @@ final class AppConfigUseCaseImpl: AppConfigUseCase {
         try await appConfigRepository.updateAppConfig(config)
     }
     
-    func updateNickname(_ nickname: String) async throws {
+    public func updateNickname(_ nickname: String) async throws {
 //        print("Impl:", #function)
         
         var config = try await appConfigRepository.readAppConfig()

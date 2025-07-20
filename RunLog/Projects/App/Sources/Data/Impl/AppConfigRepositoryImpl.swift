@@ -4,6 +4,7 @@
 //
 //  Created by 김도연 on 3/19/25.
 //
+import RLDomain
 
 import Foundation
 import CoreData

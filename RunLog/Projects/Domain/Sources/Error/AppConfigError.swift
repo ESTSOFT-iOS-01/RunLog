@@ -8,7 +8,7 @@
 import Foundation
 
 /// AppConfig 저장소 동작 중 발생할 수 있는 에러를 정의한 열거형입니다.
-enum AppConfigError: Error {
+public enum AppConfigError: Error {
     
     /// 이미 AppConfig 객체가 존재하는 경우
     case duplicatedObject

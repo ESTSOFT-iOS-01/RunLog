@@ -9,12 +9,12 @@ import RLUtil
 import Foundation
 import UIKit
 
-final class DayLogUseCaseImpl: DayLogUseCase {
+public final class DayLogUseCaseImpl: DayLogUseCase {
     
     private let dayLogRepository: DayLogRepository
     private let appConfigRepository: AppConfigRepository
     
-    init(
+    public init(
         dayLogRepository: DayLogRepository,
         appConfigRepository: AppConfigRepository
     ) {
@@ -22,7 +22,7 @@ final class DayLogUseCaseImpl: DayLogUseCase {
         self.appConfigRepository = appConfigRepository
     }
     
-    func initializeDayLog(
+    public func initializeDayLog(
         locationName: String,
         weather: Int,
         temperature: Double
@@ -62,7 +62,7 @@ final class DayLogUseCaseImpl: DayLogUseCase {
         try await appConfigRepository.updateAppConfig(appconfig)
     }
 
-    func getDayLogByDate(_ date: Date) async throws -> DayLog? {
+    public func getDayLogByDate(_ date: Date) async throws -> DayLog? {
         print("Impl:", #function)
         
         let dayLog = try await dayLogRepository.readDayLog(
@@ -71,20 +71,20 @@ final class DayLogUseCaseImpl: DayLogUseCase {
         return dayLog
     }
 
-    func getAllDayLogs() async throws -> [DayLog] {
+    public func getAllDayLogs() async throws -> [DayLog] {
         print("Impl:", #function)
         
         let dayLogs = try await dayLogRepository.readAllDayLogs()
         return dayLogs
     }
 
-    func deleteDayLogByDate(_ date: Date) async throws {
+    public func deleteDayLogByDate(_ date: Date) async throws {
         print("Impl:", #function)
         
         try await dayLogRepository.deleteDayLog(date: date.toYearMonthDay)
     }
 
-    func addSectionByDate(_ date: Date, section: Section) async throws {
+    public func addSectionByDate(_ date: Date, section: Section) async throws {
         print("Impl:", #function)
         
         // 1. update 할 DayLog 가져오기
@@ -115,7 +115,7 @@ final class DayLogUseCaseImpl: DayLogUseCase {
         try await appConfigRepository.updateAppConfig(appconfig)
     }
 
-    func getTitleByDate(_ date: Date) async throws -> String {
+    public func getTitleByDate(_ date: Date) async throws -> String {
         print("Impl:", #function)
         
         let dayLog = try await dayLogRepository.readDayLog(
@@ -124,7 +124,7 @@ final class DayLogUseCaseImpl: DayLogUseCase {
         return dayLog.title
     }
 
-    func updateTitleByDate(_ date: Date, title: String) async throws {
+    public func updateTitleByDate(_ date: Date, title: String) async throws {
         print("Impl:", #function)
         
         var targetDayLog = try await dayLogRepository.readDayLog(
@@ -135,7 +135,7 @@ final class DayLogUseCaseImpl: DayLogUseCase {
         try await dayLogRepository.updateDayLog(targetDayLog)
     }
 
-    func getLevelByDate(_ date: Date) async throws -> Int {
+    public func getLevelByDate(_ date: Date) async throws -> Int {
         print("Impl:", #function)
         
         let dayLog = try await dayLogRepository.readDayLog(
@@ -144,7 +144,7 @@ final class DayLogUseCaseImpl: DayLogUseCase {
         return dayLog.level
     }
 
-    func updateLevelByDate(_ date: Date, level: Int) async throws {
+    public func updateLevelByDate(_ date: Date, level: Int) async throws {
         print("Impl:", #function)
         
         var targetDayLog = try await dayLogRepository.readDayLog(
@@ -155,7 +155,7 @@ final class DayLogUseCaseImpl: DayLogUseCase {
         try await dayLogRepository.updateDayLog(targetDayLog)
     }
     
-    func updateTrackImageByDate(_ date: Date, image: UIImage) async throws {
+    public func updateTrackImageByDate(_ date: Date, image: UIImage) async throws {
         print("Impl:", #function)
         
         var targetDayLog = try await dayLogRepository.readDayLog(
@@ -170,7 +170,7 @@ final class DayLogUseCaseImpl: DayLogUseCase {
         try await dayLogRepository.updateDayLog(targetDayLog)
     }
     
-    func updateStreakIfNeeded() async throws {
+    public func updateStreakIfNeeded() async throws {
         let today = Date().toYearMonthDay
         
         // case: 오늘 운동을 했는지 안했는지 모르겟는데 마이페이지로 들어온 상황
@@ -179,7 +179,7 @@ final class DayLogUseCaseImpl: DayLogUseCase {
         do {
             // yes -> 업데이트 X
             try await dayLogRepository.readDayLog(date: today)
-        } catch CoreDataError.modelNotFound {
+        } catch DataError.modelNotFound {
             // no -> 어제 운동했니?
             let hasYesterdayDayLog = try await hasYesterdayDayLog()
             //      yes -> 업데이트 X
@@ -206,7 +206,7 @@ extension DayLogUseCaseImpl {
         do {
             try await dayLogRepository.readDayLog(date: yesterday)
             return true
-        } catch CoreDataError.modelNotFound {
+        } catch DataError.modelNotFound {
             return false
         }
     }

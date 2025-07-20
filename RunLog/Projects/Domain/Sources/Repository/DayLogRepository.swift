@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol DayLogRepository {
+public protocol DayLogRepository {
     /// 새로운 DayLog를 생성합니다.
     /// - Parameter dayLog: 저장할 DayLog 도메인 모델
     /// - Throws: 저장 실패 시 `CoreDataError` 발생

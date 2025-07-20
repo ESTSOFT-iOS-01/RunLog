@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol AppConfigUseCase {
+public protocol AppConfigUseCase {
 
     // MARK: - Fetch Methods
     

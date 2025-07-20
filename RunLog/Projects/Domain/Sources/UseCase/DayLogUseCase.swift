@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-protocol DayLogUseCase {
+public protocol DayLogUseCase {
     
     /// 새로운 DayLog를 생성합니다. (러닝 시작 시 호출)
     /// - Parameters:

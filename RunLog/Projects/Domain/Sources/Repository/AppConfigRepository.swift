@@ -9,7 +9,7 @@ import Foundation
 
 /// 앱 설정(AppConfig)에 대한 CRUD 기능을 정의하는 저장소 프로토콜입니다.
 /// 영속 저장소(UserDefaults, File, Database 등)와의 인터페이스를 추상화합니다.
-protocol AppConfigRepository {
+public protocol AppConfigRepository {
     
     /// 앱 설정을 생성하여 저장소에 기록합니다.
     /// - Parameter config: 저장할 앱 설정 값
