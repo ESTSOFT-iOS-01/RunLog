@@ -7,7 +7,7 @@ let project1 = Project(
         .target(
             name: "RLDesignSystem",
             destinations: [.iPhone],
-            product: .framework,
+            product: .staticFramework,
             bundleId: "com.ESTSOFTiOSTEAM1.IEEE.RLDesignSystem",
             deploymentTargets: .iOS("17.0"),
             infoPlist: .file(path: "InfoPlists/RLDesignSystem-info.plist"),

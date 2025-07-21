@@ -9,14 +9,14 @@ import RLDomain
 import Foundation
 import CoreData
 
-final class AppConfigRepositoryImpl: AppConfigRepository {
+public final class AppConfigRepositoryImpl: AppConfigRepository {
     private let context: NSManagedObjectContext
     
-    init(context: NSManagedObjectContext) {
+    public init(context: NSManagedObjectContext) {
         self.context = context
     }
     
-    func createAppConfig(_ config: AppConfig) async throws {
+    public func createAppConfig(_ config: AppConfig) async throws {
 //        print("Impl: ", #function)
         
             try await context.perform { [weak self] in
@@ -42,7 +42,7 @@ final class AppConfigRepositoryImpl: AppConfigRepository {
             }
     }
     
-    func readAppConfig() async throws -> AppConfig {
+    public func readAppConfig() async throws -> AppConfig {
 //        print("Impl: ", #function)
         
         return try await context.perform { [weak self] in
@@ -66,7 +66,7 @@ final class AppConfigRepositoryImpl: AppConfigRepository {
         
     }
     
-    func updateAppConfig(_ config: AppConfig) async throws {
+    public func updateAppConfig(_ config: AppConfig) async throws {
 //        print("Impl: ", #function)
         
         return try await context.perform { [weak self] in
@@ -97,7 +97,7 @@ final class AppConfigRepositoryImpl: AppConfigRepository {
         }
     }
     
-    func deleteAppConfig() async throws {
+    public func deleteAppConfig() async throws {
 //        print("Impl: ", #function)
         
         return try await context.perform { [weak self] in

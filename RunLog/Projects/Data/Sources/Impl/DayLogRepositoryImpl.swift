@@ -9,15 +9,15 @@ import RLDomain
 import Foundation
 import CoreData
 
-final class DayLogRepositoryImpl: DayLogRepository {
+public final class DayLogRepositoryImpl: DayLogRepository {
     
     private let context: NSManagedObjectContext
     
-    init(context: NSManagedObjectContext) {
+    public init(context: NSManagedObjectContext) {
         self.context = context
     }
     
-    func createDayLog(_ dayLog: DayLog) async throws {
+    public func createDayLog(_ dayLog: DayLog) async throws {
         print("Impl: ", #function)
         
         try await context.perform {
@@ -38,7 +38,7 @@ final class DayLogRepositoryImpl: DayLogRepository {
         }
     }
     
-    func readDayLog(date: Date) async throws -> DayLog {
+    public func readDayLog(date: Date) async throws -> DayLog {
         print("Impl: ", #function)
         
         return try await context.perform {
@@ -59,7 +59,7 @@ final class DayLogRepositoryImpl: DayLogRepository {
         }
     }
     
-    func readAllDayLogs() async throws -> [DayLog] {
+    public func readAllDayLogs() async throws -> [DayLog] {
         print("Impl: ", #function)
         
         return try await context.perform {
@@ -72,7 +72,7 @@ final class DayLogRepositoryImpl: DayLogRepository {
         }
     }
 
-    func updateDayLog(_ dayLog: DayLog) async throws {
+    public func updateDayLog(_ dayLog: DayLog) async throws {
         print("Impl: ", #function)
         
         try await context.perform {
@@ -100,7 +100,7 @@ final class DayLogRepositoryImpl: DayLogRepository {
         }
     }
 
-    func deleteDayLog(date: Date) async throws {
+    public func deleteDayLog(date: Date) async throws {
         print("Impl: ", #function)
         
         try await context.perform {

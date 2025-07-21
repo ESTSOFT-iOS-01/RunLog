@@ -9,27 +9,27 @@ import Foundation
 import MapKit
 import Combine
 
-final class DrawingManager: NSObject, MKMapViewDelegate {
+public final class DrawingManager: NSObject, MKMapViewDelegate {
     
     // MARK: - Singleton
-    static let shared = DrawingManager()
+    public static let shared = DrawingManager()
     private override init() {
         super.init()
         bind()
     }
     
     // MARK: - Input
-    enum Input {
+    public enum Input {
         case requestLine(CLLocation, CLLocation) // 단일 경로 - 운동중 화면
         case requestFullRoutePolyline([CLLocation]) // 전체 경로 - 섹션 종료 후 사진 새로 만들때
     }
-    let input = PassthroughSubject<Input, Never>()
+    public let input = PassthroughSubject<Input, Never>()
     
     // MARK: - Output
-    enum Output {
+    public enum Output {
         case responsePolyline(MKPolyline)
     }
-    let output = PassthroughSubject<Output, Never>()
+    public let output = PassthroughSubject<Output, Never>()
     
     // MARK: - Properties
     private var cancellables = Set<AnyCancellable>()
@@ -68,7 +68,7 @@ final class DrawingManager: NSObject, MKMapViewDelegate {
     }
     
     // MARK: - 폴리라인 스타일 적용
-    func mapView(_ mapView: MKMapView, rendererFor overlay: any MKOverlay) -> MKOverlayRenderer {
+    public func mapView(_ mapView: MKMapView, rendererFor overlay: any MKOverlay) -> MKOverlayRenderer {
         guard let polyline = overlay as? MKPolyline else {
             return MKOverlayRenderer()
         }

@@ -10,27 +10,27 @@ import Combine
 import CoreMotion
 
 /// 사용자가 걸은 걸음수를 받아오는 매니저
-final class PedometerManager {
+public final class PedometerManager {
     
     // MARK: - Singleton
-    static let shared = PedometerManager()
+    public static let shared = PedometerManager()
     private init() {
         bind()
     }
     
     
     // MARK: - Input
-    enum Input {
+    public enum Input {
         case requestPedometerStart
         case requestPedometerStop
     }
-    let input = PassthroughSubject<Input, Never>()
+    public let input = PassthroughSubject<Input, Never>()
     
     // MARK: - Output
-    enum Output {
+    public enum Output {
         case responseSteps(Int)
     }
-    let output = PassthroughSubject<Output, Never>()
+    public let output = PassthroughSubject<Output, Never>()
     
     // MARK: - Properties
     private var cancellables = Set<AnyCancellable>()

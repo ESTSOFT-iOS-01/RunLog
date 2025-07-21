@@ -5,6 +5,7 @@
 //  Created by 김도연 on 3/13/25.
 //
 import RLDomain
+import RLData
 import RLDesignSystem
 
 import UIKit

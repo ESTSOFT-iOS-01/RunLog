@@ -12,26 +12,26 @@ import CombineMoya
 import MapKit
 
 // MARK: - API 요청을 담당
-final class OpenWeatherService: NetworkService {
+public final class OpenWeatherService: NetworkService {
     
     // MARK: - Singleton
-    static let shared = OpenWeatherService()
+    public static let shared = OpenWeatherService()
     private init() {
         bind()
     }
     
     
     // MARK: - Input & Output
-    enum Input {
+    public enum Input {
         case requestWeather(CLLocation)
     }
-    let input = PassthroughSubject<Input, Never>()
+    public let input = PassthroughSubject<Input, Never>()
     
     // MARK: - Output
-    enum Output {
+    public enum Output {
         case responseWeather(weather: (Int, Double), aqi: Int) // 날씨컨디션, 기온을 제공
     }
-    let output = PassthroughSubject<Output, Never>()
+    public let output = PassthroughSubject<Output, Never>()
     
     // MARK: - Properties
     private var cancellables = Set<AnyCancellable>()

@@ -21,11 +21,9 @@ let project = Project(
                 .external(name: "NVActivityIndicatorView"),
                 .external(name: "NVActivityIndicatorViewExtended"),
                 .project(target: "RLDomain", path: "../Domain"),
+                .project(target: "RLData", path: "../Data"),
                 .project(target: "RLUtil", path: "../Util"),
                 .project(target: "RLDesignSystem", path: "../DesignSystem")
-            ],
-            coreDataModels: [
-                .coreDataModel("Sources/Data/DTO/DTOs.xcdatamodeld")
             ]
         ),
     ]

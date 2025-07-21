@@ -11,10 +11,10 @@ import CoreLocation
 import Combine
 
 /// 사용자의 위치 정보를 받아오는 매니저
-final class LocationManager: NSObject, CLLocationManagerDelegate {
+public final class LocationManager: NSObject, CLLocationManagerDelegate {
     
     // MARK: - Singleton
-    static let shared = LocationManager()
+    public static let shared = LocationManager()
     private override init() {
         super.init()
         setupLocationManager()
@@ -27,18 +27,18 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
     
     
     // MARK: - Input
-    enum Input {
+    public enum Input {
         case requestCurrentLocation
         case requestCityName(CLLocation) // 도시이름을 요청
     }
-    let input = PassthroughSubject<Input, Never>()
+    public let input = PassthroughSubject<Input, Never>()
     
     // MARK: - Output
-    enum Output {
+    public enum Output {
         case locationUpdate(CLLocation) // 현재위치(CLLocatio)를 제공
         case responseCityName(CLPlacemark) // 도시이름(String)을 제공
     }
-    let output = PassthroughSubject<Output, Never>()
+    public let output = PassthroughSubject<Output, Never>()
     
     // MARK: - Properties
     private var cancellables = Set<AnyCancellable>()
@@ -82,7 +82,7 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
 extension LocationManager {
     
     /// 사용자의 위치를 받아오는 Delegate 함수
-    func locationManager(
+    public func locationManager(
         _ manager: CLLocationManager,
         didUpdateLocations locations: [CLLocation]
     ) {
@@ -130,7 +130,7 @@ extension LocationManager {
 extension LocationManager {
     
     // MARK: - 권한 정보가 바뀌면 실행
-    func locationManager(
+    public func locationManager(
         _ manager: CLLocationManager,
         didChangeAuthorization status: CLAuthorizationStatus
     ) {

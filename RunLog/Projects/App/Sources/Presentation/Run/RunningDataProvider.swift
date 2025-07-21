@@ -5,6 +5,7 @@
 //  Created by 심근웅 on 3/21/25.
 //
 import RLDomain
+import RLData
 
 import Foundation
 import MapKit
