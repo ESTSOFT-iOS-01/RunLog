@@ -51,11 +51,11 @@ enum MainTab: CaseIterable {
     }
 }
 
-class MainTabBarController: UITabBarController {
+public final class MainTabBarController: UITabBarController {
     
     
     // MARK: - Init
-    init() {
+    public init() {
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -63,7 +63,7 @@ class MainTabBarController: UITabBarController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         viewControllers = MainTab.allCases.map { $0.navigationController() }
     }

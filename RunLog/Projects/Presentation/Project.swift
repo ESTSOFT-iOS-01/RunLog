@@ -1,27 +1,28 @@
 import ProjectDescription
 
-let project = Project(
-    name: "RLApp",
+let project1 = Project(
+    name: "RLPresentation",
     organizationName: "ESTSOFTiOSTEAM1",
     targets: [
         .target(
-            name: "RLApp",
+            name: "RLPresentation",
             destinations: [.iPhone],
-            product: .app,
-            bundleId: "com.ESTSOFTiOSTEAM1.IEEE.RunLog",
+            product: .staticFramework,
+            bundleId: "com.ESTSOFTiOSTEAM1.IEEE.RLPresentation",
             deploymentTargets: .iOS("17.0"),
-            infoPlist: .file(path: "InfoPlists/RunLog-info.plist"),
             sources: ["Sources/**"],
-            resources: ["Resources/**"],
+            resources: [],
             dependencies: [
+                .external(name: "SnapKit"),
+                .external(name: "Then"),
+                .external(name: "NVActivityIndicatorView"),
+                .external(name: "NVActivityIndicatorViewExtended"),
                 .project(target: "RLInject", path: "../Inject"),
                 .project(target: "RLDomain", path: "../Domain"),
-                .project(target: "RLData", path: "../Data"),
-                .project(target: "RLPresentation", path: "../Presentation"),
+                .project(target: "RLData", path: "../Data"), // 수정해야됨
                 .project(target: "RLUtil", path: "../Util"),
                 .project(target: "RLDesignSystem", path: "../DesignSystem")
             ]
-        ),
+        )
     ]
 )
-

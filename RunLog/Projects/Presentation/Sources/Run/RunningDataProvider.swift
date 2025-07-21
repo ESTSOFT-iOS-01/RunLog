@@ -6,6 +6,7 @@
 //
 import RLDomain
 import RLData
+import RLInject
 
 import Foundation
 import MapKit

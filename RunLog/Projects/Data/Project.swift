@@ -13,6 +13,9 @@ let project1 = Project(
             sources: ["Sources/**"],
             resources: [],
             dependencies: [
+                .external(name: "Moya"),
+                .external(name: "CombineMoya"),
+                .project(target: "RLInject", path: "../Inject"),
                 .project(target: "RLDomain", path: "../Domain"),
                 .project(target: "RLUtil", path: "../Util"),
             ],

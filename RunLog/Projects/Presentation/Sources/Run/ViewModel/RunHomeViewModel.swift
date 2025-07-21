@@ -6,6 +6,7 @@
 //
 import RLDomain
 import RLUtil
+import RLInject
 
 import UIKit
 import Combine

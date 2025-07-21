@@ -7,20 +7,20 @@
 
 import Foundation
 
-class DIContainer {
+public final class DIContainer {
     
-    static let shared = DIContainer()
+    public static let shared = DIContainer()
     
     private var dependencies = [String: Any]()
     
     private init() {}
 
-    func register<T>(_ dependency: T, for type: T.Type) {
+    public func register<T>(_ dependency: T, for type: T.Type) {
         let key = String(describing: type)
         dependencies[key] = dependency
     }
     
-    func resolve<T>(_ type: T.Type) -> T {
+    public func resolve<T>(_ type: T.Type) -> T {
         let key = String(describing: type)
         guard let dependency = dependencies[key] else {
             preconditionFailure("\(key)는 register되지 않았어요. resolve 부르기 전에 register 해주세요")
@@ -31,10 +31,10 @@ class DIContainer {
 
 
 @propertyWrapper
-class Dependency<T> {
-    let wrappedValue: T
+public class Dependency<T> {
+    public let wrappedValue: T
     
-    init() {
+    public init() {
         self.wrappedValue = DIContainer.shared.resolve(T.self)
     }
 }

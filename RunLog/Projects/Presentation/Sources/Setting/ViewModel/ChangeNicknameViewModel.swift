@@ -5,6 +5,7 @@
 //  Created by 김도연 on 3/17/25.
 //
 import RLDomain
+import RLInject
 
 import UIKit
 import Combine
