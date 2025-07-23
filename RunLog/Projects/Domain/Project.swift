@@ -14,7 +14,7 @@ let project1 = Project(
             resources: [],
             dependencies: [
                 .project(target: "RLUtil", path: "../Util"),
-                .project(target: "RLDesignSystem", path: "../DesignSystem")
+                .project(target: "RLDesignSystem", path: "../DesignSystem") // 수정 해야함,,
             ]
         )
     ]

@@ -7,7 +7,7 @@ let project1 = Project(
         .target(
             name: "RLUtil",
             destinations: [.iPhone],
-            product: .staticFramework,
+            product: .framework,
             bundleId: "com.ESTSOFTiOSTEAM1.IEEE.RLUtil",
             deploymentTargets: .iOS("17.0"),
             sources: ["Sources/**"],

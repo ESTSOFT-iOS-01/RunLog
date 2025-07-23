@@ -19,7 +19,6 @@ let project = Project(
                 .project(target: "RLData", path: "../Data"),
                 .project(target: "RLPresentation", path: "../Presentation"),
                 .project(target: "RLUtil", path: "../Util"),
-                .project(target: "RLDesignSystem", path: "../DesignSystem")
             ]
         ),
     ]

@@ -6,7 +6,6 @@
 //
 import RLDomain
 import RLData
-import RLDesignSystem
 import RLInject
 
 import UIKit

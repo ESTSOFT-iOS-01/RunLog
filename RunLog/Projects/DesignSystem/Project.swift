@@ -17,7 +17,6 @@ let project1 = Project(
                 .external(name: "SnapKit"),
                 .external(name: "Then"),
                 .external(name: "NVActivityIndicatorView"),
-                //.external(name: "NVActivityIndicatorViewExtended")
             ]
         )
     ]
