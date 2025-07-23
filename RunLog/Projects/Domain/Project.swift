@@ -1,21 +1,12 @@
 import ProjectDescription
+import ProjectDescriptionHelpers
 
-let project1 = Project(
-    name: "RLDomain",
-    organizationName: "ESTSOFTiOSTEAM1",
-    targets: [
-        .target(
-            name: "RLDomain",
-            destinations: [.iPhone],
-            product: .staticFramework,
-            bundleId: "com.ESTSOFTiOSTEAM1.IEEE.RLDomain",
-            deploymentTargets: .iOS("17.0"),
-            sources: ["Sources/**"],
-            resources: [],
-            dependencies: [
-                .project(target: "RLUtil", path: "../Util"),
-                .project(target: "RLDesignSystem", path: "../DesignSystem") // 수정 해야함,,
-            ]
-        )
+let project = Project.framework(
+    name: Module.domain.name,
+    organizationName: Module.organizationName,
+    infoPlist: .default,
+    dependencies: [
+        Module.util.project,
+        Module.designSystem.project
     ]
 )

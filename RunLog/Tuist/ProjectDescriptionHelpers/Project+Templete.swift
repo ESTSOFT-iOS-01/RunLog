@@ -6,9 +6,11 @@ extension Project {
         organizationName: String,
         product: Product,
         bundleID: String,
+        infoPlist: InfoPlist?,
         schemes: [Scheme] = [],
         dependencies: [TargetDependency] = [],
-        resources: ProjectDescription.ResourceFileElements? = nil
+        resources: ProjectDescription.ResourceFileElements? = nil,
+        coreDataModels: [CoreDataModel] = []
     ) -> Project {
         return Project(
             name: name,
@@ -20,10 +22,11 @@ extension Project {
                     product: product,
                     bundleId: bundleID,
                     deploymentTargets: .iOS("17.0"),
-                    infoPlist: .file(path: .relativeToRoot("Supporting Files/Info.plist")),
+                    infoPlist: infoPlist,
                     sources: ["Sources/**"],
                     resources: resources,
-                    dependencies: dependencies
+                    dependencies: dependencies,
+                    coreDataModels: coreDataModels
                 ),
                 .target(
                     name: "\(name)Tests",
@@ -31,7 +34,7 @@ extension Project {
                     product: .unitTests,
                     bundleId: bundleID,
                     deploymentTargets: .iOS("17.0"),
-                    infoPlist: .file(path: .relativeToRoot("Supporting Files/Info.plist")),
+                    infoPlist: infoPlist,
                     sources: "Tests/**",
                     dependencies: [
                         .target(name: "\(name)")
@@ -42,17 +45,19 @@ extension Project {
         )
     }
     
-    public static func app(
+    public static func app (
             name: String,
             organizationName: String,
+            infoPlist: InfoPlist?,
             dependencies: [TargetDependency] = [],
             resources: ProjectDescription.ResourceFileElements? = nil
         ) -> Project {
             return self.project(
-                name: name,
+                name: "RL\(name)",
                 organizationName: organizationName,
                 product: .app,
                 bundleID: "com.\(organizationName).\(name)",
+                infoPlist: infoPlist,
                 dependencies: dependencies,
                 resources: resources
             )
@@ -61,16 +66,20 @@ extension Project {
     public static func framework(
         name: String,
         organizationName: String,
+        infoPlist: InfoPlist?,
         dependencies: [TargetDependency] = [],
-        resources: ProjectDescription.ResourceFileElements? = nil
+        resources: ProjectDescription.ResourceFileElements? = nil,
+        coreDataModels: [CoreDataModel] = []
         ) -> Project {
             return .project(
-                name: name,
+                name: "RL\(name)",
                 organizationName: organizationName,
                 product: .framework,
-                bundleID: "com.\(organizationName).\(name)",
+                bundleID: "com.\(organizationName).RL\(name)",
+                infoPlist: infoPlist,
                 dependencies: dependencies,
-                resources: resources
+                resources: resources,
+                coreDataModels: coreDataModels
             )
         }
 }

@@ -1,20 +1,11 @@
 import ProjectDescription
+import ProjectDescriptionHelpers
 
-let project1 = Project(
-    name: "RLUtil",
-    organizationName: "ESTSOFTiOSTEAM1",
-    targets: [
-        .target(
-            name: "RLUtil",
-            destinations: [.iPhone],
-            product: .framework,
-            bundleId: "com.ESTSOFTiOSTEAM1.IEEE.RLUtil",
-            deploymentTargets: .iOS("17.0"),
-            sources: ["Sources/**"],
-            resources: [],
-            dependencies: [
-                .external(name: "SnapKit")
-            ]
-        )
+let project = Project.framework(
+    name: Module.util.name,
+    organizationName: Module.organizationName,
+    infoPlist: .default,
+    dependencies: [
+        .external(name: "SnapKit"),
     ]
 )

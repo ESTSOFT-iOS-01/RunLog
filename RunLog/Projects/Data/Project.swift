@@ -1,27 +1,18 @@
 import ProjectDescription
+import ProjectDescriptionHelpers
 
-let project1 = Project(
-    name: "RLData",
-    organizationName: "ESTSOFTiOSTEAM1",
-    targets: [
-        .target(
-            name: "RLData",
-            destinations: [.iPhone],
-            product: .framework,
-            bundleId: "com.ESTSOFTiOSTEAM1.IEEE.RLData",
-            deploymentTargets: .iOS("17.0"),
-            sources: ["Sources/**"],
-            resources: [],
-            dependencies: [
-                .external(name: "Moya"),
-                .external(name: "CombineMoya"),
-                .project(target: "RLInject", path: "../Inject"),
-                .project(target: "RLDomain", path: "../Domain"),
-                .project(target: "RLUtil", path: "../Util"),
-            ],
-            coreDataModels: [
-                .coreDataModel("Sources/DTO/DTOs.xcdatamodeld")
-            ]
-        )
+let project = Project.framework(
+    name: Module.data.name,
+    organizationName: Module.organizationName,
+    infoPlist: .default,
+    dependencies: [
+        Module.inject.project,
+        Module.domain.project,
+        Module.util.project,
+        .external(name: "Moya"),
+        .external(name: "CombineMoya"),
+    ],
+    coreDataModels: [
+        .coreDataModel("Sources/DTOs/DTOs.xcdatamodeld")
     ]
 )

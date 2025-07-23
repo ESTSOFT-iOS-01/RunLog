@@ -1,26 +1,16 @@
 import ProjectDescription
+import ProjectDescriptionHelpers
 
-let project = Project(
-    name: "RLApp",
-    organizationName: "ESTSOFTiOSTEAM1",
-    targets: [
-        .target(
-            name: "RLApp",
-            destinations: [.iPhone],
-            product: .app,
-            bundleId: "com.ESTSOFTiOSTEAM1.IEEE.RunLog",
-            deploymentTargets: .iOS("17.0"),
-            infoPlist: .file(path: "InfoPlists/RunLog-info.plist"),
-            sources: ["Sources/**"],
-            resources: ["Resources/**"],
-            dependencies: [
-                .project(target: "RLInject", path: "../Inject"),
-                .project(target: "RLDomain", path: "../Domain"),
-                .project(target: "RLData", path: "../Data"),
-                .project(target: "RLPresentation", path: "../Presentation"),
-                .project(target: "RLUtil", path: "../Util"),
-            ]
-        ),
-    ]
+let project = Project.app(
+    name: Module.app.name,
+    organizationName: Module.organizationName,
+    infoPlist: .file(path: "InfoPlists/info.plist"),
+    dependencies: [
+        Module.inject,
+        Module.domain,
+        Module.data,
+        Module.presentation,
+        Module.util,
+    ].map(\.project),
+    resources: .default
 )
-

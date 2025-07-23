@@ -7,6 +7,7 @@ public enum Module {
     case domain
     case designSystem
     case util
+    case inject
 }
 
 extension Module {
@@ -24,19 +25,19 @@ extension Module {
             "DesignSystem"
         case .util:
             "Util"
+        case .inject:
+            "Inject"
         }
     }
     
     public static let organizationName: String = "ESTSOFTiOSTEAM1"
-    
-    public static let prefixText: String = "RL"
     
     public var path: ProjectDescription.Path {
         .relativeToRoot("Projects/" + self.name)
     }
     
     public var project: TargetDependency {
-        .project(target: self.prefixText + self.name, path: self.path)
+        .project(target: "RL\(self.name)", path: self.path)
     }
 }
 
