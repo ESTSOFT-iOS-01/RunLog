@@ -8,6 +8,7 @@ let project = Project.framework(
     dependencies: [
         Module.inject.project,
         Module.domain.project,
+        Module.data.project, // 수정해야함
         Module.util.project,
         Module.designSystem.project,
         .external(name: "SnapKit"),
