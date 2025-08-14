@@ -1,0 +1,186 @@
+//
+//  CalendarView.swift
+//  RunLog
+//
+//  Created by 신승재 on 3/15/25.
+//
+import RLDesignSystem
+import RLUtil
+
+import UIKit
+import SnapKit
+import Then
+
+final class CalendarView: UIView {
+    
+    // MARK: - UI Components 선언
+    lazy var walkImage = UIImageView().then {
+        $0.image = UIImage(named: RLIcon.walkGirl.name)
+    }
+    
+    lazy var nicknameLabel = UILabel().then {
+        var nickname = "행복한쿼카러너화이팅"
+        $0.attributedText = .RLAttributedString(
+            text: nickname + " 님,",
+            font: .Heading1,
+            color: .Gray000
+        )
+    }
+    
+    lazy var bottomLabel = UILabel().then {
+        let text = "오늘도 가볍게 동네 산책 어때요?"
+        $0.attributedText = .RLAttributedString(
+            text: text,
+            font: .Body1,
+            color: .Gray000
+        )
+    }
+    
+    private let topBanner = UIView().then {
+        $0.backgroundColor = .Gray700
+        $0.layer.cornerRadius = 12
+    }
+    
+    let leftArrowButton = UIButton().then {
+        $0.setImage(UIImage(systemName: RLIcon.leftArrow.name), for: .normal)
+        $0.setPreferredSymbolConfiguration(
+            .init(pointSize: 15, weight: .semibold), forImageIn: .normal
+        )
+        $0.backgroundColor = .clear
+        $0.tintColor = .Gray000
+    }
+    
+    let rightArrowButton = UIButton().then {
+        $0.setImage(UIImage(systemName: RLIcon.rightArrow.name), for: .normal)
+        $0.setPreferredSymbolConfiguration(
+            .init(pointSize: 15, weight: .semibold), forImageIn: .normal
+        )
+        $0.backgroundColor = .clear
+        $0.tintColor = .Gray000
+    }
+    
+    var calendarTitleLabel = UILabel().then {
+        $0.attributedText = .RLAttributedString(
+            text: "25년 3월",
+            font: .Heading2,
+            color: .Gray000
+        )
+    }
+    
+    private lazy var calendarTitleContainer = UIStackView(
+        arrangedSubviews: [leftArrowButton, calendarTitleLabel ,rightArrowButton]
+    ).then {
+        $0.axis = .horizontal
+        $0.spacing = 9
+        $0.alignment = .center
+    }
+    
+    private lazy var weekdayLabels: [UILabel] = {
+        let weekdays = ["일", "월", "화", "수", "목", "금", "토"]
+        return weekdays.map { weekday in
+            let label = UILabel().then {
+                $0.text = weekday
+                $0.attributedText = .RLAttributedString(
+                    text: weekday,
+                    font: .Label2,
+                    color: .Gray300
+                )
+                $0.textAlignment = .center
+            }
+            return label
+        }
+    }()
+    
+    private lazy var weekdaysContainer = UIStackView(
+        arrangedSubviews: weekdayLabels
+    ).then {
+        $0.axis = .horizontal
+        $0.distribution = .fillEqually
+    }
+
+    lazy var collectionView = UICollectionView(
+        frame: .zero,
+        collectionViewLayout: UICollectionViewFlowLayout()
+    ).then {
+        $0.backgroundColor = .clear
+        $0.register(
+            CalendarViewCell.self,
+            forCellWithReuseIdentifier: CalendarViewCell.identifier
+        )
+    }
+    
+    
+    // MARK: - Init
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupUI()
+        setupLayout()
+
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: - Setup UI
+    private func setupUI() {
+        backgroundColor = .Gray900
+        topBanner.addSubviews(walkImage, nicknameLabel, bottomLabel)
+        addSubviews(
+            topBanner, calendarTitleContainer, weekdaysContainer, collectionView
+        )
+    }
+    
+    // MARK: - Setup Layout
+    private func setupLayout() {
+        walkImage.snp.makeConstraints {
+            $0.height.width.equalTo(DynamicSize.scaledSize(64))
+            $0.top.leading.equalToSuperview().offset(DynamicSize.scaledSize(16))
+            $0.bottom.equalToSuperview().offset(DynamicSize.scaledSize(-10))
+        }
+        
+        nicknameLabel.snp.makeConstraints {
+            $0.height.equalTo(DynamicSize.scaledSize(26))
+            $0.leading.equalTo(walkImage.snp.trailing).offset(DynamicSize.scaledSize(24))
+            $0.top.equalToSuperview().offset(DynamicSize.scaledSize(18))
+        }
+        
+        bottomLabel.snp.makeConstraints {
+            $0.height.equalTo(DynamicSize.scaledSize(17))
+            $0.leading.equalTo(walkImage.snp.trailing).offset(DynamicSize.scaledSize(24))
+            $0.bottom.equalToSuperview().offset(DynamicSize.scaledSize(-21))
+        }
+        
+        topBanner.snp.makeConstraints {
+            $0.height.equalTo(DynamicSize.scaledSize(90))
+            $0.top.equalToSuperview().offset(DynamicSize.scaledSize(24))
+            $0.horizontalEdges.equalToSuperview().inset(DynamicSize.scaledSize(24))
+        }
+        
+        leftArrowButton.snp.makeConstraints {
+            $0.width.equalTo(DynamicSize.scaledSize(26))
+        }
+        
+        rightArrowButton.snp.makeConstraints {
+            $0.width.equalTo(DynamicSize.scaledSize(26))
+        }
+        
+        calendarTitleContainer.snp.makeConstraints {
+            $0.height.equalTo(DynamicSize.scaledSize(28))
+            $0.top.equalTo(topBanner.snp.bottom).offset(DynamicSize.scaledSize(32))
+            $0.leading.equalToSuperview().offset(DynamicSize.scaledSize(24))
+        }
+        
+        weekdaysContainer.snp.makeConstraints {
+            $0.height.equalTo(DynamicSize.scaledSize(19))
+            $0.top.equalTo(calendarTitleContainer.snp.bottom).offset(DynamicSize.scaledSize(24))
+            $0.horizontalEdges.equalToSuperview().inset(DynamicSize.scaledSize(24))
+        }
+        
+        collectionView.snp.makeConstraints {
+            $0.top.equalTo(weekdaysContainer.snp.bottom).offset(DynamicSize.scaledSize(8))
+            $0.horizontalEdges.equalToSuperview().inset(DynamicSize.scaledSize(24))
+            $0.bottom.equalToSuperview()
+        }
+    }
+}
