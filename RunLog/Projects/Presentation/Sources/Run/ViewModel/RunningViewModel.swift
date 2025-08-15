@@ -11,22 +11,18 @@ import MapKit
 
 final class RunningViewModel {
     
-    // MARK: - Init
-    init() { }
-    
-    
     // MARK: - Input
     enum Input {
         case requestRunningStop // 운동종료 요청
         case requestCurrentLocation
     }
+    
     let input = PassthroughSubject<Input, Never>()
     
     // MARK: - Output
     enum Output {
-        case responseRunningStop // 운동종료
+        case currentTime(String)
         case locationUpdate(CLLocation) // 사용자 위치 데이터
-        case responseCurrentTimes(String) // 운동 시간 데이터
         case responseCurrentDistances(String) // 운동 거리 데이터
         case responseCurrentSteps(String) // 운동 걸음 수 데이터
         case lineDraw(MKPolyline) // 지도에 라인을 그림
@@ -37,7 +33,12 @@ final class RunningViewModel {
     // MARK: - Properties
     private var cancellables = Set<AnyCancellable>()
     private var provider = RunningDataProvider.shared
+    private var startTime: Date = .now
     
+    // MARK: - Init
+    init() {
+        startTimer()
+    }
     
     // MARK: - Binding
     func bind() {
@@ -61,14 +62,15 @@ final class RunningViewModel {
                 guard let self = self else { return }
                 switch output {
                 case .responseRunningStop:
-                    self.output.send(.responseRunningStop)
+                    // 제거 필요
+                    return
                     
                 case .responseCurrentLocation(let location):
                     self.output.send(.locationUpdate(location))
                     
                 case .responseCurrentTimes(let times):
-                    let timeString = times.asTimeString
-                    self.output.send(.responseCurrentTimes(timeString))
+                    // 제거 필요
+                    return
                     
                 case .responseCurrentDistances(let distances):
                     let distanceString = "\(distances.toString(withDecimal: 2))km"
@@ -82,6 +84,20 @@ final class RunningViewModel {
                     self.output.send(.lineDraw(polyline))
                 }
             }
+            .store(in: &cancellables)
+    }
+}
+
+
+private extension RunningViewModel {
+    func startTimer() {
+        Timer.publish(every: 1, on: .main, in: .common)
+            .autoconnect()
+            .sink(receiveValue: { [weak self] now in
+                guard let self = self else { return }
+                let time = now.timeIntervalSince(self.startTime)
+                self.output.send(.currentTime(time.asTimeString))
+            })
             .store(in: &cancellables)
     }
 }

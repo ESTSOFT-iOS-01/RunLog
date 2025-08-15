@@ -70,6 +70,7 @@ final class RunningViewController: UIViewController {
     init() {
         super.init(nibName: nil, bundle: nil)
     }
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -143,17 +144,13 @@ final class RunningViewController: UIViewController {
             .sink { [weak self] output in
                 guard let self = self else { return }
                 switch output {
-                // 운동 종료
-                case .responseRunningStop:
-                    self.dismiss(animated: false)
+                    
+                case .currentTime(let timeString):
+                    self.cardView.timeLabel.setConfigure(text: timeString)
                     
                 // 사용자의 변경된 위치 반영
                 case .locationUpdate(let location):
                     self.mapView.centerToLocation(location, region: self.mapView.region)
-                    
-                // 운동 시간 반영
-                case .responseCurrentTimes(let time):
-                    self.cardView.timeLabel.setConfigure(text: time)
                     
                 // 운동 거리 반영
                 case .responseCurrentDistances(let distances):
@@ -192,7 +189,7 @@ final class RunningViewController: UIViewController {
         // 종료 버튼 클릭
         cardView.finishButton.publisher
             .sink { [weak self] in
-                self?.viewModel.input.send(.requestRunningStop)
+                self?.dismiss(animated: true)
             }
             .store(in: &cancellables)
     }
