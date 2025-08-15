@@ -4,6 +4,8 @@
 //
 //  Created by 심근웅 on 3/17/25.
 //
+import RLInject
+import RLDomain
 
 import UIKit
 import Combine
@@ -24,13 +26,14 @@ final class RunningViewModel {
         case currentTime(String)
         case locationUpdate(CLLocation) // 사용자 위치 데이터
         case responseCurrentDistances(String) // 운동 거리 데이터
-        case responseCurrentSteps(String) // 운동 걸음 수 데이터
+        case currentSteps(String) // 운동 걸음 수 데이터
         case lineDraw(MKPolyline) // 지도에 라인을 그림
     }
     
     let output = PassthroughSubject<Output, Never>()
     
     // MARK: - Properties
+    @Dependency private var pedometerProvider: PedometerProvider
     private var cancellables = Set<AnyCancellable>()
     private var provider = RunningDataProvider.shared
     private var startTime: Date = .now
@@ -38,10 +41,12 @@ final class RunningViewModel {
     // MARK: - Init
     init() {
         startTimer()
+        pedometerProvider.startPedometer()
+        bind()
     }
     
     // MARK: - Binding
-    func bind() {
+    private func bind() {
         self.input
             .sink { [weak self] input in
                 guard let self = self else { return }
@@ -56,33 +61,10 @@ final class RunningViewModel {
             }
             .store(in: &cancellables)
         
-        // ViewModel에서 필요한 정보는 provider로 부터 주입
-        provider.runningOutput
-            .sink { [weak self] output in
-                guard let self = self else { return }
-                switch output {
-                case .responseRunningStop:
-                    // 제거 필요
-                    return
-                    
-                case .responseCurrentLocation(let location):
-                    self.output.send(.locationUpdate(location))
-                    
-                case .responseCurrentTimes(let times):
-                    // 제거 필요
-                    return
-                    
-                case .responseCurrentDistances(let distances):
-                    let distanceString = "\(distances.toString(withDecimal: 2))km"
-                    self.output.send(.responseCurrentDistances(distanceString))
-                    
-                case .responseCurrentSteps(let steps):
-                    let stepString = "\(steps)"
-                    self.output.send(.responseCurrentSteps(stepString))
-                    
-                case .responseLineDraw(let polyline):
-                    self.output.send(.lineDraw(polyline))
-                }
+        self.pedometerProvider.steps
+            .map { String($0) }
+            .sink { [weak self] steps in
+                self?.output.send(.currentSteps(steps))
             }
             .store(in: &cancellables)
     }
@@ -93,11 +75,11 @@ private extension RunningViewModel {
     func startTimer() {
         Timer.publish(every: 1, on: .main, in: .common)
             .autoconnect()
-            .sink(receiveValue: { [weak self] now in
+            .sink{ [weak self] now in
                 guard let self = self else { return }
                 let time = now.timeIntervalSince(self.startTime)
                 self.output.send(.currentTime(time.asTimeString))
-            })
+            }
             .store(in: &cancellables)
     }
 }

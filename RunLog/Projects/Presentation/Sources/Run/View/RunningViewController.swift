@@ -82,7 +82,6 @@ final class RunningViewController: UIViewController {
         setupUI()
         
         // binding
-        viewModel.bind()
         bindViewModel()
         bindGesture()
     }
@@ -157,7 +156,7 @@ final class RunningViewController: UIViewController {
                     self.cardView.distanceLabel.setConfigure(text: distances)
                     
                 // 운동 걸음 수 반영
-                case .responseCurrentSteps(let steps):
+                case .currentSteps(let steps):
                     self.cardView.stepsLabel.setConfigure(text: steps)
                 
                 // 지도에 이동한 루트 표시

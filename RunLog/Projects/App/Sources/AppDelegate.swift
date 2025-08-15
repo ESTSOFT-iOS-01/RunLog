@@ -43,6 +43,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             context: coreDataContainer.context
         )
         
+        DIContainer.shared.register(PedometerManager(), for: PedometerProvider.self)
+        
         DIContainer.shared.register(
             AppConfigUseCaseImpl(appConfigRepository: appConfigRepository),
             for: AppConfigUseCase.self

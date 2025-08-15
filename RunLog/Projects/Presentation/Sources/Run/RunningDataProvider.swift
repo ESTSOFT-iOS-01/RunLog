@@ -72,7 +72,7 @@ final class RunningDataProvider {
    
     // MARK: - Manager
     private let locationManger = LocationManager.shared
-    private let pedometerManager = PedometerManager.shared
+    //private let pedometerManager = PedometerManager.shared
     private let distanceManager = DistanceManager.shared
     private let drawingManager = DrawingManager.shared
     
@@ -147,17 +147,17 @@ extension RunningDataProvider {
             .store(in: &cancellables)
         
         // MARK: - Pedometer Manager
-        pedometerManager.output
-            .sink { [weak self] output in
-                guard let self = self else { return }
-                switch output {
-                case .responseSteps(let step):
-                    self.section.steps = step
-                    let steps = self.section.steps
-                    self.runningOutput.send(.responseCurrentSteps(steps))
-                }
-            }
-            .store(in: &cancellables)
+//        pedometerManager.output
+//            .sink { [weak self] output in
+//                guard let self = self else { return }
+//                switch output {
+//                case .responseSteps(let step):
+//                    self.section.steps = step
+//                    let steps = self.section.steps
+//                    self.runningOutput.send(.responseCurrentSteps(steps))
+//                }
+//            }
+//            .store(in: &cancellables)
         
        // MARK: - OpenWeather Service
         weatherService.output
@@ -250,7 +250,7 @@ extension RunningDataProvider {
         runningTimerStart()
         
         // 운동 걸음수 측정 시작
-        pedometerManager.input.send(.requestPedometerStart)
+//        pedometerManager.input.send(.requestPedometerStart)
         
         // 정상적인으로 운동 시작
         self.runHomeOutput.send(.responseRunningStart)
@@ -285,7 +285,7 @@ extension RunningDataProvider {
         self.section.route.append(endPoint)
         
         // 운동걸음수 측정 종료
-        pedometerManager.input.send(.requestPedometerStop)
+//        pedometerManager.input.send(.requestPedometerStop)
         
         // 운동시간 측정 종료
         runningTimerStop()
