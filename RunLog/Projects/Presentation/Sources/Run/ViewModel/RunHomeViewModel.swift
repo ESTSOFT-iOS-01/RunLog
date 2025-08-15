@@ -20,7 +20,6 @@ final class RunHomeViewModel {
     
     // MARK: - Input & Output
     enum Input {
-        case requestRunningStart // 운동시작 요청
         case requestCurrentLocation
         case requestCurrentWeahter
         case requestRoadRecord
@@ -29,12 +28,12 @@ final class RunHomeViewModel {
     
     // MARK: - Output
     enum Output {
-        case responseRunningStart // 운동시작
         case locationUpdate(CLLocation) // 사용자 위치 데이터
         case locationNameUpdate(String) // 가공된 위치 데이터
         case weatherUpdate(String)  // 가공된 날씨 데이터
         case responseRoadRecord(NSMutableAttributedString) // 기록 데이터
     }
+    
     let output = PassthroughSubject<Output, Never>()
     
     // MARK: - Properties
@@ -51,9 +50,6 @@ final class RunHomeViewModel {
                 guard let self = self else { return }
                 
                 switch input {
-                // 운동시작
-                case .requestRunningStart:
-                    self.provider.input.send(.requestRunningStart)
                     
                 // 사용자의 위치 요청
                 case .requestCurrentLocation:
@@ -77,7 +73,7 @@ final class RunHomeViewModel {
                 switch output {
                 // 운동시작
                 case .responseRunningStart:
-                    self.output.send(.responseRunningStart)
+                    return
                     
                 // 사용자의 위치 요청
                 case .responseCurrentLocation(let location):
