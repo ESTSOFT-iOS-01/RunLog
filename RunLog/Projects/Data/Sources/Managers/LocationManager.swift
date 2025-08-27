@@ -58,13 +58,17 @@ extension LocationManager: CLLocationManagerDelegate {
     ) {
         guard let latestLocation = locations.last else { return }
         
+        if currentLocation.value == nil {
+            currentLocation.send(latestLocation)
+            return
+        }
+        
         // 0 이상 10이하만 통과(갑자기 확 튀는 현상 방지)
         guard latestLocation.horizontalAccuracy >= 0,
               latestLocation.horizontalAccuracy <= 10 else { return }
         
         // 노이즈 제거
         if let prev = currentLocation.value, latestLocation.distance(from: prev) < 10 { return }
-        
         currentLocation.send(latestLocation)
     }
     
@@ -80,7 +84,7 @@ extension LocationManager: CLLocationManagerDelegate {
             break
 
         @unknown default:
-            break
+            return
         }
     }
     
