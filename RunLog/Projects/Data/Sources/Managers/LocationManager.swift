@@ -16,8 +16,7 @@ import CoreLocation
 public final class LocationManager: NSObject, LocationProvider {
     
     private let locationManager = CLLocationManager()
-    private let currentLocation = PassthroughSubject<CLLocation, Never>()
-    private var previousLocation: CLLocation?
+    private let currentLocation = CurrentValueSubject<CLLocation?, Never>(nil)
     
     public override init() {
         super.init()
@@ -42,7 +41,7 @@ public final class LocationManager: NSObject, LocationProvider {
     }
     
     public var locations: AnyPublisher<CLLocation, Never> {
-        currentLocation.eraseToAnyPublisher()
+        currentLocation.compactMap { $0 }.eraseToAnyPublisher()
     }
     
     deinit {
@@ -64,26 +63,21 @@ extension LocationManager: CLLocationManagerDelegate {
               latestLocation.horizontalAccuracy <= 10 else { return }
         
         // 노이즈 제거
-        if let previousLocation, latestLocation.distance(from: previousLocation) < 10 { return }
+        if let prev = currentLocation.value, latestLocation.distance(from: prev) < 10 { return }
         
         currentLocation.send(latestLocation)
-        previousLocation = latestLocation
     }
     
     public func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        switch locationManager.authorizationStatus {
+        switch manager.authorizationStatus {
         case .notDetermined:
-            locationManager.requestWhenInUseAuthorization()
+            manager.requestWhenInUseAuthorization()
 
-        case .authorizedWhenInUse:
-            locationManager.requestAlwaysAuthorization()
-            locationManager.startUpdatingLocation()
-
-        case .authorizedAlways:
-            locationManager.startUpdatingLocation()
+        case .authorizedWhenInUse, .authorizedAlways:
+            break
 
         case .denied, .restricted:
-            locationManager.stopUpdatingLocation()
+            break
 
         @unknown default:
             break

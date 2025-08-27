@@ -44,6 +44,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         )
         
         DIContainer.shared.register(PedometerManager(), for: PedometerProvider.self)
+        DIContainer.shared.register(LocationManager(), for: LocationProvider.self)
         
         DIContainer.shared.register(
             AppConfigUseCaseImpl(appConfigRepository: appConfigRepository),

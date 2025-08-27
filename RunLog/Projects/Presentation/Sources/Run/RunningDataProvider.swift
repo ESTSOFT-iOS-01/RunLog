@@ -71,7 +71,7 @@ final class RunningDataProvider {
     private var currentIsRunning: Bool = false // 운동 상태
    
     // MARK: - Manager
-    private let locationManger = LocationManager.shared
+    //private let locationManger = LocationManager.shared
     //private let pedometerManager = PedometerManager.shared
     private let distanceManager = DistanceManager.shared
     private let drawingManager = DrawingManager.shared
@@ -100,10 +100,12 @@ extension RunningDataProvider {
                     
                 // MARK: - RunHome Request
                 case .requestCurrentLocation:
-                    locationManger.input.send(.requestCurrentLocation)
+                    //locationManger.input.send(.requestCurrentLocation)
+                    return
                 case .requestCurrentCityName:
                     guard let location = self.currentLocation else { return }
-                    locationManger.input.send(.requestCityName(location))
+                    //locationManger.input.send(.requestCityName(location))
+                    return
                 case .requestCurrentWeather:
                     guard let location = self.currentLocation else { return }
                     self.weatherService.input.send(.requestWeather(location))
@@ -114,24 +116,24 @@ extension RunningDataProvider {
             .store(in: &cancellables)
         
         // MARK: - Locaiton Manager
-        locationManger.output
-            .sink { [weak self] output in
-                guard let self = self else { return }
-                switch output {
-                case .locationUpdate(let location):
-                    self.locationUpdate(location: location)
-                case .responseCityName(let placemark):
-                    let name = placemark.placemarksToString()
-                    self.currentCity = name
-                    self.runHomeOutput.send(.responseCurrentCityName(name))
-                    // 이전과 다른 지역이면 날씨를 받아옴
-                    if name != previousCity {
-                        self.input.send(.requestCurrentWeather)
-                    }
-                    previousCity = name
-                }
-            }
-            .store(in: &cancellables)
+//        locationManger.output
+//            .sink { [weak self] output in
+//                guard let self = self else { return }
+//                switch output {
+//                case .locationUpdate(let location):
+//                    self.locationUpdate(location: location)
+//                case .responseCityName(let placemark):
+//                    let name = placemark.placemarksToString()
+//                    self.currentCity = name
+//                    self.runHomeOutput.send(.responseCurrentCityName(name))
+//                    // 이전과 다른 지역이면 날씨를 받아옴
+//                    if name != previousCity {
+//                        self.input.send(.requestCurrentWeather)
+//                    }
+//                    previousCity = name
+//                }
+//            }
+//            .store(in: &cancellables)
         
         // MARK: - Distance Manager
         distanceManager.output

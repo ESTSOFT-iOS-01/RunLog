@@ -84,12 +84,12 @@ final class RunningViewController: UIViewController {
         // binding
         bindViewModel()
         bindGesture()
+        viewModel.bind()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationController?.setNavigationBarHidden(false, animated: animated)
-        setupData()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -130,12 +130,6 @@ final class RunningViewController: UIViewController {
         }
     }
     
-    // MARK: - Setup Data
-    private func setupData() {
-        // 처음 위치를 지도에 표현
-        viewModel.input.send(.requestCurrentLocation)
-    }
-    
     // MARK: - Bind ViewModel
     private func bindViewModel() {
         viewModel.output
@@ -143,12 +137,10 @@ final class RunningViewController: UIViewController {
             .sink { [weak self] output in
                 guard let self = self else { return }
                 switch output {
-                    
                 case .currentTime(let timeString):
                     self.cardView.timeLabel.setConfigure(text: timeString)
                     
-                // 사용자의 변경된 위치 반영
-                case .locationUpdate(let location):
+                case .currentLocation(let location):
                     self.mapView.centerToLocation(location, region: self.mapView.region)
                     
                 // 운동 거리 반영

@@ -14,9 +14,6 @@ import MapKit
 
 final class RunHomeViewModel {
     
-    // MARK: - Init
-    init() { }
-    
     
     // MARK: - Input & Output
     enum Input {
@@ -28,6 +25,7 @@ final class RunHomeViewModel {
     
     // MARK: - Output
     enum Output {
+        case currentLocation(CLLocation)
         case locationUpdate(CLLocation) // 사용자 위치 데이터
         case locationNameUpdate(String) // 가공된 위치 데이터
         case weatherUpdate(String)  // 가공된 날씨 데이터
@@ -41,7 +39,13 @@ final class RunHomeViewModel {
     private var provider = RunningDataProvider.shared
     
     // MARK: - Usecase
+    @Dependency private var locationProvider: LocationProvider
     @Dependency private var appConfigUseCase: AppConfigUseCase
+    
+    // MARK: - Init
+    init() {
+        
+    }
     
     // MARK: - Binding
     func bind() {
@@ -89,6 +93,15 @@ final class RunHomeViewModel {
                     let weatherString = self.toWeatherString(weahter, aqi)
                     self.output.send(.weatherUpdate(weatherString))
                 }
+            }
+            .store(in: &cancellables)
+        
+        self.locationProvider.locations
+            .handleEvents(receiveSubscription: { [weak self] _ in
+                self?.locationProvider.startUpdating()
+            })
+            .sink { [weak self] locations in
+                self?.output.send(.currentLocation(locations))
             }
             .store(in: &cancellables)
     }

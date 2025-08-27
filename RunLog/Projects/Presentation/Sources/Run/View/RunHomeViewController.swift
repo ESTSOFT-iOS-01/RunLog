@@ -73,9 +73,9 @@ final class RunHomeViewController: UIViewController {
         setupTabBar()
         
         // binding
-        viewModel.bind()
         bindViewModel()
         bindGesture()
+        viewModel.bind()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -169,9 +169,13 @@ final class RunHomeViewController: UIViewController {
                 guard let self = self else { return }
                 
                 switch output {
+                case .currentLocation(let location):
+                    self.mapView.centerToLocation(location, region: self.mapView.region)
+                    
                     // 사용자의 변경된 위치 반영
                 case .locationUpdate(let location):
-                    self.mapView.centerToLocation(location, region: self.mapView.region)
+                    //self.mapView.centerToLocation(location, region: self.mapView.region)
+                    return
                     
                     // 사용자의 변경된 위치명 반영
                 case .locationNameUpdate(let text):
