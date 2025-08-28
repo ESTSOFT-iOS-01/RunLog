@@ -75,16 +75,29 @@ final class RunningViewModel {
         
         self.locationProvider.locations
             .scan((prev: CLLocation?(nil), total: 0.0)) { state, newLocation in
-                
                 let (prev, total) = state
                 guard let prev else { return (newLocation, 0.0) }
                 let distance = newLocation.distance(from: prev) / 1000
                 
                 return (newLocation, total + distance)
             }
-            .map { String($0.total) }
+            .map { String(format: "%.2fkm", $0.total)}
             .sink { [weak self] distance in
                 self?.output.send(.currentDistance(distance))
+            }
+            .store(in: &cancellables)
+        
+        self.locationProvider.locations
+            .scan([CLLocationCoordinate2D]()) { routes, newLocation in
+                var routes = routes
+                routes.append(newLocation.coordinate)
+                return routes
+            }
+            .compactMap { coords -> MKPolyline? in
+                MKPolyline(coordinates: coords, count: coords.count)
+            }
+            .sink { [weak self] polyline in
+                self?.output.send(.lineDraw(polyline))
             }
             .store(in: &cancellables)
     }
