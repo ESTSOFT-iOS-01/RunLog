@@ -73,8 +73,8 @@ final class RunningDataProvider {
     // MARK: - Manager
     //private let locationManger = LocationManager.shared
     //private let pedometerManager = PedometerManager.shared
-    private let distanceManager = DistanceManager.shared
-    private let drawingManager = DrawingManager.shared
+    private let distanceManager = DistanceManagerLegacy.shared
+    private let drawingManager = DrawingManagerLegacy.shared
     
     // MARK: - Service
     private let weatherService = OpenWeatherService.shared

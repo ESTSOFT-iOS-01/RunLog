@@ -9,10 +9,10 @@ import Foundation
 import MapKit
 import Combine
 
-public final class DrawingManager: NSObject, MKMapViewDelegate {
+public final class DrawingManagerLegacy: NSObject, MKMapViewDelegate {
     
     // MARK: - Singleton
-    public static let shared = DrawingManager()
+    public static let shared = DrawingManagerLegacy()
     private override init() {
         super.init()
         bind()
