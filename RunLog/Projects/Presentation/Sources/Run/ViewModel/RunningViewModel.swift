@@ -22,11 +22,11 @@ final class RunningViewModel {
     
     // MARK: - Output
     enum Output {
-        case currentTime(String)
-        case currentDistance(String)
+        case currentTime(TimeInterval)
+        case currentDistance(Double)
         case currentLocation(CLLocation) // 사용자 위치 데이터
-        case currentSteps(String) // 운동 걸음 수 데이터
-        case lineDraw(MKPolyline) // 지도에 라인을 그림
+        case currentSteps(Int) // 운동 걸음 수 데이터
+        case currentRoutes([CLLocationCoordinate2D]) // 지도에 라인을 그림
     }
     
     let output = PassthroughSubject<Output, Never>()
@@ -34,11 +34,16 @@ final class RunningViewModel {
     // MARK: - Dependency
     @Dependency private var pedometerProvider: PedometerProvider
     @Dependency private var locationProvider: LocationProvider
+    @Dependency private var dayLogUseCase: DayLogUseCase
     
     // MARK: - Properties
     private var cancellables = Set<AnyCancellable>()
     private var provider = RunningDataProvider.shared
     private var startTime: Date = .now
+    
+    private(set) var totalDistance = 0.0
+    private(set) var totalSteps = 0
+    private(set) var routes: [Point] = []
     
     // MARK: - Init
     init() {
@@ -52,7 +57,7 @@ final class RunningViewModel {
                 guard let self = self else { return }
                 switch input {
                 case .requestRunningStop:
-                    self.provider.input.send(.requestRunningStop)
+                    saveCurrentSession()
                 }
             }
             .store(in: &cancellables)
@@ -61,9 +66,9 @@ final class RunningViewModel {
             .handleEvents(receiveSubscription: { [weak self] _ in
                 self?.pedometerProvider.startPedometer()
             })
-            .map { String($0) }
             .sink { [weak self] steps in
                 self?.output.send(.currentSteps(steps))
+                self?.totalSteps = steps
             }
             .store(in: &cancellables)
         
@@ -81,23 +86,22 @@ final class RunningViewModel {
                 
                 return (newLocation, total + distance)
             }
-            .map { String(format: "%.2fkm", $0.total)}
+            .map { $0.total }
             .sink { [weak self] distance in
                 self?.output.send(.currentDistance(distance))
+                self?.totalDistance = distance
             }
             .store(in: &cancellables)
         
         self.locationProvider.locations
+            .prepend(locationProvider.locations)
             .scan([CLLocationCoordinate2D]()) { routes, newLocation in
                 var routes = routes
                 routes.append(newLocation.coordinate)
                 return routes
             }
-            .compactMap { coords -> MKPolyline? in
-                MKPolyline(coordinates: coords, count: coords.count)
-            }
-            .sink { [weak self] polyline in
-                self?.output.send(.lineDraw(polyline))
+            .sink { [weak self] routes in
+                self?.output.send(.currentRoutes(routes))
             }
             .store(in: &cancellables)
     }
@@ -111,8 +115,23 @@ private extension RunningViewModel {
             .sink{ [weak self] now in
                 guard let self = self else { return }
                 let time = now.timeIntervalSince(self.startTime)
-                self.output.send(.currentTime(time.asTimeString))
+                self.output.send(.currentTime(time))
             }
             .store(in: &cancellables)
+    }
+    
+    func saveCurrentSession() {
+        Task {
+            do {
+                let section = Section(
+                    distance: self.totalDistance,
+                    steps: self.totalSteps,
+                    route: self.routes
+                )
+                try await self.dayLogUseCase.addSectionByDate(.now, section: section)
+            } catch {
+                print(error)
+            }
+        }
     }
 }

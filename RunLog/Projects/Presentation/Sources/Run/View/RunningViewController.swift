@@ -137,21 +137,23 @@ final class RunningViewController: UIViewController {
             .sink { [weak self] output in
                 guard let self = self else { return }
                 switch output {
-                case .currentTime(let timeString):
-                    self.cardView.timeLabel.setConfigure(text: timeString)
+                case .currentTime(let time):
+                    self.cardView.timeLabel.setConfigure(text: time.asTimeString)
                     
                 case .currentLocation(let location):
                     self.mapView.centerToLocation(location, region: self.mapView.region)
                     
                 case .currentDistance(let distance):
-                    self.cardView.distanceLabel.setConfigure(text: distance)
+                    self.cardView.distanceLabel.setConfigure(
+                        text: String(format: "%.2fkm", distance)
+                    )
                     
                 case .currentSteps(let steps):
-                    self.cardView.stepsLabel.setConfigure(text: steps)
+                    self.cardView.stepsLabel.setConfigure(text: String(steps))
                 
                 // 지도에 이동한 루트 표시
-                case .lineDraw(let polyline):
-                    self.mapView.addOverlay(polyline)
+                case .currentRoutes(let routes):
+                    self.mapView.addOverlay(MKPolyline(coordinates: routes, count: routes.count))
                 }
             }
             .store(in: &cancellables)
@@ -178,6 +180,7 @@ final class RunningViewController: UIViewController {
         // 종료 버튼 클릭
         cardView.finishButton.publisher
             .sink { [weak self] in
+                self?.viewModel.input.send(.requestRunningStop)
                 self?.dismiss(animated: true)
             }
             .store(in: &cancellables)
