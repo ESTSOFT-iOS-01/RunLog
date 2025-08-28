@@ -143,11 +143,9 @@ final class RunningViewController: UIViewController {
                 case .currentLocation(let location):
                     self.mapView.centerToLocation(location, region: self.mapView.region)
                     
-                // 운동 거리 반영
-                case .responseCurrentDistances(let distances):
-                    self.cardView.distanceLabel.setConfigure(text: distances)
+                case .currentDistance(let distance):
+                    self.cardView.distanceLabel.setConfigure(text: distance)
                     
-                // 운동 걸음 수 반영
                 case .currentSteps(let steps):
                     self.cardView.stepsLabel.setConfigure(text: steps)
                 

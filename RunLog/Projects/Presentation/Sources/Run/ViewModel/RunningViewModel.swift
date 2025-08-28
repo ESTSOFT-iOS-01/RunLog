@@ -23,7 +23,7 @@ final class RunningViewModel {
     // MARK: - Output
     enum Output {
         case currentTime(String)
-        case responseCurrentDistances(String) // 운동 거리 데이터
+        case currentDistance(String)
         case currentLocation(CLLocation) // 사용자 위치 데이터
         case currentSteps(String) // 운동 걸음 수 데이터
         case lineDraw(MKPolyline) // 지도에 라인을 그림
@@ -68,9 +68,23 @@ final class RunningViewModel {
             .store(in: &cancellables)
         
         self.locationProvider.locations
-            .prepend(locationProvider.locations)
             .sink { [weak self] locations in
                 self?.output.send(.currentLocation(locations))
+            }
+            .store(in: &cancellables)
+        
+        self.locationProvider.locations
+            .scan((prev: CLLocation?(nil), total: 0.0)) { state, newLocation in
+                
+                let (prev, total) = state
+                guard let prev else { return (newLocation, 0.0) }
+                let distance = newLocation.distance(from: prev) / 1000
+                
+                return (newLocation, total + distance)
+            }
+            .map { String($0.total) }
+            .sink { [weak self] distance in
+                self?.output.send(.currentDistance(distance))
             }
             .store(in: &cancellables)
     }
