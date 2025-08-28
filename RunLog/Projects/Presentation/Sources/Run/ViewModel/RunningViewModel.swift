@@ -35,6 +35,7 @@ final class RunningViewModel {
     @Dependency private var pedometerProvider: PedometerProvider
     @Dependency private var locationProvider: LocationProvider
     @Dependency private var dayLogUseCase: DayLogUseCase
+    @Dependency private var mediaUseCase: MediaUseCase
     
     // MARK: - Properties
     private var cancellables = Set<AnyCancellable>()
@@ -57,7 +58,7 @@ final class RunningViewModel {
                 guard let self = self else { return }
                 switch input {
                 case .requestRunningStop:
-                    saveCurrentSession()
+                    saveCurrentRunning()
                 }
             }
             .store(in: &cancellables)
@@ -120,15 +121,20 @@ private extension RunningViewModel {
             .store(in: &cancellables)
     }
     
-    func saveCurrentSession() {
+    func saveCurrentRunning() {
         Task {
             do {
-                let section = Section(
-                    distance: self.totalDistance,
-                    steps: self.totalSteps,
-                    route: self.routes
-                )
-                try await self.dayLogUseCase.addSectionByDate(.now, section: section)
+                let newSection = Section(distance: totalDistance, steps: totalSteps, route: routes)
+                try await self.dayLogUseCase.addSectionByDate(.now, section: newSection)
+                if let dayLog = try await dayLogUseCase.getDayLogByDate(.now) {
+                    let datas = mediaUseCase.convertSectionsToCoordinates(sections: dayLog.sections)
+                    do {
+                        let trackImage = try await mediaUseCase.setRouteImage(route: datas)
+                        try await dayLogUseCase.updateTrackImageByDate(.now, image: trackImage)
+                    } catch {
+                        print("사진 생성 및 저장 실패 \(error.localizedDescription)")
+                    }
+                }
             } catch {
                 print(error)
             }
