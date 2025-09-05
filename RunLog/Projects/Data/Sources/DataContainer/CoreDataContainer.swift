@@ -27,7 +27,7 @@ public final class CoreDataContainer {
     }()
     
     public var context: NSManagedObjectContext {
-        return persistentContainer.viewContext
+        persistentContainer.viewContext
     }
     
 }

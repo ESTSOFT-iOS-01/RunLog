@@ -24,9 +24,9 @@ final class RunningViewModel {
     enum Output {
         case currentTime(TimeInterval)
         case currentDistance(Double)
-        case currentLocation(CLLocation) // 사용자 위치 데이터
-        case currentSteps(Int) // 운동 걸음 수 데이터
-        case currentRoutes([CLLocationCoordinate2D]) // 지도에 라인을 그림
+        case currentLocation(CLLocation)
+        case currentSteps(Int)
+        case currentRoutes([CLLocationCoordinate2D])
     }
     
     let output = PassthroughSubject<Output, Never>()
@@ -39,7 +39,6 @@ final class RunningViewModel {
     
     // MARK: - Properties
     private var cancellables = Set<AnyCancellable>()
-    private var provider = RunningDataProvider.shared
     private var startTime: Date = .now
     
     private(set) var totalDistance = 0.0
@@ -96,15 +95,26 @@ final class RunningViewModel {
         
         self.locationProvider.locations
             .prepend(locationProvider.locations)
-            .scan([CLLocationCoordinate2D]()) { routes, newLocation in
+            .scan([CLLocation]()) { routes, newLocation in
                 var routes = routes
-                routes.append(newLocation.coordinate)
+                routes.append(newLocation)
                 return routes
             }
             .sink { [weak self] routes in
-                self?.output.send(.currentRoutes(routes))
+                self?.output.send(.currentRoutes(routes.map { $0.coordinate }))
+                self?.routes = routes.map {
+                    Point(
+                        latitude: $0.coordinate.latitude,
+                        longitude: $0.coordinate.longitude,
+                        timestamp: $0.timestamp
+                    )
+                }
             }
             .store(in: &cancellables)
+    }
+    
+    deinit {
+        pedometerProvider.stopPedometer()
     }
 }
 

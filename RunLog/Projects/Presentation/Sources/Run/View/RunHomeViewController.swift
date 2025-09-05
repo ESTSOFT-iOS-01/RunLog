@@ -35,7 +35,7 @@ final class RunHomeViewController: UIViewController {
     
     private var weatherLabel = RLLabel().then {
         $0.setImage(image: UIImage(systemName: RLIcon.weather.name))
-        $0.attributedText = .RLAttributedString(text: "Roading", font: .Label2)
+        $0.attributedText = .RLAttributedString(text: "loading", font: .Label2)
     }
     
     private var blurView = MapBlurView()
@@ -80,7 +80,6 @@ final class RunHomeViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        setupData()
     }
     
     // MARK: - Setup UI
@@ -153,14 +152,6 @@ final class RunHomeViewController: UIViewController {
         self.navigationController?.setupTitle(label: titleLabel)
     }
     
-    // MARK: - Setup Data
-    private func setupData() {
-        // 사용자의 위치 정보를 요청
-        viewModel.input.send(.requestCurrentLocation)
-        // RoadRecord 정보를 요청
-        viewModel.input.send(.requestRoadRecord)
-    }
-    
     // MARK: - Bind ViewModel
     private func bindViewModel() {
         viewModel.output
@@ -172,19 +163,8 @@ final class RunHomeViewController: UIViewController {
                 case .currentLocation(let location):
                     self.mapView.centerToLocation(location, region: self.mapView.region)
                     
-                    // 사용자의 변경된 위치 반영
-                case .locationUpdate(let location):
-                    //self.mapView.centerToLocation(location, region: self.mapView.region)
-                    return
-                    
-                    // 사용자의 변경된 위치명 반영
-                case .locationNameUpdate(let text):
-                    self.locationLabel.attributedText =
-                        .RLAttributedString(
-                            text: text,
-                            font: .Label2,
-                            align: .center
-                        )
+                case .currentLocationName(let name):
+                    self.locationLabel.text = name
                     
                     // 변경된 날씨 정보 반영
                 case .weatherUpdate(let text):
@@ -210,6 +190,8 @@ final class RunHomeViewController: UIViewController {
                 let vc = RunningViewController()
                 vc.modalPresentationStyle = .fullScreen
                 self.present(vc, animated: true)
+                
+                self.viewModel.input.send(.requestRunningStart)
             }
             .store(in: &cancellables)
     }

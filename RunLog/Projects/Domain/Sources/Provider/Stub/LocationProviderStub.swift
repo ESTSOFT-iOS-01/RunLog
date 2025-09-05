@@ -21,30 +21,26 @@ public final class LocationProviderStub: LocationProvider {
         isUpdating = true
         self.play(route: [
             CLLocation(latitude: 37.5665, longitude: 126.9780),
-            CLLocation(latitude: 37.5666, longitude: 126.9782),
-            CLLocation(latitude: 37.5667, longitude: 126.9784),
-            CLLocation(latitude: 37.5668, longitude: 126.9786),
-            CLLocation(latitude: 37.5669, longitude: 126.9788),
-            CLLocation(latitude: 37.5670, longitude: 126.9790),
-            CLLocation(latitude: 37.5671, longitude: 126.9792),
-            CLLocation(latitude: 37.5672, longitude: 126.9790),
-            CLLocation(latitude: 37.5673, longitude: 126.9788),
-            CLLocation(latitude: 37.5674, longitude: 126.9786),
-            CLLocation(latitude: 37.5675, longitude: 126.9784),
-            CLLocation(latitude: 37.5676, longitude: 126.9782),
-            CLLocation(latitude: 37.5677, longitude: 126.9780),
-            CLLocation(latitude: 37.5676, longitude: 126.9778),
-            CLLocation(latitude: 37.5675, longitude: 126.9776),
-            CLLocation(latitude: 37.5674, longitude: 126.9774),
-            CLLocation(latitude: 37.5673, longitude: 126.9772),
-            CLLocation(latitude: 37.5672, longitude: 126.9770),
-            CLLocation(latitude: 37.5671, longitude: 126.9772),
-            CLLocation(latitude: 37.5670, longitude: 126.9774),
-            CLLocation(latitude: 37.5669, longitude: 126.9776),
-            CLLocation(latitude: 37.5668, longitude: 126.9778),
-            CLLocation(latitude: 37.5667, longitude: 126.9780),
-            CLLocation(latitude: 37.5666, longitude: 126.9782),
-            CLLocation(latitude: 37.5665, longitude: 126.9780)
+            CLLocation(latitude: 37.5665, longitude: 126.97805),
+            CLLocation(latitude: 37.5665, longitude: 126.97810),
+            CLLocation(latitude: 37.5665, longitude: 126.97815),
+            CLLocation(latitude: 37.5665, longitude: 126.97820),
+            CLLocation(latitude: 37.5665, longitude: 126.97825),
+            CLLocation(latitude: 37.5665, longitude: 126.97830),
+            CLLocation(latitude: 37.5665, longitude: 126.97835),
+            CLLocation(latitude: 37.5665, longitude: 126.97840),
+            CLLocation(latitude: 37.5665, longitude: 126.97845),
+            CLLocation(latitude: 37.5665, longitude: 126.97850),
+            CLLocation(latitude: 37.5665, longitude: 126.97855),
+            CLLocation(latitude: 37.5665, longitude: 126.97860),
+            CLLocation(latitude: 37.5665, longitude: 126.97865),
+            CLLocation(latitude: 37.5665, longitude: 126.97870),
+            CLLocation(latitude: 37.5665, longitude: 126.97875),
+            CLLocation(latitude: 37.5665, longitude: 126.97880),
+            CLLocation(latitude: 37.5665, longitude: 126.97885),
+            CLLocation(latitude: 37.5665, longitude: 126.97890),
+            CLLocation(latitude: 37.5665, longitude: 126.97895),
+            CLLocation(latitude: 37.5665, longitude: 126.97900)
         ])
     }
     
@@ -58,7 +54,7 @@ public final class LocationProviderStub: LocationProvider {
         subject.eraseToAnyPublisher()
     }
     
-    private func play(route: [CLLocation], interval: TimeInterval = 1) {
+    private func play(route: [CLLocation], interval: TimeInterval = 2) {
         task?.cancel()
         guard isUpdating else { return }
         task = Task {

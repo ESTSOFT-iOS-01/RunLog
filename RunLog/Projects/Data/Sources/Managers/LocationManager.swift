@@ -68,7 +68,7 @@ extension LocationManager: CLLocationManagerDelegate {
               latestLocation.horizontalAccuracy <= 10 else { return }
         
         // 노이즈 제거
-        if let prev = currentLocation.value, latestLocation.distance(from: prev) < 10 { return }
+        if let prev = currentLocation.value, latestLocation.distance(from: prev) < 1 { return }
         currentLocation.send(latestLocation)
     }
     

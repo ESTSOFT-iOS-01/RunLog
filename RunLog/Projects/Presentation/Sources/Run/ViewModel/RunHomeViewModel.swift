@@ -17,34 +17,32 @@ final class RunHomeViewModel {
     
     // MARK: - Input & Output
     enum Input {
-        case requestCurrentLocation
-        case requestCurrentWeahter
-        case requestRoadRecord
+        case requestRunningStart
     }
     let input = PassthroughSubject<Input, Never>()
     
     // MARK: - Output
     enum Output {
         case currentLocation(CLLocation)
-        case locationUpdate(CLLocation) // 사용자 위치 데이터
-        case locationNameUpdate(String) // 가공된 위치 데이터
-        case weatherUpdate(String)  // 가공된 날씨 데이터
-        case responseRoadRecord(NSMutableAttributedString) // 기록 데이터
+        case currentLocationName(String)
+        case weatherUpdate(String)  // TODO: 수정해야함
+        case responseRoadRecord(NSMutableAttributedString) // TODO: 수정해야함
     }
     
     let output = PassthroughSubject<Output, Never>()
     
     // MARK: - Properties
     private var cancellables = Set<AnyCancellable>()
-    private var provider = RunningDataProvider.shared
+    private(set) var currentLocationName: String = ""
     
     // MARK: - Usecase
     @Dependency private var locationProvider: LocationProvider
+    @Dependency private var dayLogUseCase: DayLogUseCase
     @Dependency private var appConfigUseCase: AppConfigUseCase
     
     // MARK: - Init
     init() {
-        
+        self.getDistanceIndicator()
     }
     
     // MARK: - Binding
@@ -54,54 +52,42 @@ final class RunHomeViewModel {
                 guard let self = self else { return }
                 
                 switch input {
+                    case .requestRunningStart:
                     
-                // 사용자의 위치 요청
-                case .requestCurrentLocation:
-                    self.provider.input.send(.requestCurrentLocation)
-                    
-                // 사용자의 위치에 대한 날씨 요청
-                case .requestCurrentWeahter:
-                    self.provider.input.send(.requestCurrentWeather)
-                    
-                // RoadRecord 정보 요청
-                case .requestRoadRecord:
-                    self.getDistanceIndicator()
+                    Task {
+                        do {
+                            try await self.dayLogUseCase.initializeDayLog(
+                                locationName: self.currentLocationName,
+                                weather: 0, // TODO: 수정해야함
+                                temperature: 0.0 // TODO: 수정해야함
+                            )
+                        } catch {
+                            print(error)
+                        }
+                    }
                 }
             }
             .store(in: &cancellables)
         
-        // ViewModel에서 필요한 정보는 provider에서 주입
-        provider.runHomeOutput
-            .sink { [weak self] output in
-                guard let self = self else { return }
-                switch output {
-                // 운동시작
-                case .responseRunningStart:
-                    return
-                    
-                // 사용자의 위치 요청
-                case .responseCurrentLocation(let location):
-                    self.output.send(.locationUpdate(location))
-                    
-                // 사용자의 위치에 대한 도시명 요청
-                case .responseCurrentCityName(let name):
-                    let updateName = name.hasSuffix("...") ? name : "\(name)에서"
-                    self.output.send(.locationNameUpdate(updateName))
-                    
-                // 사용자의 위치에 대한 날씨 요청
-                case .responseCurrentWeather(let weahter, let aqi):
-                    let weatherString = self.toWeatherString(weahter, aqi)
-                    self.output.send(.weatherUpdate(weatherString))
-                }
-            }
-            .store(in: &cancellables)
         
         self.locationProvider.locations
             .handleEvents(receiveSubscription: { [weak self] _ in
                 self?.locationProvider.startUpdating()
             })
             .sink { [weak self] locations in
-                self?.output.send(.currentLocation(locations))
+                guard let self = self else { return }
+                
+                self.output.send(.currentLocation(locations))
+                
+                Task {
+                    do {
+                        let locationName = try await self.fetchCityName(from: locations)
+                        self.currentLocationName = locationName
+                        self.output.send(.currentLocationName(locationName))
+                    } catch {
+                        print(error)
+                    }
+                }
             }
             .store(in: &cancellables)
     }
@@ -122,10 +108,29 @@ extension RunHomeViewModel {
         }
         return formattedString
     }
-}
+    
+    private func fetchCityName(from location: CLLocation) async throws -> String {
+        let geocoder = CLGeocoder()
+        let placemarks = try await geocoder.reverseGeocodeLocation(location)
 
-// MARK: - Road Data 받아옴
-extension RunHomeViewModel {
+        guard let placemark = placemarks.first else {
+            throw NSError(domain: "GeoError", code: 0)
+        }
+
+        let city = placemark.locality
+            ?? placemark.subAdministrativeArea
+            ?? placemark.administrativeArea
+            ?? ""
+
+        let district = placemark.subLocality ?? ""
+
+        if !city.isEmpty && !district.isEmpty {
+            return "\(city) \(district)"
+        } else {
+            return city.isEmpty ? district : city
+        }
+    }
+    
     private func getDistanceIndicator() {
         Task {
             let nickname = try await appConfigUseCase.getNickname()
